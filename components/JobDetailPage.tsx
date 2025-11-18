@@ -1,10 +1,6 @@
-import svgPaths from "../imports/svg-hi6hpjx1gr";
 import { Twitter, Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
-
-// Placeholder image
-const imgYuzu = "https://placehold.co/200x200/1a1a1a/808080?text=Yuzu";
 
 interface JobDetailPageProps {
   onBack: () => void;

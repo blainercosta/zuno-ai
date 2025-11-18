@@ -1,11 +1,7 @@
 import { useRef, useEffect } from "react";
-import svgPaths from "../imports/svg-h8b310i3fd";
 import { useJobs } from "@/hooks/useJobs";
 import { formatRelativeDate } from "@/utils/date";
 import type { Job } from "@/types/job";
-
-// Placeholder image
-const imgYuzu = "https://placehold.co/200x200/1a1a1a/808080?text=Yuzu";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -13,92 +9,7 @@ interface JobsPageProps {
   onNewsClick?: () => void;
 }
 
-const BASE_JOBS_DATA = [
-  {
-    id: 1,
-    title: "Designer",
-    company: "Yuzu",
-    location: "São Paulo, SP",
-    type: "Tempo integral",
-    level: "Pleno",
-    salary: "R$ 8.000 - 12.000 / mês",
-    posted: "há 1 mês",
-    logo: imgYuzu,
-    logoType: "image" as const
-  },
-  {
-    id: 2,
-    title: "Product Designer Sênior",
-    company: "Phantom",
-    location: "Remoto",
-    type: "Remoto · Tempo integral",
-    level: "Sênior",
-    salary: "R$ 15.000 - 20.000 / mês",
-    posted: "há 2 meses",
-    logoColor: "#AB9FF2",
-    logoType: "svg" as const
-  },
-  {
-    id: 3,
-    title: "Product Designer",
-    company: "Carberry & Hanrahan",
-    location: "Rio de Janeiro, RJ",
-    type: "Tempo integral",
-    level: "Pleno",
-    salary: "R$ 9.000 - 14.000 / mês",
-    posted: "há 2 meses",
-    logoType: "initials" as const,
-    initials: "CH",
-    logoColor: "#10b981"
-  },
-  {
-    id: 4,
-    title: "Designer de Marca",
-    company: "Titan",
-    location: "Remoto",
-    type: "Tempo integral",
-    level: "Júnior",
-    salary: "R$ 5.000 - 8.000 / mês",
-    posted: "há 3 meses",
-    logoType: "initials" as const,
-    initials: "T",
-    logoColor: "#ef4444"
-  }
-];
-
-// Função para gerar mais vagas simuladas
-const generateMoreJobs = (startId: number, count: number) => {
-  const jobs = [];
-  const companies = ["Yuzu", "Phantom", "Carberry & Hanrahan", "Titan", "TechCorp", "DesignHub"];
-  const titles = ["Designer", "Product Designer", "UI Designer", "UX Designer", "Design Lead", "Senior Designer"];
-  const locations = ["São Paulo, SP", "Rio de Janeiro, RJ", "Remoto", "Belo Horizonte, MG", "Porto Alegre, RS"];
-  const levels = ["Júnior", "Pleno", "Sênior"];
-  const colors = ["#AB9FF2", "#10b981", "#ef4444", "#3b82f6", "#f59e0b"];
-
-  for (let i = 0; i < count; i++) {
-    const id = startId + i;
-    const companyIndex = id % companies.length;
-    const useInitials = id % 3 !== 0;
-
-    jobs.push({
-      id,
-      title: titles[id % titles.length],
-      company: companies[companyIndex],
-      location: locations[id % locations.length],
-      type: id % 2 === 0 ? "Tempo integral" : "Remoto · Tempo integral",
-      level: levels[id % levels.length],
-      salary: `R$ ${5000 + (id % 10) * 1000} - ${10000 + (id % 10) * 2000} / mês`,
-      posted: `há ${Math.floor(id / 4) + 1} ${id % 4 === 0 ? 'mês' : 'meses'}`,
-      logoType: useInitials ? ("initials" as const) : ("svg" as const),
-      initials: useInitials ? companies[companyIndex].substring(0, 2).toUpperCase() : undefined,
-      logoColor: colors[id % colors.length]
-    });
-  }
-
-  return jobs;
-};
-
-export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: JobsPageProps) {
+export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) {
   const { jobs, isLoading, hasMore, loadMore } = useJobs();
   const observerTarget = useRef<HTMLDivElement>(null);
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import svgPaths from "./imports/svg-shvcwjgnc";
 import svgPathsModal from "./imports/svg-rto7qlii0f";
 import JobsPage from "./components/JobsPage";
