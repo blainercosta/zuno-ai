@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { formatRelativeDate } from "@/utils/date";
 import type { Job } from "@/types/job";
+import Footer from "./Footer";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -146,6 +147,9 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

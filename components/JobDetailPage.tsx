@@ -1,6 +1,7 @@
 import { Twitter, Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
+import Footer from "./Footer";
 
 interface JobDetailPageProps {
   onBack: () => void;
@@ -261,6 +262,9 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
             </div>
           </aside>
         </div>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
