@@ -1,0 +1,33 @@
+/* Typography System */
+
+/* Job Card Typography */
+.job-title {
+  font-size: 18px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.job-company {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.job-details {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.job-posted {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+
+.job-button {
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 500;
+}
