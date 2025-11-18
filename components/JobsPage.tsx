@@ -6,7 +6,6 @@ import type { Job } from "@/types/job";
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
   onPostJobClick: () => void;
-  onNewsClick?: () => void;
 }
 
 export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) {
@@ -56,42 +55,7 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
             >
               Publicar vaga grátis
             </button>
-            {false && onNewsClick && (
-              <button
-                onClick={onNewsClick}
-                className="px-6 py-3 border border-zinc-800 rounded-xl hover:bg-zinc-900 transition-colors text-[15px] leading-[15px]"
-              >
-                Receber vagas no whatsapp
-              </button>
-            )}
           </div>
-
-          {false && (
-            <div className="flex flex-col items-center gap-6">
-              <p className="text-[15px] leading-[22.5px] text-zinc-400">Contrataram aqui</p>
-              <div className="flex items-center gap-6 sm:gap-8">
-                {/* Whop Logo */}
-                <svg className="h-[22px] w-auto" fill="none" viewBox="0 0 105 23">
-                  <path d={svgPaths.p1ed0a600} fill="#71717A" />
-                </svg>
-
-                {/* Attio Logo */}
-                <svg className="h-[24px] w-auto" fill="none" viewBox="0 0 96 24">
-                  <path d="M3.9456 0H0V3.948H3.9456V0Z" fill="#71717A" />
-                  <path clipRule="evenodd" d={svgPaths.p190cfc80} fill="#71717A" fillRule="evenodd" />
-                  <path d={svgPaths.p32995a00} fill="#71717A" />
-                  <path clipRule="evenodd" d={svgPaths.p3c9d3100} fill="#71717A" fillRule="evenodd" />
-                  <path d={svgPaths.p2571ed00} fill="#71717A" />
-                </svg>
-
-                {/* Lindy Logo */}
-                <svg className="h-[22px] w-auto" fill="none" viewBox="0 0 84 22">
-                  <path d={svgPaths.p25988cb0} fill="#71717A" />
-                  <path d={svgPaths.p15dfb670} fill="#71717A" />
-                </svg>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

@@ -65,7 +65,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
       // Gerar job_id único baseado no timestamp
       const job_id = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('vagas_ia')
         .insert([{
           job_id,

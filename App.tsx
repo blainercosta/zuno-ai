@@ -220,7 +220,6 @@ export default function App() {
             <JobsPage
               onJobClick={handleJobClick}
               onPostJobClick={handlePostJobClick}
-              onNewsClick={handleNewsClick}
             />
           ) : (
             <div className="py-4 md:py-5 lg:py-5">
