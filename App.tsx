@@ -5,6 +5,8 @@ import JobsPage from "./components/JobsPage";
 import JobDetailPage from "./components/JobDetailPage";
 import PostJobPage from "./components/PostJobPage";
 import NewsPage from "./components/NewsPage";
+import { supabase } from "@/lib/supabase";
+import type { Job } from "@/types/job";
 
 // Placeholder images
 const imgFrame2 = "https://placehold.co/800x600/1a1a1a/808080?text=Project+Preview";
@@ -34,14 +36,62 @@ const USERS = [
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<"home" | "jobs" | "job-detail" | "post-job" | "news">("jobs");
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [activeFilter, setActiveFilter] = useState("All");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [isLoadingJob, setIsLoadingJob] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Função para buscar vaga por job_id
+  const fetchJobById = useCallback(async (jobId: string) => {
+    setIsLoadingJob(true);
+    try {
+      const { data, error } = await supabase
+        .from('vagas_ia')
+        .select('*')
+        .eq('job_id', jobId)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setSelectedJob(data as Job);
+        setCurrentPage('job-detail');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar vaga:', error);
+      setCurrentPage('jobs');
+    } finally {
+      setIsLoadingJob(false);
+    }
+  }, []);
+
+  // Detecta job_id na URL ao carregar a página
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get('job');
+
+    if (jobId) {
+      fetchJobById(jobId);
+    }
+  }, [fetchJobById]);
+
+  // Atualiza URL quando navegar para uma vaga
+  const updateURL = useCallback((jobId: string | null) => {
+    const url = new URL(window.location.href);
+
+    if (jobId) {
+      url.searchParams.set('job', jobId);
+    } else {
+      url.searchParams.delete('job');
+    }
+
+    window.history.pushState({}, '', url.toString());
+  }, []);
 
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
@@ -64,14 +114,31 @@ export default function App() {
     }
   }, []);
 
-  const handleJobClick = useCallback((job: any) => {
+  const handleJobClick = useCallback((job: Job) => {
     setSelectedJob(job);
     setCurrentPage("job-detail");
-  }, []);
-  const handlePostJobClick = useCallback(() => setCurrentPage("post-job"), []);
-  const handleNewsClick = useCallback(() => setCurrentPage("news"), []);
-  const handleBackToJobs = useCallback(() => setCurrentPage("jobs"), []);
-  const handleBackToHome = useCallback(() => setCurrentPage("home"), []);
+    updateURL(job.job_id);
+  }, [updateURL]);
+
+  const handlePostJobClick = useCallback(() => {
+    setCurrentPage("post-job");
+    updateURL(null);
+  }, [updateURL]);
+
+  const handleNewsClick = useCallback(() => {
+    setCurrentPage("news");
+    updateURL(null);
+  }, [updateURL]);
+
+  const handleBackToJobs = useCallback(() => {
+    setCurrentPage("jobs");
+    updateURL(null);
+  }, [updateURL]);
+
+  const handleBackToHome = useCallback(() => {
+    setCurrentPage("home");
+    updateURL(null);
+  }, [updateURL]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -81,6 +148,21 @@ export default function App() {
       return () => container.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
+
+  // Loading state quando busca vaga via URL
+  if (isLoadingJob) {
+    return (
+      <div className="min-h-screen bg-[#09090b] text-white dark flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <svg className="animate-spin size-8 text-zinc-600" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+            <path className="opacity-60" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <p className="text-zinc-500">Carregando vaga...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white dark">
