@@ -61,6 +61,8 @@ export default function App() {
       if (data) {
         setSelectedJob(data as Job);
         setCurrentPage('job-detail');
+        // Scroll para o topo quando carrega vaga via URL
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       console.error('Erro ao buscar vaga:', error);
@@ -118,6 +120,8 @@ export default function App() {
     setSelectedJob(job);
     setCurrentPage("job-detail");
     updateURL(job.job_id);
+    // Scroll para o topo da página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [updateURL]);
 
   const handlePostJobClick = useCallback(() => {
