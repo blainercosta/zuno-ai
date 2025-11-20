@@ -82,7 +82,7 @@ export default function JobStructuredData({ job }: JobStructuredDataProps) {
     const cleanedData = JSON.parse(JSON.stringify(structuredData))
 
     // Cria ou atualiza o script tag
-    let script = document.getElementById('job-structured-data')
+    let script = document.getElementById('job-structured-data') as HTMLScriptElement | null
     if (!script) {
       script = document.createElement('script')
       script.id = 'job-structured-data'
