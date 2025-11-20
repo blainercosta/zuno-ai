@@ -8,7 +8,8 @@ import {
   getWhatsAppShareUrl,
   getTwitterShareUrl,
   getFacebookShareUrl,
-  getLinkedInShareUrl
+  getLinkedInShareUrl,
+  getJobShareUrl
 } from "@/utils/tracking";
 
 interface JobDetailPageProps {
@@ -19,6 +20,10 @@ interface JobDetailPageProps {
 
 export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPageProps) {
   const { similarJobs, isLoading: loadingSimilar } = useSimilarJobs(job, 3);
+
+  // Gera a URL compartilhável para esta vaga
+  const jobUrl = job ? getJobShareUrl(job.job_id) : ''
+
   if (!job) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -199,28 +204,28 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               <h3 className="text-base leading-[24px] mb-4">Compartilhar vaga</h3>
               <div className="flex gap-4">
                 <button
-                  onClick={() => window.open(getTwitterShareUrl(job.job_title, job.company_name, window.location.href), '_blank')}
+                  onClick={() => window.open(getTwitterShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}
                   className="text-zinc-600 hover:text-white transition-colors"
                   title="Compartilhar no Twitter"
                 >
                   <Twitter className="size-5" />
                 </button>
                 <button
-                  onClick={() => window.open(getWhatsAppShareUrl(job.job_title, job.company_name, window.location.href), '_blank')}
+                  onClick={() => window.open(getWhatsAppShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}
                   className="text-zinc-600 hover:text-white transition-colors"
                   title="Compartilhar no WhatsApp"
                 >
                   <Mail className="size-5" />
                 </button>
                 <button
-                  onClick={() => window.open(getFacebookShareUrl(window.location.href), '_blank')}
+                  onClick={() => window.open(getFacebookShareUrl(jobUrl), '_blank')}
                   className="text-zinc-600 hover:text-white transition-colors"
                   title="Compartilhar no Facebook"
                 >
                   <Facebook className="size-5" />
                 </button>
                 <button
-                  onClick={() => window.open(getLinkedInShareUrl(window.location.href, job.job_title), '_blank')}
+                  onClick={() => window.open(getLinkedInShareUrl(jobUrl, job.job_title), '_blank')}
                   className="text-zinc-600 hover:text-white transition-colors"
                   title="Compartilhar no LinkedIn"
                 >
@@ -228,7 +233,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 </button>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.href}?utm_source=direct&utm_medium=share&utm_campaign=zuno`)
+                    navigator.clipboard.writeText(`${jobUrl}?utm_source=direct&utm_medium=share&utm_campaign=zuno`)
                     alert('Link copiado! Compartilhe a vaga do Zuno AI 🤖')
                   }}
                   className="text-zinc-600 hover:text-white transition-colors"

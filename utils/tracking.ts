@@ -11,6 +11,14 @@ export interface UTMParams {
 }
 
 /**
+ * Gera a URL completa para uma vaga específica
+ */
+export function getJobShareUrl(jobId: string): string {
+  const baseUrl = window.location.origin
+  return `${baseUrl}?job=${jobId}`
+}
+
+/**
  * Adiciona parâmetros UTM a uma URL
  */
 export function addUTMParams(url: string, params: UTMParams): string {
