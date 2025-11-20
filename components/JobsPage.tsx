@@ -94,11 +94,6 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
 
       {/* Jobs List */}
       <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        {/* H2 semântico para SEO e estrutura */}
-        <h2 className="text-[24px] leading-[32px] mb-8 text-center">
-          Últimas Vagas de IA Publicadas
-        </h2>
-
         <div className="space-y-4">
           {jobs.map((job) => (
             <article
