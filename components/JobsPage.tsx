@@ -42,16 +42,16 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
   // FAQs para Rich Snippets (aparecem no Google)
   const faqs = [
     {
+      question: 'O que é o Zuno AI?',
+      answer: 'Zuno AI é o maior hub de Inteligência Artificial do Brasil. Conectamos profissionais de IA com vagas, cursos, comunidade e recursos para desenvolvimento de carreira.'
+    },
+    {
       question: 'Como encontrar vagas de IA no Brasil?',
-      answer: 'No Zuno AI você encontra vagas de Inteligência Artificial de empresas verificadas, com salários transparentes e oportunidades reais em Machine Learning, Deep Learning e Data Science.'
+      answer: 'No Zuno AI você encontra vagas de Inteligência Artificial generalista de empresas verificadas, com salários transparentes e oportunidades reais em todas as áreas de IA.'
     },
     {
-      question: 'As vagas de IA no Zuno são gratuitas?',
-      answer: 'Sim! Todas as vagas de Inteligência Artificial no Zuno AI são 100% gratuitas para candidatos. Empresas podem publicar vagas gratuitamente também.'
-    },
-    {
-      question: 'Quais tipos de vagas de IA estão disponíveis?',
-      answer: 'Oferecemos vagas em Machine Learning, Deep Learning, Data Science, NLP, Computer Vision, MLOps e outras áreas de Inteligência Artificial.'
+      question: 'O Zuno AI é gratuito?',
+      answer: 'Sim! O hub Zuno AI é 100% gratuito para profissionais. Acesse vagas, participe da comunidade e explore recursos sem custos.'
     }
   ]
 
@@ -72,11 +72,13 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
       <div className="max-w-[968px] mx-auto px-24 pt-20 pb-16 sm:pt-24 sm:pb-24">
         <div className="text-center">
           <h1 className="text-[32px] sm:text-[48px] leading-[1.2] mb-6">
-            Vagas de Inteligência Artificial no Brasil | Machine Learning & Data Science
+            Vagas de IA para profissionais<br />
+            no Brasil
           </h1>
 
-          <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[600px] mx-auto">
-            Encontre as melhores oportunidades em IA, Machine Learning e Data Science. Empresas verificadas, salários transparentes e vagas 100% reais.
+          <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[480px] mx-auto">
+            Empresas verificadas. Salários transparentes.<br />
+            Oportunidades reais em IA.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">

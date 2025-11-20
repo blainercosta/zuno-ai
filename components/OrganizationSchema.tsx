@@ -12,7 +12,7 @@ export default function OrganizationSchema() {
       name: 'Zuno AI',
       url: 'https://zuno.ai',
       logo: 'https://zuno.ai/zuno-ai.svg',
-      description: 'Plataforma de vagas de Inteligência Artificial no Brasil. Conectamos profissionais de IA com empresas inovadoras.',
+      description: 'O maior hub de Inteligência Artificial do Brasil. Conectamos profissionais de IA com empresas, cursos, comunidade e recursos.',
       foundingDate: '2024',
       address: {
         '@type': 'PostalAddress',
