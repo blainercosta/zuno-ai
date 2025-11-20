@@ -12,11 +12,32 @@ export function formatRelativeDate(dateString: string | null): string {
 
   const now = new Date()
   const diffInMs = now.getTime() - date.getTime()
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
 
-  if (diffInDays === 0) {
-    return 'hoje'
-  } else if (diffInDays === 1) {
+  // Menos de 1 hora - mostrar minutos
+  if (diffInMinutes < 60) {
+    if (diffInMinutes === 0) {
+      return 'agora'
+    } else if (diffInMinutes === 1) {
+      return 'há 1 minuto'
+    } else {
+      return `há ${diffInMinutes} minutos`
+    }
+  }
+
+  // Menos de 1 dia - mostrar horas
+  if (diffInHours < 24) {
+    if (diffInHours === 1) {
+      return 'há 1 hora'
+    } else {
+      return `há ${diffInHours} horas`
+    }
+  }
+
+  // Mais de 1 dia
+  if (diffInDays === 1) {
     return 'há 1 dia'
   } else if (diffInDays < 7) {
     return `há ${diffInDays} dias`
