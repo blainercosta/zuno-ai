@@ -3,6 +3,7 @@ import { useJobs } from "@/hooks/useJobs";
 import { formatRelativeDate } from "@/utils/date";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
+import { getJobApplicationUrl } from "@/utils/tracking";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -103,7 +104,7 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
                     className="bg-white text-slate-950 px-4 py-2.5 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[14px] leading-[14px]"
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(job.job_url, '_blank');
+                      window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
                     }}
                   >
                     Candidatar
@@ -116,7 +117,7 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
                     className="bg-white text-slate-950 px-4 py-2.5 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[14px] leading-[14px]"
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(job.job_url, '_blank');
+                      window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
                     }}
                   >
                     Candidatar

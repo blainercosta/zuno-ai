@@ -2,6 +2,14 @@ import { Twitter, Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-reac
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
+import JobStructuredData from "./JobStructuredData";
+import {
+  getJobApplicationUrl,
+  getWhatsAppShareUrl,
+  getTwitterShareUrl,
+  getFacebookShareUrl,
+  getLinkedInShareUrl
+} from "@/utils/tracking";
 
 interface JobDetailPageProps {
   onBack: () => void;
@@ -19,7 +27,11 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
     );
   }
   return (
-    <div className="flex min-h-screen">
+    <>
+      {/* Structured Data para SEO */}
+      <JobStructuredData job={job} />
+
+      <div className="flex min-h-screen">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -140,7 +152,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
 
               {/* Apply Button */}
               <button
-                onClick={() => window.open(job.job_url, '_blank')}
+                onClick={() => window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank')}
                 className="bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors mb-8"
               >
                 Candidatar-se
@@ -175,7 +187,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 </div>
               </div>
               <button
-                onClick={() => window.open(job.job_url, '_blank')}
+                onClick={() => window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank')}
                 className="w-full bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors"
               >
                 Candidatar-se
@@ -186,19 +198,42 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
             <div className="border-t border-zinc-800 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
               <h3 className="text-base leading-[24px] mb-4">Compartilhar vaga</h3>
               <div className="flex gap-4">
-                <button className="text-zinc-600 hover:text-white transition-colors">
+                <button
+                  onClick={() => window.open(getTwitterShareUrl(job.job_title, job.company_name, window.location.href), '_blank')}
+                  className="text-zinc-600 hover:text-white transition-colors"
+                  title="Compartilhar no Twitter"
+                >
                   <Twitter className="size-5" />
                 </button>
-                <button className="text-zinc-600 hover:text-white transition-colors">
+                <button
+                  onClick={() => window.open(getWhatsAppShareUrl(job.job_title, job.company_name, window.location.href), '_blank')}
+                  className="text-zinc-600 hover:text-white transition-colors"
+                  title="Compartilhar no WhatsApp"
+                >
                   <Mail className="size-5" />
                 </button>
-                <button className="text-zinc-600 hover:text-white transition-colors">
+                <button
+                  onClick={() => window.open(getFacebookShareUrl(window.location.href), '_blank')}
+                  className="text-zinc-600 hover:text-white transition-colors"
+                  title="Compartilhar no Facebook"
+                >
                   <Facebook className="size-5" />
                 </button>
-                <button className="text-zinc-600 hover:text-white transition-colors">
+                <button
+                  onClick={() => window.open(getLinkedInShareUrl(window.location.href, job.job_title), '_blank')}
+                  className="text-zinc-600 hover:text-white transition-colors"
+                  title="Compartilhar no LinkedIn"
+                >
                   <Linkedin className="size-5" />
                 </button>
-                <button className="text-zinc-600 hover:text-white transition-colors">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.href}?utm_source=direct&utm_medium=share&utm_campaign=zuno`)
+                    alert('Link copiado! Compartilhe a vaga do Zuno AI 🤖')
+                  }}
+                  className="text-zinc-600 hover:text-white transition-colors"
+                  title="Copiar link"
+                >
                   <LinkIcon className="size-5" />
                 </button>
               </div>
@@ -267,5 +302,6 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
         <Footer />
       </div>
     </div>
+    </>
   );
 }
