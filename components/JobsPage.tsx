@@ -4,6 +4,9 @@ import { formatRelativeDate } from "@/utils/date";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
 import { getJobApplicationUrl } from "@/utils/tracking";
+import OrganizationSchema from "./OrganizationSchema";
+import BreadcrumbSchema from "./BreadcrumbSchema";
+import FAQSchema from "./FAQSchema";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -35,19 +38,45 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
       }
     };
   }, [loadMore, hasMore, isLoading]);
+
+  // FAQs para Rich Snippets (aparecem no Google)
+  const faqs = [
+    {
+      question: 'Como encontrar vagas de IA no Brasil?',
+      answer: 'No Zuno AI você encontra vagas de Inteligência Artificial de empresas verificadas, com salários transparentes e oportunidades reais em Machine Learning, Deep Learning e Data Science.'
+    },
+    {
+      question: 'As vagas de IA no Zuno são gratuitas?',
+      answer: 'Sim! Todas as vagas de Inteligência Artificial no Zuno AI são 100% gratuitas para candidatos. Empresas podem publicar vagas gratuitamente também.'
+    },
+    {
+      question: 'Quais tipos de vagas de IA estão disponíveis?',
+      answer: 'Oferecemos vagas em Machine Learning, Deep Learning, Data Science, NLP, Computer Vision, MLOps e outras áreas de Inteligência Artificial.'
+    }
+  ]
+
+  // Breadcrumb para melhorar SEO
+  const breadcrumbs = [
+    { name: 'Início', url: 'https://zuno.ai' },
+    { name: 'Vagas de IA', url: 'https://zuno.ai/vagas' }
+  ]
+
   return (
     <div className="w-full">
+      {/* SEO Schemas */}
+      <OrganizationSchema />
+      <BreadcrumbSchema items={breadcrumbs} />
+      <FAQSchema faqs={faqs} />
+
       {/* Hero Section */}
       <div className="max-w-[968px] mx-auto px-24 pt-20 pb-16 sm:pt-24 sm:pb-24">
         <div className="text-center">
           <h1 className="text-[32px] sm:text-[48px] leading-[1.2] mb-6">
-            Vagas de IA para profissionais<br />
-            no Brasil
+            Vagas de Inteligência Artificial no Brasil | Machine Learning & Data Science
           </h1>
 
-          <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[480px] mx-auto">
-            Empresas verificadas. Salários transparentes.<br />
-            Oportunidades reais em IA.
+          <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[600px] mx-auto">
+            Encontre as melhores oportunidades em IA, Machine Learning e Data Science. Empresas verificadas, salários transparentes e vagas 100% reais.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
@@ -63,6 +92,11 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
 
       {/* Jobs List */}
       <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* H2 semântico para SEO e estrutura */}
+        <h2 className="text-[24px] leading-[32px] mb-8 text-center">
+          Últimas Vagas de IA Publicadas
+        </h2>
+
         <div className="space-y-4">
           {jobs.map((job) => (
             <article
