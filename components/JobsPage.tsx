@@ -11,9 +11,10 @@ import FAQSchema from "./FAQSchema";
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
   onPostJobClick: () => void;
+  onNewsClick?: () => void;
 }
 
-export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) {
+export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: JobsPageProps) {
   const { jobs, isLoading, hasMore, loadMore } = useJobs();
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -88,6 +89,14 @@ export default function JobsPage({ onJobClick, onPostJobClick }: JobsPageProps) 
             >
               Publicar vaga grátis
             </button>
+            {onNewsClick && (
+              <button
+                onClick={onNewsClick}
+                className="bg-zinc-800 text-white px-6 py-3 rounded-xl border border-zinc-700 hover:bg-zinc-700 transition-colors text-[15px] leading-[15px]"
+              >
+                Ver Notícias
+              </button>
+            )}
           </div>
         </div>
       </div>
