@@ -5,6 +5,7 @@ import JobsPage from "./components/JobsPage";
 import JobDetailPage from "./components/JobDetailPage";
 import PostJobPage from "./components/PostJobPage";
 import NewsPage from "./components/NewsPage";
+import NewsDetailPage from "./components/NewsDetailPage";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
 
@@ -35,8 +36,9 @@ const USERS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<"home" | "jobs" | "job-detail" | "post-job" | "news">("jobs");
+  const [currentPage, setCurrentPage] = useState<"home" | "jobs" | "job-detail" | "post-job" | "news" | "news-detail">("jobs");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedNewsId, setSelectedNewsId] = useState<number | null>(null);
   const [activeFilter, setActiveFilter] = useState("All");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -143,6 +145,17 @@ export default function App() {
     setCurrentPage("home");
     updateURL(null);
   }, [updateURL]);
+
+  const handleNewsDetailClick = useCallback((newsId: number) => {
+    setSelectedNewsId(newsId);
+    setCurrentPage("news-detail");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleBackToNews = useCallback(() => {
+    setCurrentPage("news");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -287,8 +300,10 @@ export default function App() {
 
         {/* Main Content */}
         <main className="flex-1 min-w-0">
-          {currentPage === "news" ? (
-            <NewsPage onNewsClick={(id) => console.log("News clicked:", id)} />
+          {currentPage === "news-detail" ? (
+            <NewsDetailPage newsId={selectedNewsId || 1} onBack={handleBackToNews} />
+          ) : currentPage === "news" ? (
+            <NewsPage onNewsClick={handleNewsDetailClick} />
           ) : currentPage === "post-job" ? (
             <PostJobPage onBack={handleBackToJobs} />
           ) : currentPage === "job-detail" ? (
