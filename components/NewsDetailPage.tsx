@@ -181,6 +181,9 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           <img
             src={news.image}
             alt={news.title}
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
             className="w-full aspect-[16/9] object-cover"
           />
         </div>

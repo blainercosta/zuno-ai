@@ -213,6 +213,8 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
                 <img
                   src={news.image}
                   alt={news.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 shadow-[0px_0px_0px_1px_inset_rgba(0,0,0,0.05)]" />
