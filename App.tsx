@@ -226,7 +226,7 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* Home/Layers */}
+              {/* Home */}
               <button
                 onClick={handleBackToHome}
                 className={`size-14 flex items-center justify-center rounded-xl ${currentPage === "home" ? "bg-zinc-800" : "hover:bg-zinc-800"}`}
@@ -234,8 +234,8 @@ export default function App() {
                 aria-current={currentPage === "home" ? "page" : undefined}
               >
                 <svg className="size-6" fill="none" stroke={currentPage === "home" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={svgPaths.p2f351e40} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M3 11L12 14L21 11" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  <path d="M9 22V12H15V22" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                 </svg>
               </button>
 
@@ -252,19 +252,19 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* News/Newspaper */}
+              {/* News/Fire */}
               <button
                 onClick={handleNewsClick}
                 className={`size-14 flex items-center justify-center rounded-xl ${currentPage === "news" ? "bg-zinc-800" : "hover:bg-zinc-800"}`}
                 aria-label="News"
                 aria-current={currentPage === "news" ? "page" : undefined}
               >
-                <svg className="size-6" fill="none" stroke={currentPage === "news" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M19 20H5C4.46957 20 3.96086 19.7893 3.58579 19.4142C3.21071 19.0391 3 18.5304 3 18V6C3 5.46957 3.21071 4.06086 3.58579 4.58579C3.96086 4.21071 4.46957 4 5 4H19C19.5304 4 20.0391 4.21071 20.4142 4.58579C20.7893 4.96086 21 5.46957 21 6V18C21 18.5304 20.7893 19.0391 20.4142 19.4142C20.0391 19.7893 19.5304 20 19 20Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M7 8H17" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M7 12H17" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M7 16H12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
+                <img
+                  src="/fire.svg"
+                  alt="News"
+                  className="size-6"
+                  style={{ filter: currentPage === "news" ? "none" : "brightness(0) saturate(100%) invert(81%) sepia(8%) saturate(328%) hue-rotate(181deg) brightness(96%) contrast(87%)" }}
+                />
               </button>
             </div>
 
