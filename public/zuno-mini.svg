@@ -1,5 +1,4 @@
 <svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="1080" height="1080" rx="270" fill="white"/>
-<rect x="619.023" y="540" width="158.049" height="237.073" rx="79.0244" fill="#202020"/>
-<rect x="302.928" y="540" width="158.049" height="237.073" rx="79.0244" fill="#202020"/>
+<rect x="619.023" y="540" width="158.049" height="237.073" rx="79.0244" fill="white"/>
+<rect x="302.928" y="540" width="158.049" height="237.073" rx="79.0244" fill="white"/>
 </svg>
