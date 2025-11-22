@@ -116,8 +116,7 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                   {job.logo_url ? (
                     <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden">
                       <img
-                        src={job.logo_url.replace('company-logo_400_', 'company-logo_100_')}
-                        srcSet={`${job.logo_url.replace('company-logo_400_', 'company-logo_100_')} 1x, ${job.logo_url.replace('company-logo_400_', 'company-logo_200_')} 2x`}
+                        src={job.logo_url}
                         alt={job.company_name}
                         className="w-full h-full object-cover"
                         width="48"
