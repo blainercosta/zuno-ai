@@ -218,13 +218,13 @@ export default function App() {
 
             {/* Nav Icons */}
             <div className="flex flex-col gap-[14px] items-center px-2">
-              {/* Search */}
-              <button className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800" aria-label="Search">
+              {/* Search - Hidden */}
+              {/* <button className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800" aria-label="Search">
                 <svg className="size-6" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24" aria-hidden="true">
                   <path d={svgPaths.pa2c4300} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                   <path d="M20 20L16 16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                 </svg>
-              </button>
+              </button> */}
 
               {/* Home */}
               <button
