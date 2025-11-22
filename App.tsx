@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import svgPaths from "./imports/svg-shvcwjgnc";
 import svgPathsModal from "./imports/svg-rto7qlii0f";
 import JobsPage from "./components/JobsPage";
@@ -734,6 +735,7 @@ export default function App() {
           scrollbar-width: none;
         }
       `}</style>
+      <SpeedInsights />
     </div>
   );
 }
