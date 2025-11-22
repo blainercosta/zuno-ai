@@ -145,17 +145,29 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
+      {/* Header - Only Back Button */}
       <div className="border-b border-zinc-800 px-8 py-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
         >
           <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M15 19L8 12L15 5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
           </svg>
           <span>Voltar</span>
         </button>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-[800px] mx-auto px-8 py-12">
+        {/* Featured Image */}
+        <div className="mb-8 overflow-hidden rounded-2xl">
+          <img
+            src={news.image}
+            alt={news.title}
+            className="w-full aspect-[16/9] object-cover"
+          />
+        </div>
 
         {/* Category Badge */}
         <div className="mb-4">
@@ -165,29 +177,17 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         </div>
 
         {/* Title */}
-        <h1 className="text-[32px] sm:text-[40px] leading-[1.2] mb-4 max-w-[800px]">
+        <h1 className="text-[32px] sm:text-[40px] leading-[1.2] mb-4">
           {news.title}
         </h1>
 
         {/* Meta */}
-        <div className="flex items-center gap-4 text-sm text-zinc-400">
+        <div className="flex items-center gap-4 text-sm text-zinc-400 mb-8">
           <span>{news.author}</span>
           <span>•</span>
           <span>{news.date}</span>
           <span>•</span>
           <span>{news.readTime} de leitura</span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-[800px] mx-auto px-8 py-12">
-        {/* Featured Image */}
-        <div className="mb-12 overflow-hidden rounded-2xl">
-          <img
-            src={news.image}
-            alt={news.title}
-            className="w-full aspect-[16/9] object-cover"
-          />
         </div>
 
         {/* Article Content */}
