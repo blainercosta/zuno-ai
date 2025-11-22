@@ -204,22 +204,16 @@ export default function App() {
       </div>
 
       <div className="flex">
-        {/* Left Sidebar - Hidden for now */}
-        <aside className="hidden">
+        {/* Left Sidebar */}
+        <aside className="w-[72px] border-r border-zinc-800 shrink-0">
           <div className="sticky top-0 h-screen flex flex-col">
             {/* Logo */}
             <div className="h-[68.88px] flex items-center justify-center relative">
-              <div className="relative size-[28.875px]">
-                <svg className="absolute bottom-[29.01%] left-0 right-[35.48%] top-0 size-full" fill="none" viewBox="0 0 19 21">
-                  <path d={svgPaths.p12bedd00} fill="#E2E8F0" fillOpacity="0.2" />
-                </svg>
-                <svg className="absolute inset-[14.51%_17.74%_14.5%_17.74%] size-full" fill="none" viewBox="0 0 19 21">
-                  <path d={svgPaths.p2968b180} fill="#E2E8F0" fillOpacity="0.5" />
-                </svg>
-                <svg className="absolute bottom-0 left-[35.48%] right-0 top-[29.01%] size-full" fill="none" viewBox="0 0 19 21">
-                  <path d={svgPaths.p2d274a00} fill="#E2E8F0" fillOpacity="0.8" />
-                </svg>
-              </div>
+              <img
+                src="/zuno-ai.svg"
+                alt="Zuno AI"
+                className="w-8 h-8"
+              />
             </div>
 
             {/* Nav Icons */}
