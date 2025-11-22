@@ -4,6 +4,111 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Uncut Sans Font Family */
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-RegularItalic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Book.woff2') format('woff2');
+  font-weight: 450;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-BookItalic.woff2') format('woff2');
+  font-weight: 450;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-SemiboldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/fonts/UncutSans-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --font-size: 16px;
   --background: #ffffff;
