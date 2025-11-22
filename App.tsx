@@ -259,12 +259,9 @@ export default function App() {
                 aria-label="News"
                 aria-current={currentPage === "news" ? "page" : undefined}
               >
-                <img
-                  src="/fire.svg"
-                  alt="News"
-                  className="size-6"
-                  style={{ filter: currentPage === "news" ? "none" : "brightness(0) saturate(100%) invert(81%) sepia(8%) saturate(328%) hue-rotate(181deg) brightness(96%) contrast(87%)" }}
-                />
+                <svg className="size-6" fill="none" stroke={currentPage === "news" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
             </div>
 
