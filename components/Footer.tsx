@@ -6,6 +6,10 @@ export default function Footer() {
           src="/zuno-mono.svg"
           alt="Zuno Mono"
           className="h-6 opacity-40"
+          width="120"
+          height="24"
+          loading="lazy"
+          decoding="async"
         />
       </div>
     </footer>

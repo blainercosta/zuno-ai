@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import svgPaths from "./imports/svg-shvcwjgnc";
 import svgPathsModal from "./imports/svg-rto7qlii0f";
 import JobsPage from "./components/JobsPage";
-import JobDetailPage from "./components/JobDetailPage";
-import PostJobPage from "./components/PostJobPage";
-import NewsPage from "./components/NewsPage";
-import NewsDetailPage from "./components/NewsDetailPage";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
+
+// Lazy load componentes secundários para reduzir bundle inicial
+const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
+const PostJobPage = lazy(() => import("./components/PostJobPage"));
+const NewsPage = lazy(() => import("./components/NewsPage"));
+const NewsDetailPage = lazy(() => import("./components/NewsDetailPage"));
 
 // Placeholder images
 const imgFrame2 = "https://placehold.co/800x600/1a1a1a/808080?text=Project+Preview";
@@ -301,21 +303,29 @@ export default function App() {
 
         {/* Main Content */}
         <main className="flex-1 min-w-0">
-          {currentPage === "news-detail" ? (
-            <NewsDetailPage newsId={selectedNewsId || 1} onBack={handleBackToNews} />
-          ) : currentPage === "news" ? (
-            <NewsPage onNewsClick={handleNewsDetailClick} />
-          ) : currentPage === "post-job" ? (
-            <PostJobPage onBack={handleBackToJobs} />
-          ) : currentPage === "job-detail" ? (
-            <JobDetailPage onBack={handleBackToJobs} onJobClick={handleJobClick} job={selectedJob} />
-          ) : currentPage === "jobs" ? (
-            <JobsPage
-              onJobClick={handleJobClick}
-              onPostJobClick={handlePostJobClick}
-              onNewsClick={handleNewsClick}
-            />
-          ) : (
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <svg className="animate-spin size-8 text-zinc-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path className="opacity-60" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            </div>
+          }>
+            {currentPage === "news-detail" ? (
+              <NewsDetailPage newsId={selectedNewsId || 1} onBack={handleBackToNews} />
+            ) : currentPage === "news" ? (
+              <NewsPage onNewsClick={handleNewsDetailClick} />
+            ) : currentPage === "post-job" ? (
+              <PostJobPage onBack={handleBackToJobs} />
+            ) : currentPage === "job-detail" ? (
+              <JobDetailPage onBack={handleBackToJobs} onJobClick={handleJobClick} job={selectedJob} />
+            ) : currentPage === "jobs" ? (
+              <JobsPage
+                onJobClick={handleJobClick}
+                onPostJobClick={handlePostJobClick}
+                onNewsClick={handleNewsClick}
+              />
+            ) : (
             <div className="py-4 md:py-5 lg:py-5">
           {/* Filters - Desktop */}
           <div className="hidden lg:flex items-center gap-3 mb-5 px-8">
@@ -447,6 +457,7 @@ export default function App() {
           </div>
             </div>
           )}
+          </Suspense>
         </main>
 
         {/* Right Sidebar - Hidden for now */}

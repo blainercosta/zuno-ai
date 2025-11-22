@@ -115,7 +115,16 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                 <div className="shrink-0">
                   {job.logo_url ? (
                     <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden">
-                      <img src={job.logo_url} alt={job.company_name} className="w-full h-full object-cover" />
+                      <img
+                        src={job.logo_url.replace('company-logo_400_', 'company-logo_100_')}
+                        srcSet={`${job.logo_url.replace('company-logo_400_', 'company-logo_100_')} 1x, ${job.logo_url.replace('company-logo_400_', 'company-logo_200_')} 2x`}
+                        alt={job.company_name}
+                        className="w-full h-full object-cover"
+                        width="48"
+                        height="48"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                   ) : (
                     <div className="size-12 rounded-xl flex items-center justify-center bg-zinc-800 text-white">
