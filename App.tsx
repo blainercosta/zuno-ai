@@ -238,16 +238,17 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* Jobs/Briefcase */}
+              {/* Jobs/Suit */}
               <button
                 onClick={handleBackToJobs}
                 className={`size-14 flex items-center justify-center rounded-xl ${currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job" ? "bg-zinc-800" : "hover:bg-zinc-800"}`}
                 aria-label="Jobs"
                 aria-current={currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job" ? "page" : undefined}
               >
-                <svg className="size-6" fill="none" stroke={currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M20 21H4C3.46957 21 2.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V9C2 8.46957 2.21071 7.96086 2.58579 7.58579C2.96086 7.21071 3.46957 7 4 7H20C20.5304 7 21.0391 7.21071 21.4142 7.58579C21.7893 7.96086 22 8.46957 22 9V19C22 19.5304 21.7893 20.0391 21.4142 20.4142C21.0391 20.7893 20.5304 21 20 21Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                <svg className="size-6" fill="none" stroke={currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job" ? "white" : "#CBD5E1"} viewBox="0 0 24 23" aria-hidden="true">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M17.0024 20.1288H6.99825C4.78819 20.1288 2.99658 18.4118 2.99658 16.2939V8.62401C2.99658 7.56502 3.89239 6.70654 4.99742 6.70654H19.0032C20.1083 6.70654 21.0041 7.56502 21.0041 8.62401V16.2939C21.0041 18.4118 19.2125 20.1288 17.0024 20.1288Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M7.99854 6.70651V4.78905C7.99854 3.73006 8.89434 2.87158 9.99937 2.87158H14.001C15.1061 2.87158 16.0019 3.73006 16.0019 4.78905V6.70651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M14.0007 11.9793H17.5021C19.4359 11.9793 21.0036 10.477 21.0036 8.62378M14.9995 11.9791L6.49755 11.9793C4.56375 11.9793 2.99609 10.477 2.99609 8.62378" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
 
