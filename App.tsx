@@ -234,8 +234,7 @@ export default function App() {
                 aria-current={currentPage === "home" ? "page" : undefined}
               >
                 <svg className="size-6" fill="none" stroke={currentPage === "home" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M9 22V12H15V22" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  <path fillRule="evenodd" clipRule="evenodd" d="M19.842 8.29901L13.842 3.63201C12.759 2.78901 11.242 2.78901 10.158 3.63201L4.158 8.29901C3.427 8.86701 3 9.74101 3 10.667V18C3 19.657 4.343 21 6 21H18C19.657 21 21 19.657 21 18V10.667C21 9.74101 20.573 8.86701 19.842 8.29901Z" strokeWidth="2"/>
                 </svg>
               </button>
 
