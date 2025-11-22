@@ -145,17 +145,33 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
   return (
     <div className="min-h-screen">
-      {/* Header - Only Back Button */}
-      <div className="border-b border-zinc-800 px-8 py-6">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
-        >
-          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M15 19L8 12L15 5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-          <span>Voltar</span>
-        </button>
+      {/* Header */}
+      <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
+        <div className="flex items-center w-full">
+          {/* Back Button Container */}
+          <div className="flex-[0_0_auto] min-w-0">
+            <div className="p-3">
+              <button
+                onClick={onBack}
+                className="bg-zinc-900 size-9 flex items-center justify-center rounded-xl hover:bg-zinc-800 transition-colors"
+              >
+                <svg className="size-6" fill="none" viewBox="0 0 24 24">
+                  <path d="M14 7L9 12L14 17" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Title Container - Centered */}
+          <div className="flex-1 flex items-center justify-center min-w-0">
+            <div className="p-3">
+              <h2 className="text-base">News</h2>
+            </div>
+          </div>
+
+          {/* Spacer to balance layout */}
+          <div className="flex-[0_0_auto] min-w-0" style={{ width: '60px' }}></div>
+        </div>
       </div>
 
       {/* Content */}
