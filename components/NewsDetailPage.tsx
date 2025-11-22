@@ -183,7 +183,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
             alt={news.title}
             loading="eager"
             decoding="async"
-            fetchpriority="high"
+            fetchPriority="high"
             className="w-full aspect-[16/9] object-cover"
           />
         </div>
