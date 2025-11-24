@@ -96,7 +96,9 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
               >
                 <span className="relative z-10">Quero ser Contratado</span>
                 <div className="absolute inset-0 rounded-xl p-[1px] animate-spin-slow">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-300 via-purple-300 via-blue-300 via-green-300 via-yellow-300 to-pink-300 opacity-80"></div>
+                  <div className="absolute inset-0 rounded-xl opacity-80" style={{
+                    background: 'conic-gradient(from 0deg, #fca5a5, #fdba74, #fcd34d, #86efac, #67e8f9, #93c5fd, #c4b5fd, #f9a8d4, #fca5a5)'
+                  }}></div>
                 </div>
                 <div className="absolute inset-[1px] rounded-xl bg-zinc-900 z-0"></div>
               </button>
