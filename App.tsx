@@ -226,7 +226,7 @@ export default function App() {
             {/* Logo */}
             <div className="h-[68.88px] flex items-center justify-center relative">
               <img
-                src="/zuno-mini-full.svg"
+                src="/zuno-mini.svg"
                 alt="Zuno AI"
                 className="w-8 h-8"
                 width="32"
