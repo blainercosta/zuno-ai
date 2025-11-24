@@ -95,10 +95,10 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                 className="relative bg-zinc-900 text-white px-6 py-3 rounded-xl text-[15px] leading-[15px] overflow-hidden group/rainbow"
               >
                 <span className="relative z-10">Quero ser Contratado</span>
-                <div className="absolute inset-0 rounded-xl p-[2px] animate-spin-slow">
+                <div className="absolute inset-0 rounded-xl p-[1px] animate-spin-slow">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-300 via-purple-300 via-blue-300 via-green-300 via-yellow-300 to-pink-300 opacity-80"></div>
                 </div>
-                <div className="absolute inset-[2px] rounded-xl bg-zinc-900 z-0"></div>
+                <div className="absolute inset-[1px] rounded-xl bg-zinc-900 z-0"></div>
               </button>
             )}
           </div>
