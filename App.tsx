@@ -459,7 +459,7 @@ export default function App() {
           </div>
             </div>
           )}
-          </Suspense>
+        </Suspense>
         </main>
 
         {/* Right Sidebar - Hidden for now */}
