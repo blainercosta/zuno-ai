@@ -225,12 +225,6 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
         {/* Intersection Observer Target */}
         {hasMore && <div ref={observerTarget} className="h-4" />}
 
-        {/* End Message */}
-        {!hasMore && !isLoading && filteredNews.length > 0 && (
-          <div className="text-center py-12 text-zinc-500 text-[14px] leading-[20px]">
-            Isto é tudo pessoal.
-          </div>
-        )}
 
         {/* Empty State */}
         {!isLoading && filteredNews.length === 0 && (
@@ -302,10 +296,12 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
             {recentJobs.length > 0 ? (
               recentJobs.map((job) => {
                 const firstLetter = job.company_name?.charAt(0).toUpperCase() || 'J';
-                const formattedDate = new Date(job.posted_at).toLocaleDateString('pt-BR', {
-                  day: 'numeric',
-                  month: 'short'
-                });
+                const formattedDate = job.posted_at
+                  ? new Date(job.posted_at).toLocaleDateString('pt-BR', {
+                      day: 'numeric',
+                      month: 'short'
+                    })
+                  : '';
 
                 return (
                   <div key={job.id} className="flex items-center gap-3 px-4 py-4 -mx-4 hover:bg-zinc-900 rounded-xl cursor-pointer">

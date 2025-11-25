@@ -1,21 +1,17 @@
-# robots.txt para Zuno AI
+# robots.txt for Zuno AI
 User-agent: *
 Allow: /
-Disallow: /api/
-Disallow: /admin/
+Allow: /jobs
+Allow: /news
+Allow: /*.js
+Allow: /*.css
 
-# Sitemap
-Sitemap: https://zuno.ai/sitemap.xml
+# Disallow admin or private pages if any
+Disallow: /admin
+Disallow: /api/private
 
-# Crawl delay
+# Sitemap location
+Sitemap: https://www.zunoai.com/sitemap.xml
+
+# Crawl delay (optional, adjust based on server capacity)
 Crawl-delay: 1
-
-# Principais bots
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /

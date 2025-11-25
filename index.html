@@ -53,6 +53,35 @@
     <meta name="theme-color" content="#09090b" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Zuno AI",
+      "description": "O maior hub de Inteligência Artificial do Brasil",
+      "url": "https://zuno.ai",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://zuno.ai/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Zuno AI",
+        "url": "https://zuno.ai",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://zuno.ai/zuno-ai.svg"
+        },
+        "sameAs": [
+          "https://twitter.com/ZunoAI",
+          "https://www.linkedin.com/company/zuno-ai"
+        ]
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
