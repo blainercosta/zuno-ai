@@ -23,6 +23,8 @@ interface GalleryItem {
   price?: number
   prompt?: string
   description?: string
+  uses?: number
+  upvotes?: number
 }
 
 // Mock gallery data
@@ -33,7 +35,9 @@ const GALLERY_ITEMS: GalleryItem[] = [
     image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
     title: 'Cyberpunk Portrait',
     price: 49.90,
-    description: 'Retrato estilo cyberpunk com iluminação neon'
+    description: 'Retrato estilo cyberpunk com iluminação neon',
+    uses: 245,
+    upvotes: 12
   },
   {
     id: 2,
@@ -42,7 +46,9 @@ const GALLERY_ITEMS: GalleryItem[] = [
     title: 'AI Art Prompt Pack',
     price: 29.90,
     prompt: 'A detailed cyberpunk cityscape at night, neon lights reflecting on wet streets...',
-    description: 'Pack com 10 prompts para arte cyberpunk'
+    description: 'Pack com 10 prompts para arte cyberpunk',
+    uses: 532,
+    upvotes: 28
   },
   {
     id: 3,
@@ -50,16 +56,20 @@ const GALLERY_ITEMS: GalleryItem[] = [
     image_url: 'https://images.unsplash.com/photo-1707327956851-30a531b70cda?w=800',
     title: 'Fantasy Landscape',
     price: 59.90,
-    description: 'Paisagem fantástica com montanhas e céu místico'
+    description: 'Paisagem fantástica com montanhas e céu místico',
+    uses: 189,
+    upvotes: 8
   },
   {
     id: 4,
     type: 'prompt',
     image_url: 'https://images.unsplash.com/photo-1710170842969-ccf9e41097e9?w=800',
-    title: 'Character Design Prompts',
+    title: 'Character Design',
     price: 39.90,
     prompt: 'Full body character design, anime style, detailed clothing...',
-    description: 'Pack com 15 prompts para design de personagens'
+    description: 'Pack com 15 prompts para design de personagens',
+    uses: 421,
+    upvotes: 19
   },
   {
     id: 5,
@@ -67,7 +77,9 @@ const GALLERY_ITEMS: GalleryItem[] = [
     image_url: 'https://images.unsplash.com/photo-1706049379414-437ec3a54e93?w=800',
     title: 'Abstract AI Art',
     price: 44.90,
-    description: 'Arte abstrata gerada por IA com cores vibrantes'
+    description: 'Arte abstrata gerada por IA',
+    uses: 298,
+    upvotes: 15
   },
   {
     id: 6,
@@ -75,30 +87,17 @@ const GALLERY_ITEMS: GalleryItem[] = [
     image_url: 'https://images.unsplash.com/photo-1706885093476-b1e54f26cec4?w=800',
     title: 'Futuristic Architecture',
     price: 54.90,
-    description: 'Arquitetura futurista com formas orgânicas'
+    description: 'Arquitetura futurista com formas orgânicas',
+    uses: 367,
+    upvotes: 22
   }
 ]
 
 export default function ProfessionalDetailPage({ professional, onBack }: ProfessionalDetailPageProps) {
-  const [activeTab, setActiveTab] = useState<'about' | 'gallery'>('about')
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <svg
-            key={star}
-            className={`size-4 ${star <= rating ? 'text-yellow-500' : 'text-zinc-700'}`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-      </div>
-    )
-  }
+  const totalUses = GALLERY_ITEMS.reduce((sum, item) => sum + (item.uses || 0), 0)
+  const totalUpvotes = GALLERY_ITEMS.reduce((sum, item) => sum + (item.upvotes || 0), 0)
 
   return (
     <>
@@ -116,234 +115,187 @@ export default function ProfessionalDetailPage({ professional, onBack }: Profess
               </svg>
             </button>
 
-            {/* Title */}
-            <h2 className="text-sm md:text-base absolute left-1/2 -translate-x-1/2">Perfil</h2>
+            {/* Name */}
+            <h2 className="text-sm md:text-base absolute left-1/2 -translate-x-1/2 font-medium">@{professional.name.toLowerCase().replace(' ', '')}</h2>
 
-            {/* Contact Button */}
-            <button className="px-4 py-2 bg-white text-slate-950 rounded-xl text-sm font-medium hover:bg-zinc-100 transition-colors">
-              Contatar
+            {/* Menu */}
+            <button className="size-10 flex items-center justify-center rounded-xl hover:bg-zinc-800 transition-colors">
+              <svg className="size-6" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="1.5" fill="white"/>
+                <circle cx="12" cy="12" r="1.5" fill="white"/>
+                <circle cx="12" cy="18" r="1.5" fill="white"/>
+              </svg>
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          {/* Profile Header */}
-          <div className="bg-black rounded-2xl p-6 md:p-8 border border-zinc-800 mb-6">
-            <div className="flex flex-col md:flex-row gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          {/* Profile Section */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
+            {/* Profile Info */}
+            <div className="flex items-center gap-4">
               {/* Profile Image */}
               <div className="relative">
-                <div className="size-32 md:size-40 rounded-2xl overflow-hidden bg-zinc-900 shrink-0">
+                <div className="size-20 md:size-24 rounded-full overflow-hidden bg-zinc-900 shrink-0">
                   <img
                     src={professional.image_url}
                     alt={professional.name}
                     className="w-full h-full object-cover"
                   />
-                  {/* Status Badge - On top of image */}
-                  <div className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm ${
-                    professional.status === 'online'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/50'
-                  }`}>
-                    {professional.status === 'online' ? 'Online' : 'Offline'}
-                  </div>
+                  {/* Status Badge */}
+                  <div className={`absolute bottom-1 right-1 size-4 md:size-5 rounded-full border-2 border-zinc-950 ${
+                    professional.status === 'online' ? 'bg-emerald-400' : 'bg-zinc-600'
+                  }`} />
                 </div>
               </div>
 
-              {/* Profile Info */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-2xl md:text-3xl font-semibold text-white">{professional.name}</h1>
-                      {professional.badge && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">
-                          {professional.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-lg text-zinc-400 mb-3">{professional.role}</p>
-                    {professional.location && (
-                      <div className="flex items-center gap-2 text-sm text-zinc-500">
-                        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        {professional.location}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Rating */}
-                <div className="flex items-center gap-2 mb-4">
-                  {renderStars(professional.rating)}
-                  <span className="text-sm text-zinc-400">({professional.rating}.0)</span>
-                </div>
-
-                {/* Skills */}
-                {professional.skills && professional.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {professional.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-300"
-                      >
-                        {skill}
-                      </span>
-                    ))}
+              <div>
+                <h1 className="text-xl md:text-2xl font-semibold text-white mb-1">{professional.name}</h1>
+                <p className="text-sm md:text-base text-zinc-400 mb-2">{professional.role}</p>
+                {professional.location && (
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                    <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    {professional.location}
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Follow Button */}
+            <button className="px-6 py-2.5 bg-white text-slate-950 rounded-xl text-sm font-medium hover:bg-zinc-100 transition-colors flex items-center gap-2">
+              Seguir
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M17 8l4 4m0 0l-4 4m4-4H3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="text-center p-4 bg-black border border-zinc-800 rounded-xl">
+              <div className="text-2xl md:text-3xl font-semibold text-white mb-1">{totalUses.toLocaleString()}</div>
+              <div className="text-xs md:text-sm text-zinc-500">Total Uses</div>
+            </div>
+            <div className="text-center p-4 bg-black border border-zinc-800 rounded-xl">
+              <div className="text-2xl md:text-3xl font-semibold text-white mb-1">{totalUpvotes}</div>
+              <div className="text-xs md:text-sm text-zinc-500">Upvotes</div>
+            </div>
+            <div className="text-center p-4 bg-black border border-zinc-800 rounded-xl">
+              <div className="text-2xl md:text-3xl font-semibold text-white mb-1">
+                {GALLERY_ITEMS.filter(i => i.type === 'prompt').length}
+              </div>
+              <div className="text-xs md:text-sm text-zinc-500">Prompts</div>
+            </div>
+            <div className="text-center p-4 bg-black border border-zinc-800 rounded-xl">
+              <div className="text-2xl md:text-3xl font-semibold text-white mb-1">
+                <span className="flex items-center justify-center gap-1">
+                  {professional.rating}
+                  <svg className="size-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </span>
+              </div>
+              <div className="text-xs md:text-sm text-zinc-500">Avg. Rating</div>
+            </div>
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-zinc-800 mb-6">
-            <div className="flex gap-8">
-              <button
-                onClick={() => setActiveTab('about')}
-                className={`pb-4 px-1 border-b-2 transition-colors ${
-                  activeTab === 'about'
-                    ? 'border-white text-white'
-                    : 'border-transparent text-zinc-500 hover:text-zinc-300'
-                }`}
-              >
-                Sobre
+          <div className="flex items-center gap-4 mb-6 border-b border-zinc-800">
+            <button className="pb-3 px-1 text-sm font-medium text-white border-b-2 border-white">
+              Criados
+            </button>
+            <button className="pb-3 px-1 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">
+              Salvos
+            </button>
+            <button className="pb-3 px-1 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">
+              Favoritos
+            </button>
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-sm text-zinc-400">
+              {GALLERY_ITEMS.length} itens
+            </div>
+            <div className="flex gap-2">
+              <button className="size-8 flex items-center justify-center bg-zinc-800 rounded-lg">
+                <svg className="size-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 5h4v4H4V5zm6 0h4v4h-4V5zm6 0h4v4h-4V5zM4 11h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 17h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"/>
+                </svg>
               </button>
-              <button
-                onClick={() => setActiveTab('gallery')}
-                className={`pb-4 px-1 border-b-2 transition-colors ${
-                  activeTab === 'gallery'
-                    ? 'border-white text-white'
-                    : 'border-transparent text-zinc-500 hover:text-zinc-300'
-                }`}
-              >
-                Galeria & Produtos
+              <button className="size-8 flex items-center justify-center hover:bg-zinc-800 rounded-lg transition-colors">
+                <svg className="size-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
               </button>
             </div>
           </div>
 
-          {/* Tab Content */}
-          {activeTab === 'about' ? (
-            <div className="space-y-6">
-              {/* About Section */}
-              <div className="bg-black rounded-2xl p-6 border border-zinc-800">
-                <h3 className="text-lg font-semibold mb-4">Sobre mim</h3>
-                <p className="text-zinc-400 leading-relaxed mb-4">
-                  Sou um profissional apaixonado por Inteligência Artificial e suas aplicações criativas.
-                  Com mais de 5 anos de experiência em Machine Learning e Deep Learning, especializo-me
-                  em criar soluções inovadoras que combinam tecnologia e arte.
-                </p>
-                <p className="text-zinc-400 leading-relaxed">
-                  Atualmente trabalho com modelos generativos, computer vision e NLP,
-                  desenvolvendo projetos que vão desde aplicações comerciais até
-                  experiências artísticas experimentais.
-                </p>
-              </div>
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {GALLERY_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setSelectedItem(item)}
+                className="group cursor-pointer"
+              >
+                <div className="bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-all hover:shadow-lg hover:shadow-black/20">
+                  {/* Image */}
+                  <div className="relative aspect-square bg-zinc-900 overflow-hidden">
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
 
-              {/* Experience Section */}
-              <div className="bg-black rounded-2xl p-6 border border-zinc-800">
-                <h3 className="text-lg font-semibold mb-4">Experiência</h3>
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 className="font-medium text-white">Senior ML Engineer</h4>
-                        <p className="text-sm text-zinc-400">Tech Company Inc.</p>
-                      </div>
-                      <span className="text-sm text-zinc-500">2021 - Presente</span>
+                    {/* Type Badge */}
+                    <div className="absolute top-3 left-3">
+                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-medium backdrop-blur-sm ${
+                        item.type === 'prompt'
+                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                      }`}>
+                        {item.type === 'prompt' ? 'Prompt' : 'Imagem'}
+                      </span>
                     </div>
-                    <p className="text-sm text-zinc-500">
-                      Desenvolvimento de modelos de ML para aplicações de computer vision e NLP.
-                    </p>
-                  </div>
-                  <div className="border-t border-zinc-800 pt-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 className="font-medium text-white">ML Engineer</h4>
-                        <p className="text-sm text-zinc-400">AI Startup</p>
-                      </div>
-                      <span className="text-sm text-zinc-500">2019 - 2021</span>
-                    </div>
-                    <p className="text-sm text-zinc-500">
-                      Implementação de pipelines de ML e deployment de modelos em produção.
-                    </p>
-                  </div>
-                </div>
-              </div>
 
-              {/* Stats Section */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-black rounded-2xl p-6 border border-zinc-800 text-center">
-                  <div className="text-2xl font-semibold text-white mb-1">150+</div>
-                  <div className="text-sm text-zinc-500">Projetos</div>
-                </div>
-                <div className="bg-black rounded-2xl p-6 border border-zinc-800 text-center">
-                  <div className="text-2xl font-semibold text-white mb-1">89</div>
-                  <div className="text-sm text-zinc-500">Clientes</div>
-                </div>
-                <div className="bg-black rounded-2xl p-6 border border-zinc-800 text-center">
-                  <div className="text-2xl font-semibold text-white mb-1">5.0</div>
-                  <div className="text-sm text-zinc-500">Avaliação</div>
-                </div>
-                <div className="bg-black rounded-2xl p-6 border border-zinc-800 text-center">
-                  <div className="text-2xl font-semibold text-white mb-1">5+</div>
-                  <div className="text-sm text-zinc-500">Anos</div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              {/* Gallery Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {GALLERY_ITEMS.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => setSelectedItem(item)}
-                    className="group cursor-pointer"
-                  >
-                    <div className="bg-black rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-700 transition-colors">
-                      {/* Image */}
-                      <div className="relative aspect-square bg-zinc-900 overflow-hidden">
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        {/* Type Badge */}
-                        <div className="absolute top-3 right-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-                            item.type === 'prompt'
-                              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                              : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                          }`}>
-                            {item.type === 'prompt' ? 'Prompt' : 'Imagem'}
-                          </span>
+                    {/* Stats Overlay */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-white text-xs font-medium">
+                        <div className="flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg">
+                          <svg className="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeWidth="2"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeWidth="2"/>
+                          </svg>
+                          {item.uses}
+                        </div>
+                        <div className="flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg">
+                          <svg className="size-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+                          </svg>
+                          {item.upvotes}
                         </div>
                       </div>
-
-                      {/* Info */}
-                      <div className="p-4">
-                        <h3 className="font-medium text-white mb-1 truncate">{item.title}</h3>
-                        <p className="text-sm text-zinc-500 mb-3 line-clamp-2">{item.description}</p>
-                        {item.price && (
-                          <div className="flex items-center justify-between">
-                            <span className="text-lg font-semibold text-white">
-                              R$ {item.price.toFixed(2)}
-                            </span>
-                            <button className="px-4 py-2 bg-white text-slate-950 rounded-lg text-sm font-medium hover:bg-zinc-100 transition-colors">
-                              Comprar
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
-                ))}
+
+                  {/* Info */}
+                  <div className="p-3">
+                    <h3 className="font-medium text-white text-sm mb-1 truncate">{item.title}</h3>
+                    {item.price && (
+                      <div className="text-lg font-semibold text-white">
+                        R$ {item.price.toFixed(2)}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       </div>
 
