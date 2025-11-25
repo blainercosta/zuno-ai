@@ -99,7 +99,6 @@ export default function ProfessionalDetailPage({ professional, onBack }: Profess
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
   const [visibleItems, setVisibleItems] = useState(8) // Inicialmente mostra 8 itens
 
-  const totalRevenue = GALLERY_ITEMS.reduce((sum, item) => sum + ((item.price || 0) * (item.uses || 0)), 0)
   const hasMoreItems = visibleItems < GALLERY_ITEMS.length
 
   const handleLoadMore = () => {
