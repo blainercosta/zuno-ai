@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { formatRelativeDate } from "@/utils/date";
 import type { Job } from "@/types/job";
@@ -7,6 +7,7 @@ import { getJobApplicationUrl } from "@/utils/tracking";
 import OrganizationSchema from "./OrganizationSchema";
 import BreadcrumbSchema from "./BreadcrumbSchema";
 import FAQSchema from "./FAQSchema";
+import BetaAccessModal from "./BetaAccessModal";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -17,6 +18,7 @@ interface JobsPageProps {
 export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: JobsPageProps) {
   const { jobs, isLoading, hasMore, loadMore } = useJobs();
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,18 +92,62 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
               Publicar vaga grátis
             </button>
             {onNewsClick && (
-              <button
-                onClick={onNewsClick}
-                className="relative bg-zinc-900 text-white px-6 py-3 rounded-xl text-[15px] leading-[15px] overflow-hidden group/rainbow"
-              >
-                <span className="relative z-10">Quero ser Contratado</span>
-                <div className="absolute inset-0 rounded-xl p-[1px] animate-spin-slow">
-                  <div className="absolute inset-0 rounded-xl opacity-80" style={{
-                    background: 'conic-gradient(from 0deg, #fca5a5, #fdba74, #fcd34d, #86efac, #67e8f9, #93c5fd, #c4b5fd, #f9a8d4, #fca5a5)'
-                  }}></div>
+              <>
+                <style>{`
+                  @property --beta-angle {
+                    syntax: '<angle>';
+                    initial-value: 0deg;
+                    inherits: false;
+                  }
+
+                  @keyframes rotate-beta {
+                    to {
+                      --beta-angle: 360deg;
+                    }
+                  }
+
+                  .beta-btn-wrapper {
+                    position: relative;
+                    display: inline-block;
+                  }
+
+                  .beta-btn-wrapper::before,
+                  .beta-btn-wrapper::after {
+                    content: '';
+                    position: absolute;
+                    inset: -1px;
+                    border-radius: 12px;
+                    background: conic-gradient(
+                      from var(--beta-angle),
+                      #7349D4,
+                      #FF7BCA,
+                      #FFF96F,
+                      #62D4DD,
+                      #7349D4
+                    );
+                    animation: rotate-beta 3s linear infinite;
+                    pointer-events: none;
+                  }
+
+                  .beta-btn-wrapper::after {
+                    filter: blur(15px);
+                    opacity: 0.4;
+                  }
+
+                  .beta-btn-inner {
+                    position: relative;
+                    z-index: 1;
+                  }
+                `}</style>
+                <div className="beta-btn-wrapper">
+                  <button
+                    onClick={() => setIsBetaModalOpen(true)}
+                    className="beta-btn-inner bg-[#18181b] text-white px-6 py-3 rounded-xl text-[15px] leading-[15px]"
+                  >
+                    Quero ser Contratado
+                  </button>
                 </div>
-                <div className="absolute inset-[1px] rounded-xl bg-zinc-900 z-0"></div>
-              </button>
+              </>
             )}
           </div>
         </div>
@@ -205,6 +251,9 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
 
       {/* Footer */}
       <Footer />
+
+      {/* Beta Access Modal */}
+      <BetaAccessModal isOpen={isBetaModalOpen} onClose={() => setIsBetaModalOpen(false)} />
     </div>
   );
 }
