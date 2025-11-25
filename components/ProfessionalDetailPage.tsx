@@ -139,14 +139,14 @@ export default function ProfessionalDetailPage({ professional, onBack }: Profess
                     alt={professional.name}
                     className="w-full h-full object-cover"
                   />
-                </div>
-                {/* Status Badge */}
-                <div className={`absolute -bottom-2 -right-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-                  professional.status === 'online'
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                }`}>
-                  {professional.status === 'online' ? 'Online' : 'Offline'}
+                  {/* Status Badge - On top of image */}
+                  <div className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm ${
+                    professional.status === 'online'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/50'
+                  }`}>
+                    {professional.status === 'online' ? 'Online' : 'Offline'}
+                  </div>
                 </div>
               </div>
 
