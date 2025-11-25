@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNews } from "@/hooks/useNews";
+import { supabase } from "@/lib/supabase";
+import type { Job } from "@/types/job";
 
 const FILTERS = [
   "Tudo", "IA", "Startups", "Tecnologia", "Design", "Produto",
@@ -10,29 +12,35 @@ interface NewsPageProps {
   onNewsClick: (id: number) => void;
 }
 
-const JOBS = [
-  { title: "Designer", company: "Yuzu", date: "18 set" },
-  { title: "Product Designer Sênior", company: "Phantom", date: "20 ago" },
-  { title: "Product Designer", company: "Carberry & Hanrahan", date: "18 ago", initials: "CH", color: "emerald" },
-  { title: "Designer de Marca", company: "Titan", date: "31 jul" }
-];
-
-const USERS = [
-  { name: "Marjorie T Eunike", username: "@margedesign", initials: "ME", color: "indigo" },
-  { name: "Chronicles Embod…", username: "@chroniclesuix", initials: "CE", color: "emerald" },
-  { name: "Ethereal Nexus O…", username: "@etherealux", initials: "EN", color: "purple" }
-];
-
 export default function NewsPage({ onNewsClick }: NewsPageProps) {
   const [activeFilter, setActiveFilter] = useState("Tudo");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [recentJobs, setRecentJobs] = useState<Job[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Fetch news from Supabase with category filter
   const { news, isLoading, hasMore, loadMore } = useNews(activeFilter);
+
+  // Fetch recent jobs
+  useEffect(() => {
+    const fetchRecentJobs = async () => {
+      const { data, error } = await supabase
+        .from('vagas_ia')
+        .select('*')
+        .eq('status', 'active')
+        .order('posted_at', { ascending: false })
+        .limit(4);
+
+      if (data && !error) {
+        setRecentJobs(data);
+      }
+    };
+
+    fetchRecentJobs();
+  }, []);
 
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
@@ -282,7 +290,7 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
         </div>
 
         {/* Recent Jobs */}
-        <div className="p-8 border-b border-zinc-800">
+        <div className="p-8">
           <div className="flex items-center justify-between mb-6">
             <h3>Vagas recentes</h3>
             <button className="px-3 py-2 text-sm border border-zinc-800 rounded-lg hover:bg-zinc-800">
@@ -291,63 +299,34 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
           </div>
 
           <div className="space-y-0">
-            {JOBS.map((job, i) => {
-              const colorMap: Record<string, string> = {
-                emerald: 'bg-emerald-500',
-                indigo: 'bg-indigo-500',
-                purple: 'bg-purple-500',
-                red: 'bg-red-500',
-              };
-              const bgColor = job.color ? colorMap[job.color] || 'bg-zinc-500' : 'bg-[#202023]';
+            {recentJobs.length > 0 ? (
+              recentJobs.map((job) => {
+                const firstLetter = job.company_name?.charAt(0).toUpperCase() || 'J';
+                const formattedDate = new Date(job.posted_at).toLocaleDateString('pt-BR', {
+                  day: 'numeric',
+                  month: 'short'
+                });
 
-              return (
-                <div key={i} className="flex items-center gap-3 px-4 py-4 -mx-4 hover:bg-zinc-900 rounded-xl">
-                  {job.initials ? (
-                    <div className={`size-12 rounded-xl flex items-center justify-center shrink-0 ${bgColor}`}>
-                      <span className="text-sm">{job.initials}</span>
+                return (
+                  <div key={job.id} className="flex items-center gap-3 px-4 py-4 -mx-4 hover:bg-zinc-900 rounded-xl cursor-pointer">
+                    <div className="size-12 rounded-xl bg-[#202023] flex items-center justify-center shrink-0">
+                      <span className="text-sm font-medium">{firstLetter}</span>
                     </div>
-                  ) : (
-                    <div className="size-12 rounded-xl bg-[#202023] shrink-0" />
-                  )}
 
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm mb-0.5 text-zinc-100 truncate">{job.title}</h4>
-                    <p className="text-sm text-zinc-500 truncate">{job.company}</p>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm mb-0.5 text-zinc-100 truncate">{job.job_title}</h4>
+                      <p className="text-sm text-zinc-500 truncate">{job.company_name}</p>
+                    </div>
+
+                    <span className="text-xs text-zinc-600 whitespace-nowrap">{formattedDate}</span>
                   </div>
-
-                  <span className="text-xs text-zinc-600 whitespace-nowrap">{job.date}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Novos assinantes */}
-        <div className="p-8">
-          <h3 className="mb-6">Novos assinantes</h3>
-
-          <div className="space-y-0">
-            {USERS.map((user, i) => {
-              const colorMap: Record<string, string> = {
-                emerald: 'bg-emerald-500',
-                indigo: 'bg-indigo-500',
-                purple: 'bg-purple-500',
-                red: 'bg-red-500',
-              };
-              const bgColor = colorMap[user.color] || 'bg-zinc-500';
-
-              return (
-                <div key={i} className="flex items-center gap-3 px-4 py-4 -mx-4 rounded-xl hover:bg-zinc-900 cursor-pointer">
-                  <div className={`size-10 rounded-full flex items-center justify-center shrink-0 ${bgColor}`}>
-                    <span className="text-sm">{user.initials}</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm text-zinc-100 truncate">{user.name}</h4>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-zinc-500 text-sm">
+                Nenhuma vaga disponível
+              </div>
+            )}
           </div>
         </div>
       </aside>
