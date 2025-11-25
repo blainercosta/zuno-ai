@@ -13,38 +13,56 @@ export function useNews(category?: string) {
   const fetchNews = useCallback(async (pageNumber: number, filterCategory?: string) => {
     setIsLoading(true)
 
-    const start = pageNumber * NEWS_PER_PAGE
-    const end = start + NEWS_PER_PAGE - 1
-
-    let query = supabase
+    // Build query for news table
+    let newsQuery = supabase
       .from('news')
       .select('*')
       .eq('status', 'published')
-      .order('published_at', { ascending: false })
+
+    // Build query for posts table
+    let postsQuery = supabase
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
 
     // Apply category filter if provided and not "Tudo"
     if (filterCategory && filterCategory !== 'Tudo') {
-      query = query.eq('category', filterCategory)
+      newsQuery = newsQuery.eq('category', filterCategory)
+      postsQuery = postsQuery.eq('category', filterCategory)
     }
 
-    const { data, error } = await query.range(start, end)
+    // Fetch from both tables
+    const [newsResult, postsResult] = await Promise.all([
+      newsQuery,
+      postsQuery
+    ])
 
-    if (error) {
-      console.error('Error fetching news:', error)
-      setIsLoading(false)
-      return
+    if (newsResult.error) {
+      console.error('Error fetching news:', newsResult.error)
     }
 
-    if (data) {
-      if (pageNumber === 0) {
-        setNews(data)
-      } else {
-        setNews(prev => [...prev, ...data])
-      }
-
-      setHasMore(data.length === NEWS_PER_PAGE)
+    if (postsResult.error) {
+      console.error('Error fetching posts:', postsResult.error)
     }
 
+    // Merge and sort results by published_at
+    const allNews = [
+      ...(newsResult.data || []),
+      ...(postsResult.data || [])
+    ].sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+
+    // Apply pagination
+    const start = pageNumber * NEWS_PER_PAGE
+    const end = start + NEWS_PER_PAGE
+    const paginatedNews = allNews.slice(start, end)
+
+    if (pageNumber === 0) {
+      setNews(paginatedNews)
+    } else {
+      setNews(prev => [...prev, ...paginatedNews])
+    }
+
+    setHasMore(paginatedNews.length === NEWS_PER_PAGE)
     setIsLoading(false)
   }, [])
 
