@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
 interface PostJobPageProps {
@@ -55,6 +55,15 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -96,12 +105,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
 
       if (error) throw error
 
+      setShowSuccess(true)
       setMessage({ type: 'success', text: 'Vaga publicada com sucesso!' })
 
-      // Limpar formulário após 2 segundos e voltar
+      // Voltar após 3 segundos
       setTimeout(() => {
         onBack()
-      }, 2000)
+      }, 3000)
 
     } catch (error: any) {
       console.error('Erro ao publicar vaga:', error)
@@ -124,51 +134,60 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen pb-20 md:pb-0">
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-16 h-[60px] md:h-[72px]">
-            {/* Drag Handle - Mobile Only */}
-            <div className="md:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-zinc-700 rounded-full"></div>
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fadeIn"
+        onClick={onBack}
+      />
 
-            {/* Back Button */}
-            <button
-              onClick={onBack}
-              className="size-10 flex items-center justify-center rounded-xl hover:bg-zinc-800 transition-colors"
-            >
-              <svg className="size-6" fill="none" viewBox="0 0 24 24">
-                <path d="M15 19L8 12L15 5" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-              </svg>
-            </button>
+      {/* Modal Container with slide-up animation */}
+      <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center pointer-events-none">
+        <div
+          className="pointer-events-auto w-full md:w-auto md:max-w-4xl md:mx-4 bg-zinc-950 md:rounded-2xl overflow-hidden animate-slideUp md:animate-scaleIn flex flex-col max-h-screen"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {!showSuccess ? (
+            // Form View
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Header */}
+              <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
+                <div className="flex items-center justify-between px-4 sm:px-6 lg:px-16 h-[60px] md:h-[72px]">
+                  {/* Drag Handle - Mobile Only */}
+                  <div className="md:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-zinc-700 rounded-full"></div>
 
-            {/* Title */}
-            <h2 className="text-sm md:text-base absolute left-1/2 -translate-x-1/2">Publicar vaga</h2>
+                  {/* Back Button */}
+                  <button
+                    onClick={onBack}
+                    className="size-10 flex items-center justify-center rounded-xl hover:bg-zinc-800 transition-colors"
+                  >
+                    <svg className="size-6" fill="none" viewBox="0 0 24 24">
+                      <path d="M15 19L8 12L15 5" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                    </svg>
+                  </button>
 
-            {/* Spacer */}
-            <div className="size-10"></div>
-          </div>
-        </div>
+                  {/* Title */}
+                  <h2 className="text-sm md:text-base absolute left-1/2 -translate-x-1/2">Publicar vaga</h2>
 
-        {/* Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-16 py-6 md:py-8 lg:py-16 overflow-y-auto">
-          <div className="max-w-[752px] mx-auto">
-            <h1 className="text-[24px] md:text-[30px] leading-[30px] md:leading-[36px] mb-2">Publicar uma vaga</h1>
-            <p className="text-[14px] md:text-[16px] leading-[21px] md:leading-[24px] text-zinc-400 mb-8 md:mb-12">
-              Preencha os campos abaixo para publicar sua vaga gratuitamente.
-            </p>
-
-            {/* Message */}
-            {message && (
-              <div className={`mb-8 p-4 rounded-xl border ${
-                message.type === 'success'
-                  ? 'bg-green-950/20 border-green-800 text-green-400'
-                  : 'bg-red-950/20 border-red-800 text-red-400'
-              }`}>
-                {message.text}
+                  {/* Spacer */}
+                  <div className="size-10"></div>
+                </div>
               </div>
-            )}
+
+              {/* Content */}
+              <div className="flex-1 px-4 sm:px-6 lg:px-16 py-6 md:py-8 lg:py-16 overflow-y-auto">
+                <div className="max-w-[752px] mx-auto">
+                  <h1 className="text-[24px] md:text-[30px] leading-[30px] md:leading-[36px] mb-2">Publicar uma vaga</h1>
+                  <p className="text-[14px] md:text-[16px] leading-[21px] md:leading-[24px] text-zinc-400 mb-8 md:mb-12">
+                    Preencha os campos abaixo para publicar sua vaga gratuitamente.
+                  </p>
+
+                  {/* Message */}
+                  {message && message.type === 'error' && (
+                    <div className="mb-8 p-4 rounded-xl border bg-red-950/20 border-red-800 text-red-400">
+                      {message.text}
+                    </div>
+                  )}
 
             <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
               {/* Informações da Empresa */}
@@ -462,28 +481,97 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                 </div>
               </div>
 
-              {/* Submit Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-8">
-                <button
-                  type="button"
-                  onClick={onBack}
-                  disabled={isSubmitting}
-                  className="order-2 sm:order-1 px-6 py-3.5 md:py-3 border border-zinc-800 rounded-xl text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] hover:bg-zinc-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="order-1 sm:order-2 flex-1 bg-white text-slate-950 px-6 py-3.5 md:py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Publicando...' : 'Publicar vaga gratuitamente'}
-                </button>
+                  {/* Submit Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-8">
+                    <button
+                      type="button"
+                      onClick={onBack}
+                      disabled={isSubmitting}
+                      className="order-2 sm:order-1 px-6 py-3.5 md:py-3 border border-zinc-800 rounded-xl text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] hover:bg-zinc-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="order-1 sm:order-2 flex-1 bg-white text-slate-950 px-6 py-3.5 md:py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? 'Publicando...' : 'Publicar vaga gratuitamente'}
+                    </button>
+                  </div>
+                </form>
+                </div>
               </div>
-            </form>
-          </div>
+            </div>
+          ) : (
+            // Success View
+            <div className="flex flex-col items-center justify-center p-8 md:p-12 lg:p-16 min-h-[400px]">
+              {/* Success Icon */}
+              <div className="size-16 md:size-20 mb-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <svg className="size-8 md:size-10 text-emerald-400" fill="none" viewBox="0 0 24 24">
+                  <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+
+              {/* Success Message */}
+              <h3 className="text-xl md:text-2xl font-semibold text-white mb-2 text-center">
+                Vaga publicada com sucesso!
+              </h3>
+              <p className="text-sm md:text-base text-zinc-400 text-center mb-6">
+                Sua vaga foi publicada e já está disponível na plataforma.
+              </p>
+
+              {/* Auto-close message */}
+              <p className="text-xs text-zinc-500 text-center">
+                Redirecionando em alguns segundos...
+              </p>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+
+        .animate-scaleIn {
+          animation: scaleIn 0.2s ease-out;
+        }
+      `}</style>
+    </>
   );
 }
