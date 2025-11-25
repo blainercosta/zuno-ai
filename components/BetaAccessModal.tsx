@@ -133,7 +133,6 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
             name: formData.name.trim(),
             email: formData.email.trim().toLowerCase(),
             phone: cleanPhone,
-            created_at: new Date().toISOString(),
           }
         ])
         .select();
