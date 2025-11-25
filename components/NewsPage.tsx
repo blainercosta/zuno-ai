@@ -309,7 +309,24 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
 
                 return (
                   <div key={job.id} className="flex items-center gap-3 px-4 py-4 -mx-4 hover:bg-zinc-900 rounded-xl cursor-pointer">
-                    <div className="size-12 rounded-xl bg-[#202023] flex items-center justify-center shrink-0">
+                    {job.logo_url ? (
+                      <img
+                        src={job.logo_url}
+                        alt={job.company_name}
+                        className="size-12 rounded-xl object-cover shrink-0"
+                        onError={(e) => {
+                          // Fallback to first letter if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="size-12 rounded-xl bg-[#202023] flex items-center justify-center shrink-0"
+                      style={{ display: job.logo_url ? 'none' : 'flex' }}
+                    >
                       <span className="text-sm font-medium">{firstLetter}</span>
                     </div>
 

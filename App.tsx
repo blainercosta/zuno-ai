@@ -5,6 +5,7 @@ import svgPathsModal from "./imports/svg-rto7qlii0f";
 import JobsPage from "./components/JobsPage";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
+import { getIdFromSlug, generateSlug } from "@/utils/shareUtils";
 
 // Lazy load componentes secundários para reduzir bundle inicial
 const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
@@ -77,13 +78,21 @@ export default function App() {
     }
   }, []);
 
-  // Detecta job_id na URL ao carregar a página
+  // Detecta job_id ou news na URL ao carregar a página
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const jobId = params.get('job');
+    const newsSlug = params.get('news');
 
     if (jobId) {
       fetchJobById(jobId);
+    } else if (newsSlug) {
+      const newsId = getIdFromSlug(newsSlug);
+      if (newsId) {
+        setSelectedNewsId(newsId);
+        setCurrentPage('news-detail');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   }, [fetchJobById]);
 
@@ -95,6 +104,20 @@ export default function App() {
       url.searchParams.set('job', jobId);
     } else {
       url.searchParams.delete('job');
+    }
+
+    window.history.pushState({}, '', url.toString());
+  }, []);
+
+  // Atualiza URL quando navegar para uma notícia
+  const updateNewsURL = useCallback((newsId: number | null, newsTitle?: string) => {
+    const url = new URL(window.location.href);
+
+    if (newsId && newsTitle) {
+      const slug = generateSlug(newsTitle, newsId);
+      url.searchParams.set('news', slug);
+    } else {
+      url.searchParams.delete('news');
     }
 
     window.history.pushState({}, '', url.toString());
@@ -137,7 +160,8 @@ export default function App() {
   const handleNewsClick = useCallback(() => {
     setCurrentPage("news");
     updateURL(null);
-  }, [updateURL]);
+    updateNewsURL(null);
+  }, [updateURL, updateNewsURL]);
 
   const handleBackToJobs = useCallback(() => {
     setCurrentPage("jobs");
@@ -149,16 +173,43 @@ export default function App() {
     updateURL(null);
   }, [updateURL]);
 
-  const handleNewsDetailClick = useCallback((newsId: number) => {
+  const handleNewsDetailClick = useCallback(async (newsId: number) => {
     setSelectedNewsId(newsId);
     setCurrentPage("news-detail");
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+
+    // Fetch news title to update URL with slug
+    try {
+      const { data: newsData } = await supabase
+        .from('news')
+        .select('title')
+        .eq('id', newsId)
+        .single();
+
+      if (newsData) {
+        updateNewsURL(newsId, newsData.title);
+      } else {
+        // Try posts table if not found in news
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+
+        if (postData) {
+          updateNewsURL(newsId, postData.title);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching news title for URL:', error);
+    }
+  }, [updateNewsURL]);
 
   const handleBackToNews = useCallback(() => {
     setCurrentPage("news");
+    updateNewsURL(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [updateNewsURL]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
