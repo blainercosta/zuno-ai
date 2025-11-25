@@ -272,7 +272,7 @@ export default function App() {
 
       <div className="flex">
         {/* Left Sidebar */}
-        <aside className="w-[72px] border-r border-zinc-800 shrink-0">
+        <aside className="hidden md:block w-[72px] border-r border-zinc-800 shrink-0">
           <div className="sticky top-0 h-screen flex flex-col">
             {/* Logo */}
             <div className="h-[68.88px] flex items-center justify-center relative">
@@ -640,6 +640,47 @@ export default function App() {
         </aside>
         )}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-zinc-800 z-50">
+        <div className="flex items-center justify-around h-16 px-4">
+          {/* Jobs/Suit */}
+          <button
+            onClick={handleBackToJobs}
+            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+              currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job"
+                ? "text-white"
+                : "text-zinc-500"
+            }`}
+            aria-label="Jobs"
+            aria-current={currentPage === "jobs" || currentPage === "job-detail" || currentPage === "post-job" ? "page" : undefined}
+          >
+            <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 23" aria-hidden="true">
+              <path fillRule="evenodd" clipRule="evenodd" d="M17.0024 20.1288H6.99825C4.78819 20.1288 2.99658 18.4118 2.99658 16.2939V8.62401C2.99658 7.56502 3.89239 6.70654 4.99742 6.70654H19.0032C20.1083 6.70654 21.0041 7.56502 21.0041 8.62401V16.2939C21.0041 18.4118 19.2125 20.1288 17.0024 20.1288Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7.99854 6.70651V4.78905C7.99854 3.73006 8.89434 2.87158 9.99937 2.87158H14.001C15.1061 2.87158 16.0019 3.73006 16.0019 4.78905V6.70651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14.0007 11.9793H17.5021C19.4359 11.9793 21.0036 10.477 21.0036 8.62378M14.9995 11.9791L6.49755 11.9793C4.56375 11.9793 2.99609 10.477 2.99609 8.62378" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-[10px]">Vagas</span>
+          </button>
+
+          {/* News/Fire */}
+          <button
+            onClick={handleNewsClick}
+            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+              currentPage === "news" || currentPage === "news-detail"
+                ? "text-white"
+                : "text-zinc-500"
+            }`}
+            aria-label="News"
+            aria-current={currentPage === "news" || currentPage === "news-detail" ? "page" : undefined}
+          >
+            <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-[10px]">News</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Project Modal */}
       {showProjectModal && (

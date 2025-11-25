@@ -111,11 +111,11 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
   const topNews = useMemo(() => news.slice(0, 4), [news]);
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full pb-16 md:pb-0">
       <div className="flex-1 min-w-0">
         <div className="py-4 md:py-5 lg:py-5">
         {/* Filters */}
-        <div className="mb-5 px-8">
+        <div className="mb-5 px-4 md:px-6 lg:px-8">
           <div className="flex items-center gap-2">
           {/* Left Navigation Button */}
           {showLeftArrow && (
@@ -166,7 +166,7 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
         </div>
 
         {/* News Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 px-4 md:px-6 lg:px-8">
           {filteredNews.map((item) => (
             <article
               key={item.id}

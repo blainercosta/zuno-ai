@@ -139,7 +139,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
       {/* Hero Image */}
       {news.image_url && (
-        <div className="w-full aspect-[21/9] md:aspect-[21/9] bg-zinc-900 overflow-hidden">
+        <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-zinc-900 overflow-hidden">
           <img
             src={news.image_url}
             alt={news.title}
@@ -152,7 +152,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
       )}
 
       {/* Content */}
-      <div className="max-w-[720px] mx-auto px-6 md:px-8 py-12">
+      <div className="max-w-[720px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
         {/* Category Badge */}
         <div className="mb-6">
           <span className="inline-block px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-zinc-300 font-medium">
@@ -173,11 +173,11 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         )}
 
         {/* Meta */}
-        <div className="flex items-center gap-4 text-sm text-zinc-500 mb-12 pb-8 border-b border-zinc-800">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-zinc-500 mb-8 md:mb-12 pb-6 md:pb-8 border-b border-zinc-800">
           <span>{news.author}</span>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <span>{new Date(news.published_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <span>{news.read_time} de leitura</span>
         </div>
 

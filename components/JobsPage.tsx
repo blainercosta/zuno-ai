@@ -72,11 +72,11 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
       <FAQSchema faqs={faqs} />
 
       {/* Hero Section */}
-      <div className="max-w-[968px] mx-auto px-24 pt-20 pb-16 sm:pt-24 sm:pb-24">
+      <div className="max-w-[968px] mx-auto px-4 md:px-8 lg:px-24 pt-12 pb-8 sm:pt-20 sm:pb-16 md:pt-24 md:pb-24">
         <div className="text-center">
-          <h1 className="text-[32px] sm:text-[48px] leading-[1.2] mb-6">
-            Vagas de IA para profissionais<br />
-            no Brasil
+          <h1 className="text-[28px] sm:text-[36px] md:text-[48px] leading-[1.2] mb-4 md:mb-6">
+            Vagas de IA para profissionais<br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>no Brasil
           </h1>
 
           <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[480px] mx-auto">
@@ -154,15 +154,15 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
       </div>
 
       {/* Jobs List */}
-      <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-24 md:pb-16">
         <div className="space-y-4">
           {jobs.map((job) => (
             <article
               key={job.id}
               onClick={() => onJobClick(job)}
-              className="border border-zinc-800 rounded-2xl p-6 hover:bg-zinc-900/30 transition-colors cursor-pointer group"
+              className="border border-zinc-800 rounded-2xl p-4 md:p-6 hover:bg-zinc-900/30 transition-colors cursor-pointer group"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start md:items-center gap-3 md:gap-4">
                 {/* Logo */}
                 <div className="shrink-0">
                   {job.logo_url ? (
@@ -186,11 +186,11 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
 
                 {/* Job Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-[18px] leading-[18px] text-white mb-3 truncate">{job.job_title}</h3>
-                  <div className="flex items-center gap-2 text-[14px] leading-[20px] min-w-0">
-                    <span className="text-zinc-300 truncate shrink-0">{job.company_name}</span>
+                  <h3 className="text-[16px] md:text-[18px] leading-tight text-white mb-2 md:mb-3 line-clamp-2 md:truncate">{job.job_title}</h3>
+                  <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-[13px] md:text-[14px] leading-[18px] md:leading-[20px] min-w-0">
+                    <span className="text-zinc-300 truncate">{job.company_name}</span>
                     <span className="text-zinc-500 truncate">
-                      · {job.location}
+                      {job.location}
                       {job.seniority_level && ` · ${job.seniority_level}`}
                       {job.employment_type && ` · ${job.employment_type}`}
                     </span>
