@@ -12,8 +12,6 @@ const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
 const PostJobPage = lazy(() => import("./components/PostJobPage"));
 const NewsPage = lazy(() => import("./components/NewsPage"));
 const NewsDetailPage = lazy(() => import("./components/NewsDetailPage"));
-const ProfessionalsPage = lazy(() => import("./components/ProfessionalsPage"));
-const ProfessionalDetailPage = lazy(() => import("./components/ProfessionalDetailPage"));
 
 // Placeholder images
 const imgFrame2 = "https://placehold.co/800x600/1a1a1a/808080?text=Project+Preview";
@@ -41,23 +39,10 @@ const USERS = [
   { name: "Ethereal Nexus O…", username: "@etherealux", initials: "EN", color: "purple" }
 ];
 
-interface Professional {
-  id: number
-  name: string
-  role: string
-  image_url: string
-  status: 'online' | 'offline'
-  badge?: string
-  rating: number
-  location?: string
-  skills?: string[]
-}
-
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<"home" | "jobs" | "job-detail" | "post-job" | "news" | "news-detail" | "professionals" | "professional-detail">("jobs");
+  const [currentPage, setCurrentPage] = useState<"home" | "jobs" | "job-detail" | "post-job" | "news" | "news-detail">("jobs");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [selectedNewsId, setSelectedNewsId] = useState<number | null>(null);
-  const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [activeFilter, setActiveFilter] = useState("All");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -177,23 +162,6 @@ export default function App() {
     updateURL(null);
     updateNewsURL(null);
   }, [updateURL, updateNewsURL]);
-
-  const handleProfessionalsClick = useCallback(() => {
-    setCurrentPage("professionals");
-    updateURL(null);
-    updateNewsURL(null);
-  }, [updateURL, updateNewsURL]);
-
-  const handleProfessionalClick = useCallback((professional: Professional) => {
-    setSelectedProfessional(professional);
-    setCurrentPage("professional-detail");
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const handleBackToProfessionals = useCallback(() => {
-    setCurrentPage("professionals");
-    setSelectedProfessional(null);
-  }, []);
 
   const handleBackToJobs = useCallback(() => {
     setCurrentPage("jobs");
@@ -355,21 +323,6 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* Professionals/Users */}
-              <button
-                onClick={handleProfessionalsClick}
-                className={`size-14 flex items-center justify-center rounded-xl ${currentPage === "professionals" ? "bg-zinc-800" : "hover:bg-zinc-800"}`}
-                aria-label="Professionals"
-                aria-current={currentPage === "professionals" ? "page" : undefined}
-              >
-                <svg className="size-6" fill="none" stroke={currentPage === "professionals" ? "white" : "#CBD5E1"} viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-
               {/* News/Fire */}
               <button
                 onClick={handleNewsClick}
@@ -417,10 +370,6 @@ export default function App() {
               <NewsDetailPage newsId={selectedNewsId || 1} onBack={handleBackToNews} />
             ) : currentPage === "news" ? (
               <NewsPage onNewsClick={handleNewsDetailClick} />
-            ) : currentPage === "professional-detail" && selectedProfessional ? (
-              <ProfessionalDetailPage professional={selectedProfessional} onBack={handleBackToProfessionals} />
-            ) : currentPage === "professionals" ? (
-              <ProfessionalsPage onProfessionalClick={handleProfessionalClick} />
             ) : currentPage === "post-job" ? (
               <PostJobPage onBack={handleBackToJobs} />
             ) : currentPage === "job-detail" ? (
