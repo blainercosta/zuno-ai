@@ -1,76 +1,9 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-
-// Placeholder images
-const imgNews1 = "https://placehold.co/800x600/1a1a1a/808080?text=News+1";
-const imgNews2 = "https://placehold.co/800x600/1a1a1a/808080?text=News+2";
-const imgNews3 = "https://placehold.co/800x600/1a1a1a/808080?text=News+3";
+import { useNews } from "@/hooks/useNews";
 
 const FILTERS = [
   "Tudo", "IA", "Startups", "Tecnologia", "Design", "Produto",
   "Engenharia", "Dados", "Web3", "DevOps", "Mobile", "Backend"
-];
-
-const NEWS_DATA = [
-  {
-    id: 1,
-    title: "Como a IA está transformando o mercado de trabalho brasileiro",
-    excerpt: "Entenda como a inteligência artificial está criando novas oportunidades e mudando a forma como trabalhamos.",
-    author: "João Silva",
-    date: "há 2 dias",
-    readTime: "5 min",
-    category: "IA",
-    image: imgNews1
-  },
-  {
-    id: 2,
-    title: "Startups brasileiras que estão revolucionando o mercado de IA",
-    excerpt: "Conheça as principais empresas nacionais que estão inovando com inteligência artificial.",
-    author: "Maria Santos",
-    date: "há 3 dias",
-    readTime: "8 min",
-    category: "Startups",
-    image: imgNews2
-  },
-  {
-    id: 3,
-    title: "O futuro do trabalho remoto em tecnologia",
-    excerpt: "Como as empresas de tech estão se adaptando ao novo modelo de trabalho distribuído.",
-    author: "Pedro Costa",
-    date: "há 5 dias",
-    readTime: "6 min",
-    category: "Tecnologia",
-    image: imgNews3
-  },
-  {
-    id: 4,
-    title: "Habilidades mais procuradas em IA para 2024",
-    excerpt: "Descubra quais competências técnicas as empresas estão buscando em profissionais de IA.",
-    author: "Ana Oliveira",
-    date: "há 1 semana",
-    readTime: "7 min",
-    category: "IA",
-    image: imgNews1
-  },
-  {
-    id: 5,
-    title: "Como preparar seu portfólio para vagas em tech",
-    excerpt: "Dicas práticas para destacar seu trabalho e impressionar recrutadores.",
-    author: "Carlos Mendes",
-    date: "há 1 semana",
-    readTime: "4 min",
-    category: "Design",
-    image: imgNews2
-  },
-  {
-    id: 6,
-    title: "Tendências em desenvolvimento de produtos com IA",
-    excerpt: "As principais inovações que estão moldando o futuro do product design.",
-    author: "Juliana Lima",
-    date: "há 2 semanas",
-    readTime: "9 min",
-    category: "Produto",
-    image: imgNews3
-  }
 ];
 
 interface NewsPageProps {
@@ -90,19 +23,16 @@ const USERS = [
   { name: "Ethereal Nexus O…", username: "@etherealux", initials: "EN", color: "purple" }
 ];
 
-const TOP_NEWS = [
-  { id: 1, title: "Como a IA está transformando o mercado de trabalho brasileiro", readTime: "5 min" },
-  { id: 2, title: "Startups brasileiras que estão revolucionando o mercado de IA", readTime: "8 min" },
-  { id: 3, title: "O futuro do trabalho remoto em tecnologia", readTime: "6 min" },
-  { id: 4, title: "Habilidades mais procuradas em IA para 2024", readTime: "7 min" },
-];
-
 export default function NewsPage({ onNewsClick }: NewsPageProps) {
   const [activeFilter, setActiveFilter] = useState("Tudo");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Fetch news from Supabase with category filter
+  const { news, isLoading, hasMore, loadMore } = useNews(activeFilter);
 
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
@@ -134,16 +64,43 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
     }
   }, [handleScroll]);
 
-  // Filter news based on active filter and search query - memoized for performance
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [loadMore, hasMore, isLoading]);
+
+  // Filter news based on search query - memoized for performance
   const filteredNews = useMemo(() => {
-    return NEWS_DATA.filter((news) => {
-      const matchesFilter = activeFilter === "Tudo" || news.category === activeFilter;
-      const matchesSearch = searchQuery === "" ||
-        news.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        news.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesFilter && matchesSearch;
+    if (!searchQuery) return news;
+
+    return news.filter((item) => {
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
     });
-  }, [activeFilter, searchQuery]);
+  }, [news, searchQuery]);
+
+  // Get top 4 news for sidebar (most recent)
+  const topNews = useMemo(() => news.slice(0, 4), [news]);
 
   return (
     <div className="flex w-full">
@@ -202,42 +159,78 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
 
         {/* News Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 px-8">
-          {filteredNews.map((news) => (
-            <div
-              key={news.id}
-              onClick={() => onNewsClick(news.id)}
+          {filteredNews.map((item) => (
+            <article
+              key={item.id}
+              onClick={() => onNewsClick(item.id)}
               className="group cursor-pointer"
             >
               {/* Image */}
-              <div className="relative mb-3 overflow-hidden rounded-xl aspect-[4/3]">
-                <img
-                  src={news.image}
-                  alt={news.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative mb-3 overflow-hidden rounded-xl aspect-[4/3] bg-zinc-900">
+                {item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-zinc-700">
+                    <svg className="size-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                  </div>
+                )}
                 <div className="absolute inset-0 shadow-[0px_0px_0px_1px_inset_rgba(0,0,0,0.05)]" />
               </div>
 
               {/* Content - vertical layout */}
               <div className="space-y-2">
                 {/* Read time */}
-                <p className="text-sm text-zinc-500">{news.readTime} de leitura</p>
+                <p className="text-sm text-zinc-500">{item.read_time} de leitura</p>
 
                 {/* Title */}
-                <h3 className="text-sm text-white">
-                  {news.title}
+                <h3 className="text-sm text-white line-clamp-2">
+                  {item.title}
                 </h3>
 
                 {/* Excerpt */}
-                <p className="text-sm text-zinc-400">
-                  {news.excerpt}
+                <p className="text-sm text-zinc-400 line-clamp-2">
+                  {item.excerpt}
                 </p>
               </div>
-            </div>
+            </article>
           ))}
         </div>
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="flex justify-center py-8">
+            <svg className="animate-spin size-6 text-zinc-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+              <path className="opacity-60" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          </div>
+        )}
+
+        {/* Intersection Observer Target */}
+        {hasMore && <div ref={observerTarget} className="h-4" />}
+
+        {/* End Message */}
+        {!hasMore && !isLoading && filteredNews.length > 0 && (
+          <div className="text-center py-12 text-zinc-500 text-[14px] leading-[20px]">
+            Isto é tudo pessoal.
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && filteredNews.length === 0 && (
+          <div className="text-center py-16 text-zinc-500">
+            <p className="text-lg mb-2">Nenhuma notícia encontrada</p>
+            <p className="text-sm">Tente ajustar os filtros ou busca</p>
+          </div>
+        )}
         </div>
       </div>
 
@@ -266,10 +259,10 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
           <h3 className="mb-6">Mais lidas da semana</h3>
 
           <div className="space-y-4">
-            {TOP_NEWS.map((news, i) => (
+            {topNews.map((item, i) => (
               <div
-                key={news.id}
-                onClick={() => onNewsClick(news.id)}
+                key={item.id}
+                onClick={() => onNewsClick(item.id)}
                 className="cursor-pointer group"
               >
                 <div className="flex gap-3">
@@ -278,9 +271,9 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
                   </span>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
-                      {news.title}
+                      {item.title}
                     </h4>
-                    <p className="text-xs text-zinc-500">{news.readTime} de leitura</p>
+                    <p className="text-xs text-zinc-500">{item.read_time} de leitura</p>
                   </div>
                 </div>
               </div>
