@@ -124,12 +124,15 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen pb-20 md:pb-0">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-16 h-[72px]">
+          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-16 h-[60px] md:h-[72px]">
+            {/* Drag Handle - Mobile Only */}
+            <div className="md:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-zinc-700 rounded-full"></div>
+
             {/* Back Button */}
             <button
               onClick={onBack}
@@ -141,7 +144,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
             </button>
 
             {/* Title */}
-            <h2 className="text-base absolute left-1/2 -translate-x-1/2">Publicar vaga</h2>
+            <h2 className="text-sm md:text-base absolute left-1/2 -translate-x-1/2">Publicar vaga</h2>
 
             {/* Spacer */}
             <div className="size-10"></div>
@@ -149,10 +152,10 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
+        <div className="flex-1 px-4 sm:px-6 lg:px-16 py-6 md:py-8 lg:py-16 overflow-y-auto">
           <div className="max-w-[752px] mx-auto">
-            <h1 className="text-[30px] leading-[36px] mb-2">Publicar uma vaga</h1>
-            <p className="text-[16px] leading-[24px] text-zinc-400 mb-12">
+            <h1 className="text-[24px] md:text-[30px] leading-[30px] md:leading-[36px] mb-2">Publicar uma vaga</h1>
+            <p className="text-[14px] md:text-[16px] leading-[21px] md:leading-[24px] text-zinc-400 mb-8 md:mb-12">
               Preencha os campos abaixo para publicar sua vaga gratuitamente.
             </p>
 
@@ -167,13 +170,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-12">
+            <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
               {/* Informações da Empresa */}
-              <div className="space-y-6">
-                <h3 className="text-[20px] leading-[30px] text-slate-50">Informações da empresa</h3>
+              <div className="space-y-5 md:space-y-6">
+                <h3 className="text-[18px] md:text-[20px] leading-[27px] md:leading-[30px] text-slate-50">Informações da empresa</h3>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Nome da empresa *
                   </label>
                   <input
@@ -182,13 +185,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.company_name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="Ex: Acme Inc"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Website da empresa
                   </label>
                   <input
@@ -196,13 +199,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     name="company_url"
                     value={formData.company_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="https://exemplo.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     URL do logo da empresa
                   </label>
                   <input
@@ -210,16 +213,16 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     name="logo_url"
                     value={formData.logo_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="https://exemplo.com/logo.png"
                   />
-                  <p className="text-[12px] leading-[18px] text-zinc-500 mt-2">
+                  <p className="text-[13px] md:text-[12px] leading-[19px] md:leading-[18px] text-zinc-500 mt-2">
                     Cole a URL de uma imagem hospedada (PNG ou JPG)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Sobre a empresa *
                   </label>
                   <textarea
@@ -228,18 +231,18 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Descreva sua empresa, missão e cultura..."
                   />
                 </div>
               </div>
 
               {/* Informações da Vaga */}
-              <div className="space-y-6 pt-8 border-t border-zinc-800">
-                <h3 className="text-[20px] leading-[30px] text-slate-50">Informações da vaga</h3>
+              <div className="space-y-5 md:space-y-6 pt-6 md:pt-8 border-t border-zinc-800">
+                <h3 className="text-[18px] md:text-[20px] leading-[27px] md:leading-[30px] text-slate-50">Informações da vaga</h3>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Título da vaga *
                   </label>
                   <input
@@ -248,13 +251,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.job_title}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="Ex: Product Designer Sênior"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Descrição completa da vaga
                   </label>
                   <textarea
@@ -262,14 +265,14 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.description_full}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Descrição geral da vaga..."
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                    <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                       Localização
                     </label>
                     <input
@@ -277,20 +280,20 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                      className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                       placeholder="Ex: São Paulo, SP"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                    <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                       Nível de senioridade
                     </label>
                     <select
                       name="seniority_level"
                       value={formData.seniority_level}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
+                      className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
                     >
                       <option value="" className="bg-zinc-900">Selecione</option>
                       <option value="Júnior" className="bg-zinc-900">Júnior</option>
@@ -305,14 +308,14 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                    <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                       Tipo de emprego
                     </label>
                     <select
                       name="employment_type"
                       value={formData.employment_type}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
+                      className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
                     >
                       <option value="" className="bg-zinc-900">Selecione</option>
                       <option value="Tempo integral" className="bg-zinc-900">Tempo integral</option>
@@ -324,14 +327,14 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                   </div>
 
                   <div>
-                    <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                    <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                       Tipo de local de trabalho
                     </label>
                     <select
                       name="workplace_type"
                       value={formData.workplace_type}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
+                      className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white focus:outline-none focus:border-zinc-700 transition-colors appearance-none cursor-pointer"
                     >
                       <option value="" className="bg-zinc-900">Selecione</option>
                       <option value="Remoto" className="bg-zinc-900">Remoto</option>
@@ -355,7 +358,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Salário
                   </label>
                   <input
@@ -363,13 +366,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     name="salary"
                     value={formData.salary}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="Ex: R$ 10.000 - 15.000 / mês"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Responsabilidades *
                   </label>
                   <textarea
@@ -378,13 +381,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Descreva as principais responsabilidades da função..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Requisitos *
                   </label>
                   <textarea
@@ -393,13 +396,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Liste os requisitos necessários para a vaga..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Diferenciais
                   </label>
                   <textarea
@@ -407,13 +410,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.differentials}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Liste os diferenciais que seriam um plus..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Benefícios
                   </label>
                   <textarea
@@ -421,13 +424,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.benefits}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Descreva os benefícios oferecidos..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Processo seletivo
                   </label>
                   <textarea
@@ -435,13 +438,13 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.process}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                     placeholder="Descreva as etapas do processo seletivo..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                  <label className="block text-[15px] md:text-[14px] leading-[22px] md:leading-[21px] mb-2.5 md:mb-2 text-zinc-300">
                     Link para candidatura *
                   </label>
                   <input
@@ -450,7 +453,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                     value={formData.job_url}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-transparent border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
+                    className="w-full px-4 py-3.5 md:py-3 bg-transparent border border-zinc-800 rounded-xl text-[16px] md:text-[15px] text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-colors"
                     placeholder="https://linkedin.com/jobs/view/123456"
                   />
                   <p className="text-[12px] leading-[18px] text-zinc-500 mt-2">
@@ -460,19 +463,19 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-8">
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-8">
                 <button
                   type="button"
                   onClick={onBack}
                   disabled={isSubmitting}
-                  className="order-2 sm:order-1 px-6 py-3 border border-zinc-800 rounded-xl text-[15px] leading-[15px] hover:bg-zinc-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="order-2 sm:order-1 px-6 py-3.5 md:py-3 border border-zinc-800 rounded-xl text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] hover:bg-zinc-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="order-1 sm:order-2 flex-1 bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[15px] leading-[15px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="order-1 sm:order-2 flex-1 bg-white text-slate-950 px-6 py-3.5 md:py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[16px] md:text-[15px] leading-[16px] md:leading-[15px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Publicando...' : 'Publicar vaga gratuitamente'}
                 </button>
