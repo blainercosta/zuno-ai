@@ -31,7 +31,7 @@ export const copyToClipboard = async (url: string): Promise<boolean> => {
   }
 };
 
-export const generateSlug = (title: string, id: number): string => {
+export const generateSlug = (title: string, id: number | string): string => {
   const slug = title
     .toLowerCase()
     .normalize('NFD')
@@ -48,4 +48,18 @@ export const getIdFromSlug = (slug: string): number | null => {
   const parts = slug.split('-');
   const id = parseInt(parts[parts.length - 1]);
   return isNaN(id) ? null : id;
+};
+
+// Generate slug for professionals (name-based)
+export const generateProfessionalSlug = (name: string, id: number): string => {
+  const slug = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .trim();
+
+  return `${slug}-${id}`;
 };

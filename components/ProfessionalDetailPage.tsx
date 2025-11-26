@@ -1,17 +1,8 @@
 import { useState } from 'react'
+import type { Professional } from '@/types/professional'
 
 interface ProfessionalDetailPageProps {
-  professional: {
-    id: number
-    name: string
-    role: string
-    image_url: string
-    status: 'online' | 'offline'
-    badge?: string
-    rating: number
-    location?: string
-    skills?: string[]
-  }
+  professional: Professional
   onBack: () => void
 }
 
@@ -143,6 +134,29 @@ export default function ProfessionalDetailPage({ professional, onBack }: Profess
                   src={professional.image_url}
                   alt={professional.name}
                   className="w-full h-full object-cover"
+                  onLoad={(e) => {
+                    console.log(`✅ [DETAIL] Avatar carregado:`, {
+                      name: professional.name,
+                      url: professional.image_url,
+                      naturalWidth: e.currentTarget.naturalWidth,
+                      naturalHeight: e.currentTarget.naturalHeight
+                    });
+                  }}
+                  onError={(e) => {
+                    console.warn(`⚠️ [DETAIL] Erro ao carregar avatar:`, {
+                      name: professional.name,
+                      attempted_url: professional.image_url,
+                      fallback_1: `https://avatar.vercel.sh/${professional.name.toLowerCase().replace(/\s+/g, '-')}`,
+                      fallback_2: `https://avatar.vercel.sh/${professional.id}`
+                    });
+                    // Sistema de fallback em cascata
+                    const fallback1 = `https://avatar.vercel.sh/${professional.name.toLowerCase().replace(/\s+/g, '-')}`;
+                    if (e.currentTarget.src !== fallback1) {
+                      e.currentTarget.src = fallback1;
+                    } else {
+                      e.currentTarget.src = `https://avatar.vercel.sh/${professional.id}`;
+                    }
+                  }}
                 />
               </div>
             </div>
