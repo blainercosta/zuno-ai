@@ -1,8 +1,17 @@
+export interface ContentBlock {
+  type: 'paragraph' | 'heading' | 'image' | 'callout' | 'divider'
+  text?: string
+  level?: number
+  url?: string
+  caption?: string
+  style?: string
+}
+
 export interface News {
-  id: number
+  id: number | string  // posts table uses integer, news table uses UUID
   title: string
   excerpt: string
-  content?: string
+  content?: string | ContentBlock[]  // Can be HTML string or structured JSON array
   author: string
   author_avatar?: string
   published_at: string

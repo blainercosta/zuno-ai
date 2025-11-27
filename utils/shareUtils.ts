@@ -44,7 +44,15 @@ export const generateSlug = (title: string, id: number | string): string => {
   return `${slug}-${id}`;
 };
 
-export const getIdFromSlug = (slug: string): number | null => {
+export const getIdFromSlug = (slug: string): number | string | null => {
+  // Check if slug ends with UUID (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+  const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidMatch = slug.match(uuidPattern);
+  if (uuidMatch) {
+    return uuidMatch[0];
+  }
+
+  // Otherwise try to get integer ID from last segment
   const parts = slug.split('-');
   const id = parseInt(parts[parts.length - 1]);
   return isNaN(id) ? null : id;

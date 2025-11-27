@@ -13,11 +13,11 @@ export function useNews(category?: string) {
   const fetchNews = useCallback(async (pageNumber: number, filterCategory?: string) => {
     setIsLoading(true)
 
-    // Build query for news table
+    // Build query for news table (status can be 'published' or null)
     let newsQuery = supabase
       .from('news')
       .select('*')
-      .eq('status', 'published')
+      .or('status.eq.published,status.is.null')
 
     // Build query for posts table
     let postsQuery = supabase
@@ -45,9 +45,17 @@ export function useNews(category?: string) {
       console.error('Error fetching posts:', postsResult.error)
     }
 
+    // Map news table fields to match News type
+    const mappedNews = (newsResult.data || []).map(item => ({
+      ...item,
+      image_url: item.cover_image || item.image_url,
+      excerpt: item.subtitle || item.excerpt,
+      read_time: item.read_time || '5 min'
+    }))
+
     // Merge and sort results by published_at
     const allNews = [
-      ...(newsResult.data || []),
+      ...mappedNews,
       ...(postsResult.data || [])
     ].sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
 

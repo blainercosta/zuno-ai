@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { supabase } from '@/lib/supabase';
 import type { News } from '@/types/news';
 import { shareOnTwitter, shareOnLinkedIn, copyToClipboard, generateSlug } from '@/utils/shareUtils';
 import NewsSEO from './NewsSEO';
 import { NewsDetailSkeleton } from './Skeleton';
+import StructuredContent from './StructuredContent';
 
 // Configuração segura do DOMPurify
 const sanitizeConfig = {
@@ -17,7 +18,7 @@ const sanitizeConfig = {
 };
 
 interface NewsDetailPageProps {
-  newsId: number;
+  newsId: number | string;
   onBack: () => void;
 }
 
@@ -34,34 +35,42 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
     const fetchNewsDetail = async () => {
       setIsLoading(true);
 
-      // Try fetching from news table first
-      const { data: newsData, error: newsError } = await supabase
-        .from('news')
-        .select('*')
-        .eq('id', newsId)
-        .eq('status', 'published')
-        .single();
+      const isUUID = typeof newsId === 'string' && newsId.includes('-');
 
-      if (newsData) {
-        setNews(newsData);
-        setIsLoading(false);
-        return;
-      }
+      if (isUUID) {
+        // UUID means it's from news table (status can be 'published' or null)
+        const { data: newsData, error: newsError } = await supabase
+          .from('news')
+          .select('*')
+          .eq('id', newsId)
+          .or('status.eq.published,status.is.null')
+          .single();
 
-      // If not found in news, try posts table
-      const { data: postData, error: postError } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('id', newsId)
-        .eq('status', 'published')
-        .single();
+        if (newsData) {
+          // Map news table fields to match News type
+          setNews({
+            ...newsData,
+            image_url: newsData.cover_image || newsData.image_url,
+            excerpt: newsData.subtitle || newsData.excerpt,
+            read_time: newsData.read_time || '5 min'
+          });
+        } else if (newsError) {
+          console.error('Error fetching news detail:', newsError);
+        }
+      } else {
+        // Integer ID means it's from posts table
+        const { data: postData, error: postError } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', newsId)
+          .eq('status', 'published')
+          .single();
 
-      if (postData) {
-        setNews(postData);
-      }
-
-      if (newsError && postError) {
-        console.error('Error fetching news detail:', newsError, postError);
+        if (postData) {
+          setNews(postData);
+        } else if (postError) {
+          console.error('Error fetching post detail:', postError);
+        }
       }
 
       setIsLoading(false);
@@ -87,6 +96,23 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
   const handleShareLinkedIn = () => {
     shareOnLinkedIn(currentUrl);
   };
+
+  // Check if content is structured JSON or HTML
+  const isStructuredContent = useMemo(() => {
+    if (!news?.content) return false;
+    // Already an array (parsed by Supabase JSONB column)
+    if (Array.isArray(news.content)) return true;
+    // Try to parse as JSON string
+    if (typeof news.content === 'string') {
+      try {
+        const parsed = JSON.parse(news.content);
+        return Array.isArray(parsed);
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }, [news?.content]);
 
   if (isLoading) {
     return <NewsDetailSkeleton />;
@@ -189,10 +215,14 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         {/* Article Content */}
         {news.content && (
           <article className="prose prose-invert prose-zinc max-w-none">
-            <div
-              className="article-content"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.content, sanitizeConfig) }}
-            />
+            {isStructuredContent ? (
+              <StructuredContent content={news.content} />
+            ) : typeof news.content === 'string' ? (
+              <div
+                className="article-content"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.content, sanitizeConfig) }}
+              />
+            ) : null}
           </article>
         )}
 

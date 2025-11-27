@@ -115,7 +115,8 @@ function ProfessionalDetailRoute() {
 
   const professionalId = getIdFromSlug(slug);
 
-  if (!professionalId) {
+  // Professionals only use integer IDs
+  if (!professionalId || typeof professionalId === 'string') {
     return <Navigate to="/professionals" replace />;
   }
 
@@ -194,17 +195,32 @@ function PostJobPageWrapper() {
 function NewsPageWrapper() {
   const navigate = useNavigate();
 
-  const handleNewsClick = async (newsId: number) => {
-    try {
-      // Fetch news title to create proper slug
-      const { data: newsData } = await supabase
-        .from('news')
-        .select('title')
-        .eq('id', newsId)
-        .single();
+  const handleNewsClick = async (newsId: number | string) => {
+    const isUUID = typeof newsId === 'string' && newsId.includes('-');
 
-      if (newsData) {
-        const slug = `${newsData.title
+    try {
+      let title: string | undefined;
+
+      if (isUUID) {
+        // UUID means it's from news table
+        const { data: newsData } = await supabase
+          .from('news')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+        title = newsData?.title;
+      } else {
+        // Integer ID means it's from posts table
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+        title = postData?.title;
+      }
+
+      if (title) {
+        const slug = `${title
           .toLowerCase()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
@@ -214,24 +230,7 @@ function NewsPageWrapper() {
           .trim()}-${newsId}`;
         navigate(`/news/${slug}`);
       } else {
-        // Try posts table if not found in news
-        const { data: postData } = await supabase
-          .from('posts')
-          .select('title')
-          .eq('id', newsId)
-          .single();
-
-        if (postData) {
-          const slug = `${postData.title
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim()}-${newsId}`;
-          navigate(`/news/${slug}`);
-        }
+        navigate(`/news/${newsId}`);
       }
     } catch (error) {
       console.error('Error fetching news title:', error);

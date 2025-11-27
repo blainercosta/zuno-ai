@@ -10,7 +10,7 @@ const FILTERS = [
 ];
 
 interface NewsPageProps {
-  onNewsClick: (id: number) => void;
+  onNewsClick: (id: number | string) => void;
   onViewAllJobs?: () => void;
 }
 
