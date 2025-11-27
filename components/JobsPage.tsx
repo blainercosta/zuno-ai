@@ -18,7 +18,7 @@ interface JobsPageProps {
 
 // Cores da logo Zuno AI para indicar frescor da vaga
 const dateColorClasses = {
-  pink: 'text-[#FF7BCA]',     // < 1 hora
+  pink: 'text-[#FF7BCA]',     // < 6 horas
   purple: 'text-[#7349D4]',   // < 12 horas
   blue: 'text-[#62D4DD]',     // < 24 horas
   default: 'text-zinc-500',   // > 24 horas

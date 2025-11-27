@@ -11,7 +11,7 @@ export function getDateColor(dateString: string | null): DateColor {
   const diffInMs = now.getTime() - date.getTime()
   const diffInHours = diffInMs / (1000 * 60 * 60)
 
-  if (diffInHours < 1) return 'pink'      // < 1 hora
+  if (diffInHours < 6) return 'pink'      // < 6 horas
   if (diffInHours < 12) return 'purple'   // < 12 horas
   if (diffInHours < 24) return 'blue'     // < 24 horas
   return 'default'
