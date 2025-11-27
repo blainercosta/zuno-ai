@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNews } from "@/hooks/useNews";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
+import { NewsGridSkeleton, NewsSidebarSkeleton, JobsSidebarSkeleton } from "./Skeleton";
 
 const FILTERS = [
   "Tudo", "IA", "Startups", "Tecnologia", "Design", "Produto",
@@ -10,14 +11,16 @@ const FILTERS = [
 
 interface NewsPageProps {
   onNewsClick: (id: number) => void;
+  onViewAllJobs?: () => void;
 }
 
-export default function NewsPage({ onNewsClick }: NewsPageProps) {
+export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) {
   const [activeFilter, setActiveFilter] = useState("Tudo");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -27,6 +30,7 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
   // Fetch recent jobs
   useEffect(() => {
     const fetchRecentJobs = async () => {
+      setLoadingJobs(true);
       const { data, error } = await supabase
         .from('vagas_ia')
         .select('*')
@@ -37,6 +41,7 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
       if (data && !error) {
         setRecentJobs(data);
       }
+      setLoadingJobs(false);
     };
 
     fetchRecentJobs();
@@ -166,6 +171,11 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
         </div>
 
         {/* News Grid */}
+        <div className="px-4 md:px-6 lg:px-8">
+          {/* Initial loading skeleton */}
+          {isLoading && news.length === 0 && <NewsGridSkeleton count={6} />}
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 px-4 md:px-6 lg:px-8">
           {filteredNews.map((item) => (
             <article
@@ -261,25 +271,29 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
           <h3 className="mb-6">Mais lidas da semana</h3>
 
           <div className="space-y-4">
-            {topNews.map((item, i) => (
-              <div
-                key={item.id}
-                onClick={() => onNewsClick(item.id)}
-                className="cursor-pointer group"
-              >
-                <div className="flex gap-3">
-                  <span className="text-2xl font-bold text-zinc-800 group-hover:text-zinc-700 transition-colors">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-zinc-500">{item.read_time} de leitura</p>
+            {isLoading && news.length === 0 ? (
+              <NewsSidebarSkeleton />
+            ) : (
+              topNews.map((item, i) => (
+                <div
+                  key={item.id}
+                  onClick={() => onNewsClick(item.id)}
+                  className="cursor-pointer group"
+                >
+                  <div className="flex gap-3">
+                    <span className="text-2xl font-bold text-zinc-800 group-hover:text-zinc-700 transition-colors">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-zinc-500">{item.read_time} de leitura</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -287,13 +301,18 @@ export default function NewsPage({ onNewsClick }: NewsPageProps) {
         <div className="p-8">
           <div className="flex items-center justify-between mb-6">
             <h3>Vagas recentes</h3>
-            <button className="px-3 py-2 text-sm border border-zinc-800 rounded-lg hover:bg-zinc-800">
+            <button
+              onClick={onViewAllJobs}
+              className="px-3 py-2 text-sm border border-zinc-800 rounded-lg hover:bg-zinc-800"
+            >
               Ver todas
             </button>
           </div>
 
           <div className="space-y-0">
-            {recentJobs.length > 0 ? (
+            {loadingJobs ? (
+              <JobsSidebarSkeleton count={4} />
+            ) : recentJobs.length > 0 ? (
               recentJobs.map((job) => {
                 const firstLetter = job.company_name?.charAt(0).toUpperCase() || 'J';
                 const formattedDate = job.posted_at

@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
 import type { Professional } from "@/types/professional";
 import { getIdFromSlug, generateProfessionalSlug } from "@/utils/shareUtils";
+import { JobDetailSkeleton } from "./components/Skeleton";
 
 // Lazy load componentes secundários para reduzir bundle inicial
 const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
@@ -81,7 +82,7 @@ function JobDetailWrapper({ jobId, onBack, onJobClick }: { jobId: string; onBack
     fetchJob();
   }, [jobId]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <JobDetailSkeleton />;
   if (!job) return <Navigate to="/jobs" replace />;
 
   return <JobDetailPage job={job} onBack={onBack} onJobClick={onJobClick} />;
@@ -238,7 +239,7 @@ function NewsPageWrapper() {
     }
   };
 
-  return <NewsPage onNewsClick={handleNewsClick} />;
+  return <NewsPage onNewsClick={handleNewsClick} onViewAllJobs={() => navigate('/jobs')} />;
 }
 
 // Professionals Page Wrapper
@@ -272,7 +273,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           {/* Logo */}
           <div className="h-[68.88px] flex items-center justify-center relative">
             <img
-              src="/zuno-mini.svg"
+              src="/zuno-ai.svg"
               alt="Zuno AI"
               className="w-8 h-8"
               width="32"

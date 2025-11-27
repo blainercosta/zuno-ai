@@ -8,6 +8,7 @@ import OrganizationSchema from "./OrganizationSchema";
 import BreadcrumbSchema from "./BreadcrumbSchema";
 import FAQSchema from "./FAQSchema";
 import BetaAccessModal from "./BetaAccessModal";
+import { JobsListSkeleton } from "./Skeleton";
 
 interface JobsPageProps {
   onJobClick: (job: Job) => void;
@@ -156,6 +157,9 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
       {/* Jobs List */}
       <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-24 md:pb-16">
         <div className="space-y-4">
+          {/* Initial loading skeleton */}
+          {isLoading && jobs.length === 0 && <JobsListSkeleton count={5} />}
+
           {jobs.map((job) => (
             <article
               key={job.id}

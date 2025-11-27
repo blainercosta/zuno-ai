@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { supabase } from '@/lib/supabase';
 import type { News } from '@/types/news';
 import { shareOnTwitter, shareOnLinkedIn, copyToClipboard, generateSlug } from '@/utils/shareUtils';
 import NewsSEO from './NewsSEO';
+import { NewsDetailSkeleton } from './Skeleton';
+
+// Configuração segura do DOMPurify
+const sanitizeConfig = {
+  ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'strong', 'em', 'b', 'i', 'img', 'blockquote', 'code', 'pre', 'br', 'span', 'div'],
+  ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'target', 'rel'],
+  ALLOW_DATA_ATTR: false,
+  ADD_ATTR: ['target'],
+  FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'button', 'object', 'embed'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+};
 
 interface NewsDetailPageProps {
   newsId: number;
@@ -77,14 +89,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <svg className="animate-spin size-8 text-zinc-600" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-          <path className="opacity-60" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-      </div>
-    );
+    return <NewsDetailSkeleton />;
   }
 
   if (!news) {
@@ -186,7 +191,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           <article className="prose prose-invert prose-zinc max-w-none">
             <div
               className="article-content"
-              dangerouslySetInnerHTML={{ __html: news.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.content, sanitizeConfig) }}
             />
           </article>
         )}

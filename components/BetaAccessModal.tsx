@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { submitWaitlist } from '@/lib/api';
 
 interface BetaAccessModalProps {
   isOpen: boolean;
@@ -126,27 +126,22 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
         return;
       }
 
-      const { data, error } = await supabase
-        .from('beta_waitlist')
-        .insert([
-          {
-            name: formData.name.trim(),
-            email: formData.email.trim().toLowerCase(),
-            phone: cleanPhone,
-          }
-        ])
-        .select();
+      const result = await submitWaitlist({
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: cleanPhone,
+      });
 
-      if (error) {
-        console.error('Supabase error:', error);
-        if (error.code === '23505') {
+      if (result.error) {
+        console.error('Waitlist API error:', result.error);
+        if (result.error.includes('já está cadastrado') || result.error.includes('duplicate')) {
           setErrors({ email: 'Este email já está cadastrado' });
           return;
         }
-        throw error;
+        throw new Error(result.error);
       }
 
-      console.log('Beta waitlist signup successful:', data);
+      console.log('Beta waitlist signup successful:', result);
       setShowSuccess(true);
       setFormData({ name: '', email: '', phone: '' });
     } catch (error) {

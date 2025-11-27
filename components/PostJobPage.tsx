@@ -1,5 +1,5 @@
 import { useState, FormEvent, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { submitJob } from '@/lib/api'
 
 interface PostJobPageProps {
   onBack: () => void;
@@ -71,53 +71,46 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
     setMessage(null)
 
     try {
-      // Gerar job_id único baseado no timestamp
-      const job_id = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      // Usar Edge Function segura para submeter a vaga
+      const result = await submitJob({
+        job_url: formData.job_url,
+        job_title: formData.job_title,
+        company_name: formData.company_name,
+        company_url: formData.company_url || undefined,
+        logo_url: formData.logo_url || undefined,
+        location: formData.location || undefined,
+        seniority_level: formData.seniority_level || undefined,
+        employment_type: formData.employment_type || undefined,
+        workplace_type: formData.workplace_type || undefined,
+        is_remote: formData.is_remote,
+        description_full: formData.description_full || undefined,
+        about_company: formData.about_company || undefined,
+        responsibilities: formData.responsibilities || undefined,
+        requirements: formData.requirements || undefined,
+        differentials: formData.differentials || undefined,
+        benefits: formData.benefits || undefined,
+        salary: formData.salary || undefined,
+        process: formData.process || undefined,
+      })
 
-      const { error } = await supabase
-        .from('vagas_ia')
-        .insert([{
-          job_id,
-          job_url: formData.job_url,
-          job_title: formData.job_title,
-          company_name: formData.company_name,
-          company_url: formData.company_url || null,
-          company_id: null, // Pode ser preenchido depois se necessário
-          logo_url: formData.logo_url || null,
-          location: formData.location || null,
-          posted_at: new Date().toISOString(),
-          seniority_level: formData.seniority_level || null,
-          employment_type: formData.employment_type || null,
-          workplace_type: formData.workplace_type || null,
-          is_remote: formData.is_remote,
-          is_easy_apply: false,
-          description_full: formData.description_full || null,
-          about_company: formData.about_company || null,
-          responsibilities: formData.responsibilities || null,
-          requirements: formData.requirements || null,
-          differentials: formData.differentials || null,
-          benefits: formData.benefits || null,
-          salary: formData.salary || null,
-          process: formData.process || null,
-          status: 'active'
-        }])
-        .select()
-
-      if (error) throw error
+      if (result.error) {
+        throw new Error(result.error)
+      }
 
       setShowSuccess(true)
-      setMessage({ type: 'success', text: 'Vaga publicada com sucesso!' })
+      setMessage({ type: 'success', text: 'Vaga enviada para aprovação!' })
 
       // Voltar após 3 segundos
       setTimeout(() => {
         onBack()
       }, 3000)
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao publicar vaga:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao publicar vaga. Tente novamente.'
       setMessage({
         type: 'error',
-        text: error.message || 'Erro ao publicar vaga. Tente novamente.'
+        text: errorMessage
       })
     } finally {
       setIsSubmitting(false)
