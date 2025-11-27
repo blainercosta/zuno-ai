@@ -1,13 +1,13 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import svgPaths from "./imports/svg-shvcwjgnc";
 import JobsPage from "./components/JobsPage";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
 import type { Professional } from "@/types/professional";
 import { getIdFromSlug, generateProfessionalSlug } from "@/utils/shareUtils";
 import { JobDetailSkeleton } from "./components/Skeleton";
+import BetaAccessModal from "./components/BetaAccessModal";
 
 // Lazy load componentes secundários para reduzir bundle inicial
 const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
@@ -264,6 +264,22 @@ function ProfileSettingsPageWrapper() {
 // Main Layout Component
 function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+
+  // Check if current route is active
+  const isActive = (path: string) => {
+    if (path === '/jobs') {
+      return location.pathname === '/jobs' || location.pathname.startsWith('/job/');
+    }
+    if (path === '/news') {
+      return location.pathname === '/news' || location.pathname.startsWith('/news/');
+    }
+    if (path === '/professionals') {
+      return location.pathname === '/professionals' || location.pathname.startsWith('/professional/');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white dark">
@@ -287,10 +303,12 @@ function Layout({ children }: { children: React.ReactNode }) {
             {import.meta.env.DEV && (
               <button
                 onClick={() => navigate('/')}
-                className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800"
+                className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                  isActive('/') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+                }`}
                 aria-label="Home"
               >
-                <svg className="size-6" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24">
+                <svg className="size-6" fill="none" stroke={isActive('/') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
                   <path fillRule="evenodd" clipRule="evenodd" d="M19.842 8.29901L13.842 3.63201C12.759 2.78901 11.242 2.78901 10.158 3.63201L4.158 8.29901C3.427 8.86701 3 9.74101 3 10.667V18C3 19.657 4.343 21 6 21H18C19.657 21 21 19.657 21 18V10.667C21 9.74101 20.573 8.86701 19.842 8.29901Z" strokeWidth="2"/>
                 </svg>
               </button>
@@ -299,10 +317,12 @@ function Layout({ children }: { children: React.ReactNode }) {
             {/* Jobs */}
             <button
               onClick={() => navigate('/jobs')}
-              className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800"
+              className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                isActive('/jobs') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+              }`}
               aria-label="Jobs"
             >
-              <svg className="size-6" fill="none" stroke="#CBD5E1" viewBox="0 0 24 23">
+              <svg className="size-6" fill="none" stroke={isActive('/jobs') ? 'white' : '#CBD5E1'} viewBox="0 0 24 23">
                 <path fillRule="evenodd" clipRule="evenodd" d="M17.0024 20.1288H6.99825C4.78819 20.1288 2.99658 18.4118 2.99658 16.2939V8.62401C2.99658 7.56502 3.89239 6.70654 4.99742 6.70654H19.0032C20.1083 6.70654 21.0041 7.56502 21.0041 8.62401V16.2939C21.0041 18.4118 19.2125 20.1288 17.0024 20.1288Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M7.99854 6.70651V4.78905C7.99854 3.73006 8.89434 2.87158 9.99937 2.87158H14.001C15.1061 2.87158 16.0019 3.73006 16.0019 4.78905V6.70651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M14.0007 11.9793H17.5021C19.4359 11.9793 21.0036 10.477 21.0036 8.62378M14.9995 11.9791L6.49755 11.9793C4.56375 11.9793 2.99609 10.477 2.99609 8.62378" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -313,10 +333,12 @@ function Layout({ children }: { children: React.ReactNode }) {
             {import.meta.env.DEV && (
               <button
                 onClick={() => navigate('/professionals')}
-                className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800"
+                className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                  isActive('/professionals') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+                }`}
                 aria-label="Professionals"
               >
-                <svg className="size-6" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24">
+                <svg className="size-6" fill="none" stroke={isActive('/professionals') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
                   <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -328,25 +350,27 @@ function Layout({ children }: { children: React.ReactNode }) {
             {/* News */}
             <button
               onClick={() => navigate('/news')}
-              className="size-14 flex items-center justify-center rounded-xl hover:bg-zinc-800"
+              className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                isActive('/news') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+              }`}
               aria-label="News"
             >
-              <svg className="size-7" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24">
+              <svg className="size-7" fill="none" stroke={isActive('/news') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
                 <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
 
-          {/* Bottom Icon - Settings */}
+          {/* Bottom Icon - User Profile (opens Beta Modal) */}
           <div className="mt-auto mb-8 px-2">
             <button
-              onClick={() => navigate('/settings')}
-              className="w-full h-12 flex items-center justify-center rounded-xl hover:bg-zinc-800"
-              aria-label="Settings"
+              onClick={() => setIsBetaModalOpen(true)}
+              className="w-full h-12 flex items-center justify-center rounded-xl hover:bg-zinc-800 transition-colors"
+              aria-label="Quero ser contratado"
             >
               <svg className="size-6" fill="none" stroke="white" viewBox="0 0 24 24">
-                <path d={svgPaths.p2667d080} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                <path d={svgPaths.p3a387c80} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
@@ -364,7 +388,9 @@ function Layout({ children }: { children: React.ReactNode }) {
           {/* Jobs */}
           <button
             onClick={() => navigate('/jobs')}
-            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors text-zinc-500"
+            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+              isActive('/jobs') ? 'text-white' : 'text-zinc-500'
+            }`}
             aria-label="Jobs"
           >
             <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 23">
@@ -378,7 +404,9 @@ function Layout({ children }: { children: React.ReactNode }) {
           {/* News */}
           <button
             onClick={() => navigate('/news')}
-            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors text-zinc-500"
+            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+              isActive('/news') ? 'text-white' : 'text-zinc-500'
+            }`}
             aria-label="News"
           >
             <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,8 +414,24 @@ function Layout({ children }: { children: React.ReactNode }) {
             </svg>
             <span className="text-[10px]">News</span>
           </button>
+
+          {/* User Profile - Opens Beta Modal */}
+          <button
+            onClick={() => setIsBetaModalOpen(true)}
+            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors text-zinc-500"
+            aria-label="Quero ser contratado"
+          >
+            <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-[10px]">Perfil</span>
+          </button>
         </div>
       </nav>
+
+      {/* Beta Access Modal */}
+      <BetaAccessModal isOpen={isBetaModalOpen} onClose={() => setIsBetaModalOpen(false)} />
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
