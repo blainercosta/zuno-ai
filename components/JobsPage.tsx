@@ -17,9 +17,10 @@ interface JobsPageProps {
 }
 
 export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: JobsPageProps) {
-  const { jobs, isLoading, hasMore, loadMore } = useJobs();
+  const { jobs, isLoading, hasMore, loadMore, searchQuery, search, clearSearch } = useJobs();
   const observerTarget = useRef<HTMLDivElement>(null);
   const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -156,6 +157,47 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
 
       {/* Jobs List */}
       <div className="max-w-[896px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-24 md:pb-16">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg className="size-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => search(e.target.value)}
+              placeholder="Buscar por cargo, empresa ou localização..."
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-12 pr-12 py-3.5 text-[15px] text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  clearSearch();
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
+                aria-label="Limpar busca"
+              >
+                <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {searchQuery && !isLoading && (
+            <p className="mt-3 text-[14px] text-zinc-500">
+              {jobs.length === 0
+                ? `Nenhuma vaga encontrada para "${searchQuery}"`
+                : `${jobs.length} vaga${jobs.length !== 1 ? 's' : ''} encontrada${jobs.length !== 1 ? 's' : ''} para "${searchQuery}"`
+              }
+            </p>
+          )}
+        </div>
+
         <div className="space-y-4">
           {/* Initial loading skeleton */}
           {isLoading && jobs.length === 0 && <JobsListSkeleton count={5} />}
