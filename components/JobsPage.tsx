@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
-import { formatRelativeDate } from "@/utils/date";
+import { formatRelativeDate, getDateColor } from "@/utils/date";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
 import { getJobApplicationUrl } from "@/utils/tracking";
@@ -14,6 +14,14 @@ interface JobsPageProps {
   onJobClick: (job: Job) => void;
   onPostJobClick: () => void;
   onNewsClick?: () => void;
+}
+
+// Cores da logo Zuno AI para indicar frescor da vaga
+const dateColorClasses = {
+  pink: 'text-[#FF7BCA]',     // < 1 hora
+  purple: 'text-[#7349D4]',   // < 12 horas
+  blue: 'text-[#62D4DD]',     // < 24 horas
+  default: 'text-zinc-500',   // > 24 horas
 }
 
 export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: JobsPageProps) {
@@ -245,7 +253,7 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
 
                 {/* Posted & Apply */}
                 <div className="hidden sm:flex items-center gap-4 shrink-0">
-                  <span className="text-[12px] leading-[16px] text-zinc-500">{formatRelativeDate(job.posted_at)}</span>
+                  <span className={`text-[12px] leading-[16px] ${dateColorClasses[getDateColor(job.posted_at)]}`}>{formatRelativeDate(job.posted_at)}</span>
                   <button
                     className="bg-white text-slate-950 px-4 py-2.5 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[14px] leading-[14px]"
                     onClick={(e) => {

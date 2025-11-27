@@ -1,3 +1,22 @@
+// Cores da logo do Zuno AI para indicar frescor da vaga
+export type DateColor = 'pink' | 'purple' | 'blue' | 'default'
+
+export function getDateColor(dateString: string | null): DateColor {
+  if (!dateString) return 'default'
+
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return 'default'
+
+  const now = new Date()
+  const diffInMs = now.getTime() - date.getTime()
+  const diffInHours = diffInMs / (1000 * 60 * 60)
+
+  if (diffInHours < 1) return 'pink'      // < 1 hora
+  if (diffInHours < 12) return 'purple'   // < 12 horas
+  if (diffInHours < 24) return 'blue'     // < 24 horas
+  return 'default'
+}
+
 export function formatRelativeDate(dateString: string | null): string {
   if (!dateString) {
     return 'Data não disponível'
