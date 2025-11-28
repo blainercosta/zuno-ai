@@ -37,12 +37,12 @@ export default function NewsSEO({ news, url }: NewsSEOProps) {
     updateMetaTag('og:url', url, true);
     updateMetaTag('og:site_name', 'Zuno AI', true);
 
-    if (news.image_url) {
-      updateMetaTag('og:image', news.image_url, true);
-      updateMetaTag('og:image:width', '1200', true);
-      updateMetaTag('og:image:height', '630', true);
-      updateMetaTag('og:image:alt', news.title, true);
-    }
+    const imageUrl = news.image_url || `${window.location.origin}/og-cover.png`;
+    updateMetaTag('og:image', imageUrl, true);
+    updateMetaTag('og:image:width', '1200', true);
+    updateMetaTag('og:image:height', '630', true);
+    updateMetaTag('og:image:type', 'image/png', true);
+    updateMetaTag('og:image:alt', news.title, true);
 
     // Article specific
     updateMetaTag('article:published_time', news.published_at, true);
@@ -53,9 +53,7 @@ export default function NewsSEO({ news, url }: NewsSEOProps) {
     updateMetaTag('twitter:card', 'summary_large_image');
     updateMetaTag('twitter:title', news.title);
     updateMetaTag('twitter:description', news.excerpt || news.title);
-    if (news.image_url) {
-      updateMetaTag('twitter:image', news.image_url);
-    }
+    updateMetaTag('twitter:image', imageUrl);
 
     // Create canonical link
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
