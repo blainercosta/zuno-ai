@@ -313,6 +313,19 @@ function Layout({ children }: { children: React.ReactNode }) {
               </button>
             )}
 
+            {/* News */}
+            <button
+              onClick={() => navigate('/news')}
+              className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                isActive('/news') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+              }`}
+              aria-label="News"
+            >
+              <svg className="size-7" fill="none" stroke={isActive('/news') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
             {/* Jobs */}
             <button
               onClick={() => navigate('/jobs')}
@@ -345,19 +358,6 @@ function Layout({ children }: { children: React.ReactNode }) {
                 </svg>
               </button>
             )}
-
-            {/* News */}
-            <button
-              onClick={() => navigate('/news')}
-              className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
-                isActive('/news') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
-              }`}
-              aria-label="News"
-            >
-              <svg className="size-7" fill="none" stroke={isActive('/news') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
-                <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
           </div>
 
           {/* Bottom Icon - User Profile (opens Beta Modal) */}
@@ -384,6 +384,20 @@ function Layout({ children }: { children: React.ReactNode }) {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-zinc-800 z-50">
         <div className="flex items-center justify-around h-16 px-4">
+          {/* News */}
+          <button
+            onClick={() => navigate('/news')}
+            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+              isActive('/news') ? 'text-white' : 'text-zinc-500'
+            }`}
+            aria-label="News"
+          >
+            <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-[10px]">News</span>
+          </button>
+
           {/* Jobs */}
           <button
             onClick={() => navigate('/jobs')}
@@ -398,20 +412,6 @@ function Layout({ children }: { children: React.ReactNode }) {
               <path d="M14.0007 11.9793H17.5021C19.4359 11.9793 21.0036 10.477 21.0036 8.62378M14.9995 11.9791L6.49755 11.9793C4.56375 11.9793 2.99609 10.477 2.99609 8.62378" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <span className="text-[10px]">Vagas</span>
-          </button>
-
-          {/* News */}
-          <button
-            onClick={() => navigate('/news')}
-            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-              isActive('/news') ? 'text-white' : 'text-zinc-500'
-            }`}
-            aria-label="News"
-          >
-            <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-[10px]">News</span>
           </button>
 
           {/* User Profile - Opens Beta Modal */}
