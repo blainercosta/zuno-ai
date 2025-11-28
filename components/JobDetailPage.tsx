@@ -1,4 +1,4 @@
-import { Twitter, Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
+import { Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
@@ -207,9 +207,11 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 <button
                   onClick={() => window.open(getTwitterShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}
                   className="text-zinc-600 hover:text-white transition-colors"
-                  title="Compartilhar no Twitter"
+                  title="Compartilhar no X"
                 >
-                  <Twitter className="size-5" />
+                  <svg className="size-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
                 </button>
                 <button
                   onClick={() => window.open(getWhatsAppShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}

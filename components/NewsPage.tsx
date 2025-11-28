@@ -206,7 +206,7 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
               {/* Content - vertical layout */}
               <div className="space-y-2">
                 {/* Read time */}
-                <p className="text-sm text-zinc-500">{item.read_time} de leitura</p>
+                <p className="text-sm text-zinc-500">{item.read_time} min de leitura</p>
 
                 {/* Title */}
                 <h3 className="text-sm text-white line-clamp-2">
@@ -288,7 +288,7 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
                       <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
                         {item.title}
                       </h4>
-                      <p className="text-xs text-zinc-500">{item.read_time} de leitura</p>
+                      <p className="text-xs text-zinc-500">{item.read_time} min de leitura</p>
                     </div>
                   </div>
                 </div>
