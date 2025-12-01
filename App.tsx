@@ -283,7 +283,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#09090b] text-white dark">
       {/* Left Sidebar */}
-      <aside className="hidden md:block w-[72px] border-r border-zinc-800 shrink-0 fixed left-0 top-0 h-screen z-50">
+      <aside className="hidden md:block w-[72px] border-r border-zinc-800 shrink-0 fixed left-0 top-0 h-screen z-40">
         <div className="sticky top-0 h-screen flex flex-col">
           {/* Logo */}
           <div className="h-[68.88px] flex items-center justify-center relative">
