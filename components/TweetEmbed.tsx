@@ -81,63 +81,78 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const embedAttempted = useRef(false);
 
   // Get the tweet ID from either prop
   const id = tweetId || (tweetUrl ? extractTweetId(tweetUrl) : null);
 
   useEffect(() => {
-    if (!id || !containerRef.current) {
+    const container = containerRef.current;
+
+    if (!id || !container) {
       setError(true);
       setIsLoading(false);
       return;
     }
 
-    // Prevent double embedding in StrictMode
-    if (embedAttempted.current) {
-      return;
-    }
-    embedAttempted.current = true;
-
-    let mounted = true;
+    let cancelled = false;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
 
     const embedTweet = async () => {
       try {
         await loadTwitterScript();
 
-        if (!mounted || !containerRef.current) {
-          return;
-        }
+        if (cancelled) return;
 
         if (!window.twttr?.widgets?.createTweet) {
           throw new Error('Twitter widgets not available');
         }
 
         // Clear container before embedding
-        containerRef.current.innerHTML = '';
+        container.innerHTML = '';
 
-        // Create the tweet embed
-        const tweetElement = await window.twttr.widgets.createTweet(
+        // Start the createTweet call
+        window.twttr.widgets.createTweet(
           id,
-          containerRef.current,
+          container,
           {
             theme: 'dark',
             dnt: true,
             align: 'center',
             conversation: 'none',
           }
-        );
-
-        if (mounted) {
-          // createTweet returns undefined if tweet doesn't exist or is private
-          if (!tweetElement) {
-            setError(true);
+        ).then((el) => {
+          if (!cancelled) {
+            if (!el) {
+              setError(true);
+            }
+            setIsLoading(false);
           }
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('Error embedding tweet:', err);
-        if (mounted) {
+        }).catch(() => {
+          if (!cancelled) {
+            setError(true);
+            setIsLoading(false);
+          }
+        });
+
+        // Poll for iframe as fallback (Twitter sometimes doesn't resolve the promise quickly)
+        let pollCount = 0;
+        const maxPolls = 50; // 5 seconds
+        pollInterval = setInterval(() => {
+          pollCount++;
+          const iframe = container.querySelector('iframe');
+
+          if (iframe) {
+            if (pollInterval) clearInterval(pollInterval);
+            if (!cancelled) {
+              setIsLoading(false);
+            }
+          } else if (pollCount >= maxPolls) {
+            if (pollInterval) clearInterval(pollInterval);
+          }
+        }, 100);
+
+      } catch {
+        if (!cancelled) {
           setError(true);
           setIsLoading(false);
         }
@@ -147,7 +162,8 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
     embedTweet();
 
     return () => {
-      mounted = false;
+      cancelled = true;
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [id]);
 
