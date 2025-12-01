@@ -268,6 +268,14 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
             height: auto;
             min-height: auto;
             border-radius: 24px 24px 0 0;
+            background: conic-gradient(
+              from var(--angle),
+              #7349D4,
+              #FF7BCA,
+              #FFF96F,
+              #62D4DD,
+              #7349D4
+            );
           }
 
           .zuno-gradient::before,
@@ -381,6 +389,14 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
             height: auto;
             min-height: auto;
             border-radius: 24px 24px 0 0;
+            background: conic-gradient(
+              from var(--angle),
+              #7349D4,
+              #FF7BCA,
+              #FFF96F,
+              #62D4DD,
+              #7349D4
+            );
           }
 
           .success-card::before,
@@ -464,10 +480,16 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
             display: block;
           }
 
+          .zuno-gradient,
+          .success-card {
+            padding: 1px;
+          }
+
           .zuno-gradient .card-inner,
           .success-card .card-inner {
             position: relative !important;
             inset: auto !important;
+            padding-bottom: 24px !important;
           }
         }
 
