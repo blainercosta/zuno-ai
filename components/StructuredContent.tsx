@@ -1,4 +1,5 @@
 import type { ContentBlock } from '@/types/news'
+import TweetEmbed from './TweetEmbed'
 
 interface StructuredContentProps {
   content: string | ContentBlock[]
@@ -97,6 +98,56 @@ export default function StructuredContent({ content }: StructuredContentProps) {
           case 'divider':
             return (
               <hr key={index} className="border-zinc-800 my-10" />
+            )
+
+          case 'tweet':
+            return (
+              <TweetEmbed
+                key={index}
+                tweetId={block.tweetId}
+                tweetUrl={block.tweetUrl || block.url}
+              />
+            )
+
+          case 'embed':
+            // Handle different embed types
+            if (block.embedType === 'twitter' || block.url?.includes('twitter.com') || block.url?.includes('x.com')) {
+              return (
+                <TweetEmbed
+                  key={index}
+                  tweetUrl={block.url}
+                />
+              )
+            }
+            // YouTube embed
+            if (block.embedType === 'youtube' || block.url?.includes('youtube.com') || block.url?.includes('youtu.be')) {
+              const videoId = block.url?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&\s?]+)/)?.[1]
+              if (videoId) {
+                return (
+                  <div key={index} className="my-8 aspect-video rounded-xl overflow-hidden">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="YouTube video"
+                    />
+                  </div>
+                )
+              }
+            }
+            // Generic embed fallback
+            return (
+              <div key={index} className="my-8 p-4 bg-zinc-900 rounded-xl border border-zinc-800">
+                <a
+                  href={block.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:text-sky-300 text-sm break-all"
+                >
+                  {block.url}
+                </a>
+              </div>
             )
 
           default:

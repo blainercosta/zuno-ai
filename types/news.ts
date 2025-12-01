@@ -1,10 +1,14 @@
 export interface ContentBlock {
-  type: 'paragraph' | 'heading' | 'image' | 'callout' | 'divider'
+  type: 'paragraph' | 'heading' | 'image' | 'callout' | 'divider' | 'tweet' | 'embed'
   text?: string
   level?: number
   url?: string
   caption?: string
   style?: string
+  // Tweet/embed specific fields
+  tweetId?: string
+  tweetUrl?: string
+  embedType?: 'twitter' | 'youtube' | 'instagram'
 }
 
 export interface News {
