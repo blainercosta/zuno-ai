@@ -263,15 +263,20 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
         @media (max-width: 768px) {
           .zuno-gradient {
-            width: 100vw;
+            width: 100%;
+            max-width: 100vw;
             height: auto;
-            min-height: 480px;
+            min-height: auto;
             border-radius: 24px 24px 0 0;
           }
 
           .zuno-gradient::before,
           .zuno-gradient::after {
             border-radius: 24px 24px 0 0;
+          }
+
+          .zuno-gradient .card-inner {
+            border-radius: 23px 23px 0 0 !important;
           }
         }
 
@@ -371,9 +376,10 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
         @media (max-width: 768px) {
           .success-card {
-            width: 100vw;
+            width: 100%;
+            max-width: 100vw;
             height: auto;
-            min-height: 480px;
+            min-height: auto;
             border-radius: 24px 24px 0 0;
           }
 
@@ -381,7 +387,12 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
           .success-card::after {
             border-radius: 24px 24px 0 0;
           }
+
+          .success-card .card-inner {
+            border-radius: 23px 23px 0 0 !important;
+          }
         }
+
         .modal-container {
           width: 480px;
           height: 480px;
@@ -416,9 +427,39 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
         @media (max-width: 768px) {
           .modal-container {
-            width: 100vw;
+            width: 100%;
+            max-width: 100vw;
             height: auto;
-            min-height: 480px;
+            min-height: auto;
+            perspective: none;
+          }
+
+          .modal-flipper {
+            transform-style: flat;
+          }
+
+          .modal-flipper.flipped {
+            transform: none;
+          }
+
+          .modal-front,
+          .modal-back {
+            position: relative;
+            backface-visibility: visible;
+            -webkit-backface-visibility: visible;
+          }
+
+          .modal-back {
+            transform: none;
+            display: none;
+          }
+
+          .modal-flipper.flipped .modal-front {
+            display: none;
+          }
+
+          .modal-flipper.flipped .modal-back {
+            display: block;
           }
         }
 
@@ -427,7 +468,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
           height: 4px;
           background: rgba(255, 255, 255, 0.3);
           border-radius: 2px;
-          margin: 0 auto 20px;
+          margin: 0 auto 16px;
         }
 
         @media (min-width: 769px) {
@@ -445,11 +486,11 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
               ref={modalRef}
               className="zuno-gradient relative overflow-hidden"
             >
-              <div className="card-inner absolute inset-[1px] bg-[#0a0a0a] rounded-[39px] md:rounded-[39px] rounded-t-[23px] z-10 flex flex-col justify-center p-[76px] md:p-[76px] p-8 pt-6">
+              <div className="card-inner absolute inset-[1px] bg-[#0a0a0a] rounded-t-[23px] md:rounded-[39px] z-10 flex flex-col justify-center p-6 pt-4 md:p-[76px]">
                 <div className="drag-handle"></div>
 
-                <div className="mb-8 text-center relative z-10">
-                  <div className="flex items-center justify-between mb-8">
+                <div className="mb-4 md:mb-8 text-center relative z-10">
+                  <div className="flex items-center justify-between mb-4 md:mb-8">
                     <div className="flex-1"></div>
                     <h2 className="text-[11px] leading-[14px] font-normal text-white/80 tracking-[0.2em] uppercase flex-1 text-center">
                       Acesso Beta
@@ -477,7 +518,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
                     </div>
                   </div>
 
-                  <p className="text-[15px] leading-[22px] text-white/70 max-w-[320px] mx-auto">
+                  <p className="text-[14px] md:text-[15px] leading-[20px] md:leading-[22px] text-white/70 max-w-[280px] md:max-w-[320px] mx-auto">
                     Cadastre-se agora e saia na frente. Seja um dos primeiros a ter acesso exclusivo.
                   </p>
                 </div>
@@ -553,7 +594,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
           {/* Back - Success */}
           <div className="modal-back">
             <div className="success-card w-full h-full">
-              <div className="card-inner absolute inset-[1px] bg-[#0a0a0a] rounded-[39px] md:rounded-[39px] rounded-t-[23px] z-10 flex flex-col px-12 md:px-12 px-8 py-12 md:py-12 py-8">
+              <div className="card-inner absolute inset-[1px] bg-[#0a0a0a] rounded-t-[23px] md:rounded-[39px] z-10 flex flex-col px-6 py-6 md:px-12 md:py-12">
                 <div className="drag-handle"></div>
 
                 <div className="flex justify-end mb-4 relative z-[100]">
@@ -582,16 +623,16 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
                   </button>
                 </div>
 
-                <div className="flex-1 flex flex-col items-center justify-center text-center relative z-[2]">
-                  <h2 className="text-[10px] leading-[14px] font-normal text-white/50 mb-6 tracking-[0.2em] uppercase">
+                <div className="flex-1 flex flex-col items-center justify-center text-center relative z-[2] py-8 md:py-0">
+                  <h2 className="text-[10px] leading-[14px] font-normal text-white/50 mb-4 md:mb-6 tracking-[0.2em] uppercase">
                     VOCÊ ESTÁ DENTRO!
                   </h2>
 
-                  <h3 className="text-[28px] leading-[34px] font-bold text-white mb-3 max-w-[320px]">
+                  <h3 className="text-[22px] md:text-[28px] leading-[28px] md:leading-[34px] font-bold text-white mb-3 max-w-[280px] md:max-w-[320px]">
                     Estamos muito felizes em tê-lo(a) conosco!
                   </h3>
 
-                  <p className="text-[14px] leading-[20px] text-white/90 max-w-[320px]">
+                  <p className="text-[14px] leading-[20px] text-white/90 max-w-[280px] md:max-w-[320px]">
                     Fique de olho na sua caixa de entrada, novidades em breve.
                   </p>
                 </div>
