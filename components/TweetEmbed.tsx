@@ -9,6 +9,7 @@ interface TweetEmbedProps {
 declare global {
   interface Window {
     twttr?: {
+      _e?: Array<() => void>;
       widgets: {
         load: (element?: HTMLElement) => void;
         createTweet: (
@@ -43,58 +44,73 @@ function extractTweetId(url: string): string | null {
   return null;
 }
 
+// Initialize Twitter widgets using official pattern
+// https://developer.x.com/en/docs/twitter-for-websites/javascript-api/guides/set-up-twitter-for-websites
+function initTwitterWidgets(): void {
+  const d = document;
+  const s = 'script';
+  const id = 'twitter-wjs';
+
+  // Skip if already set up with ready function
+  if (window.twttr?.ready) {
+    return;
+  }
+
+  // Check if script already exists
+  if (d.getElementById(id)) {
+    return;
+  }
+
+  // Initialize twttr object with async queue
+  const t = {
+    _e: [] as Array<() => void>,
+    ready: function (f: () => void) {
+      this._e.push(f);
+    },
+  };
+  window.twttr = t as unknown as typeof window.twttr;
+
+  // Create script element
+  const js = d.createElement(s) as HTMLScriptElement;
+  js.id = id;
+  js.src = 'https://platform.twitter.com/widgets.js';
+
+  // Insert before first script tag
+  const fjs = d.getElementsByTagName(s)[0];
+  fjs?.parentNode?.insertBefore(js, fjs);
+}
+
 // Load Twitter widgets script
 function loadTwitterScript(): Promise<void> {
   return new Promise((resolve, reject) => {
-    // If already loaded and ready
+    // If already fully loaded
     if (window.twttr?.widgets?.createTweet) {
       resolve();
       return;
     }
 
-    // Check if script tag exists
-    const existingScript = document.getElementById('twitter-wjs');
+    // Initialize using official pattern
+    initTwitterWidgets();
 
-    if (!existingScript) {
-      // Create and add the script
-      const script = document.createElement('script');
-      script.id = 'twitter-wjs';
-      script.src = 'https://platform.twitter.com/widgets.js';
-      script.async = true;
-      script.charset = 'utf-8';
-      document.body.appendChild(script);
-    }
-
-    // Wait for twttr to be ready using twttr.ready if available
-    const waitForReady = () => {
-      if (window.twttr?.ready) {
-        window.twttr.ready(() => {
+    // Use twttr.ready to queue our callback
+    if (window.twttr?.ready) {
+      window.twttr.ready(() => {
+        if (window.twttr?.widgets?.createTweet) {
           resolve();
-        });
-      } else {
-        // Poll for twttr availability
-        let attempts = 0;
-        const maxAttempts = 50; // 5 seconds
-        const checkInterval = setInterval(() => {
-          attempts++;
-          if (window.twttr?.widgets?.createTweet) {
-            clearInterval(checkInterval);
-            resolve();
-          } else if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            reject(new Error('Twitter script load timeout'));
-          }
-        }, 100);
-      }
-    };
-
-    // If script already exists, just wait for it
-    if (existingScript) {
-      waitForReady();
+        } else {
+          reject(new Error('Twitter widgets not available after ready'));
+        }
+      });
     } else {
-      // For new script, wait a tick then start waiting
-      setTimeout(waitForReady, 50);
+      reject(new Error('Failed to initialize Twitter widgets'));
     }
+
+    // Timeout fallback
+    setTimeout(() => {
+      if (!window.twttr?.widgets?.createTweet) {
+        reject(new Error('Twitter script load timeout'));
+      }
+    }, 10000);
   });
 }
 
