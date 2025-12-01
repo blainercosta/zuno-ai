@@ -185,8 +185,8 @@ serve(async (req) => {
       .select()
 
     if (error) {
-      console.error('Supabase error:', error)
-      throw new Error('Erro ao salvar vaga')
+      console.error('Supabase error:', JSON.stringify(error, null, 2))
+      throw new Error(`Erro ao salvar vaga: ${error.message || error.code || 'unknown'}`)
     }
 
     return new Response(

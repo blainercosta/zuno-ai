@@ -1,17 +1,28 @@
-# robots.txt for Zuno AI
+# Robots.txt for Zuno AI - Portal de Notícias de IA
 User-agent: *
 Allow: /
+
+# Important paths for crawlers
+Allow: /noticias-ia/
+Allow: /noticias-ia/*
 Allow: /jobs
-Allow: /news
+Allow: /job/*
 Allow: /*.js
 Allow: /*.css
 
-# Disallow admin or private pages if any
+# Legacy redirects (301 to new paths)
+Allow: /news
+Allow: /news/*
+
+# Disallow admin or private pages
 Disallow: /admin
 Disallow: /api/private
+Disallow: /settings
+Disallow: /_next/
 
-# Sitemap location
-Sitemap: https://www.zunoai.com/sitemap.xml
+# Sitemap locations
+Sitemap: https://usezuno.app/sitemap.xml
+Sitemap: https://usezuno.app/sitemap-news.xml
 
-# Crawl delay (optional, adjust based on server capacity)
+# Crawl delay (adjust based on server capacity)
 Crawl-delay: 1

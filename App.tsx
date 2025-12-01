@@ -93,16 +93,22 @@ function NewsDetailRoute() {
   const navigate = useNavigate();
 
   if (!slug) {
-    return <Navigate to="/news" replace />;
+    return <Navigate to="/noticias-ia" replace />;
   }
 
   const newsId = getIdFromSlug(slug);
 
   if (!newsId) {
-    return <Navigate to="/news" replace />;
+    return <Navigate to="/noticias-ia" replace />;
   }
 
-  return <NewsDetailPage newsId={newsId} onBack={() => navigate('/news')} />;
+  return <NewsDetailPage newsId={newsId} onBack={() => navigate('/noticias-ia')} />;
+}
+
+// Legacy redirect for old /news/:slug URLs
+function NewsLegacyRedirect() {
+  const { slug } = useParams<{ slug: string }>();
+  return <Navigate to={`/noticias-ia/${slug || ''}`} replace />;
 }
 
 function ProfessionalDetailRoute() {
@@ -194,6 +200,7 @@ function PostJobPageWrapper() {
 // News Page Wrapper
 function NewsPageWrapper() {
   const navigate = useNavigate();
+  const { categoria } = useParams<{ categoria?: string }>();
 
   const handleNewsClick = async (newsId: number | string) => {
     const isUUID = typeof newsId === 'string' && newsId.includes('-');
@@ -228,17 +235,17 @@ function NewsPageWrapper() {
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .trim()}-${newsId}`;
-        navigate(`/news/${slug}`);
+        navigate(`/noticias-ia/${slug}`);
       } else {
-        navigate(`/news/${newsId}`);
+        navigate(`/noticias-ia/${newsId}`);
       }
     } catch (error) {
       console.error('Error fetching news title:', error);
-      navigate(`/news/${newsId}`);
+      navigate(`/noticias-ia/${newsId}`);
     }
   };
 
-  return <NewsPage onNewsClick={handleNewsClick} onViewAllJobs={() => navigate('/jobs')} />;
+  return <NewsPage onNewsClick={handleNewsClick} onViewAllJobs={() => navigate('/jobs')} initialCategory={categoria} />;
 }
 
 // Professionals Page Wrapper
@@ -271,8 +278,8 @@ function Layout({ children }: { children: React.ReactNode }) {
     if (path === '/jobs') {
       return location.pathname === '/jobs' || location.pathname.startsWith('/job/');
     }
-    if (path === '/news') {
-      return location.pathname === '/news' || location.pathname.startsWith('/news/');
+    if (path === '/noticias-ia') {
+      return location.pathname === '/noticias-ia' || location.pathname.startsWith('/noticias-ia/');
     }
     if (path === '/professionals') {
       return location.pathname === '/professionals' || location.pathname.startsWith('/professional/');
@@ -315,13 +322,13 @@ function Layout({ children }: { children: React.ReactNode }) {
 
             {/* News */}
             <button
-              onClick={() => navigate('/news')}
+              onClick={() => navigate('/noticias-ia')}
               className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
-                isActive('/news') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+                isActive('/noticias-ia') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
               }`}
-              aria-label="News"
+              aria-label="Notícias de IA"
             >
-              <svg className="size-7" fill="none" stroke={isActive('/news') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
+              <svg className="size-7" fill="none" stroke={isActive('/noticias-ia') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
                 <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -386,11 +393,11 @@ function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-around h-16 px-4">
           {/* News */}
           <button
-            onClick={() => navigate('/news')}
+            onClick={() => navigate('/noticias-ia')}
             className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-              isActive('/news') ? 'text-white' : 'text-zinc-500'
+              isActive('/noticias-ia') ? 'text-white' : 'text-zinc-500'
             }`}
-            aria-label="News"
+            aria-label="Notícias de IA"
           >
             <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path fillRule="evenodd" clipRule="evenodd" d="M6.19807 7.55982L9.68086 3.49658L13.4357 7.87725L15.8653 5.04268L17.802 7.30217C19.0465 8.75406 19.7305 10.6032 19.7305 12.5155V12.7731C19.7305 14.8234 18.9161 16.7897 17.4663 18.2394C16.0166 19.6892 14.0503 20.5037 12 20.5037C7.73059 20.5037 4.26953 17.0426 4.26953 12.7732C4.26953 10.8609 4.95359 9.01173 6.19807 7.55982Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -464,7 +471,10 @@ export default function App() {
                 {/* Jobs routes */}
                 <Route path="/jobs" element={<JobsPageWrapper />} />
                 <Route path="/job/:slug" element={<JobDetailRoute />} />
-                <Route path="/post-job" element={<PostJobPageWrapper />} />
+                {/* Post job route - hidden in production */}
+                {import.meta.env.DEV && (
+                  <Route path="/post-job" element={<PostJobPageWrapper />} />
+                )}
 
                 {/* Professionals routes - Hidden in production */}
                 {import.meta.env.DEV && (
@@ -474,9 +484,14 @@ export default function App() {
                   </>
                 )}
 
-                {/* News routes */}
-                <Route path="/news" element={<NewsPageWrapper />} />
-                <Route path="/news/:slug" element={<NewsDetailRoute />} />
+                {/* News routes - SEO optimized paths */}
+                <Route path="/noticias-ia" element={<NewsPageWrapper />} />
+                <Route path="/noticias-ia/:slug" element={<NewsDetailRoute />} />
+                <Route path="/noticias-ia/categoria/:categoria" element={<NewsPageWrapper />} />
+
+                {/* Legacy redirects for old /news URLs */}
+                <Route path="/news" element={<Navigate to="/noticias-ia" replace />} />
+                <Route path="/news/:slug" element={<NewsLegacyRedirect />} />
 
                 {/* Catch all - redirect to jobs */}
                 <Route path="*" element={<Navigate to="/jobs" replace />} />

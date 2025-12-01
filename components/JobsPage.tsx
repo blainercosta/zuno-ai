@@ -95,12 +95,15 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
-            <button
-              onClick={onPostJobClick}
-              className="bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[15px] leading-[15px]"
-            >
-              Publicar vaga grátis
-            </button>
+            {/* Post Job button - hidden in production */}
+            {import.meta.env.DEV && (
+              <button
+                onClick={onPostJobClick}
+                className="bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[15px] leading-[15px]"
+              >
+                Publicar vaga grátis
+              </button>
+            )}
             {onNewsClick && (
               <>
                 <style>{`

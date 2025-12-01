@@ -129,3 +129,35 @@ export async function fetchSimilarJobs(data: SimilarJobsData): Promise<ApiRespon
     return { error: 'Erro de conexão. Tente novamente.' }
   }
 }
+
+interface SimilarNewsData {
+  newsId: string | number
+  limit?: number
+}
+
+/**
+ * Busca notícias similares via Edge Function (OpenAI fica no backend)
+ */
+export async function fetchSimilarNews(data: SimilarNewsData): Promise<ApiResponse<unknown[]>> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/similar-news`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(data),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      return { error: result.error || 'Erro ao buscar notícias similares' }
+    }
+
+    return result
+  } catch (error) {
+    console.error('Error fetching similar news:', error)
+    return { error: 'Erro de conexão. Tente novamente.' }
+  }
+}

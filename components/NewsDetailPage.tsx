@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify';
 import { supabase } from '@/lib/supabase';
 import type { News } from '@/types/news';
 import { shareOnTwitter, shareOnLinkedIn, copyToClipboard, generateSlug } from '@/utils/shareUtils';
+import { useSimilarNews } from '@/hooks/useSimilarNews';
 import NewsSEO from './NewsSEO';
 import { NewsDetailSkeleton } from './Skeleton';
 import StructuredContent from './StructuredContent';
@@ -27,8 +28,11 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
   const [isLoading, setIsLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  // Hook para buscar notícias relacionadas via embeddings
+  const { similarNews, isLoading: isLoadingSimilar } = useSimilarNews(news, 4);
+
   const currentUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/news/${news ? generateSlug(news.title, news.id) : newsId}`
+    ? `${window.location.origin}/noticias-ia/${news ? generateSlug(news.title, news.id) : newsId}`
     : '';
 
   useEffect(() => {
@@ -287,6 +291,61 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
             </div>
           </div>
         </div>
+
+        {/* Related News Section */}
+        {(similarNews.length > 0 || isLoadingSimilar) && (
+          <div className="mt-12 pt-8 border-t border-zinc-800">
+            <h2 className="text-xl font-semibold mb-6">Notícias Relacionadas</h2>
+
+            {isLoadingSimilar ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-zinc-900 rounded-xl p-4 animate-pulse">
+                    <div className="aspect-[16/9] bg-zinc-800 rounded-lg mb-3" />
+                    <div className="h-4 bg-zinc-800 rounded w-1/4 mb-2" />
+                    <div className="h-5 bg-zinc-800 rounded w-full mb-1" />
+                    <div className="h-5 bg-zinc-800 rounded w-3/4" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {similarNews.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`/noticias-ia/${item.slug || generateSlug(item.title, item.id)}`}
+                    className="group bg-zinc-900 hover:bg-zinc-800/70 rounded-xl overflow-hidden transition-colors"
+                  >
+                    {item.image_url && (
+                      <div className="aspect-[16/9] overflow-hidden">
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <span className="inline-block px-2 py-0.5 text-xs rounded bg-zinc-800 text-zinc-400 mb-2">
+                        {item.category}
+                      </span>
+                      <h3 className="text-sm font-medium line-clamp-2 group-hover:text-white transition-colors">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-500 mt-2">
+                        {new Date(item.published_at).toLocaleDateString('pt-BR', {
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <style>{`

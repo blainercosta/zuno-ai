@@ -4,14 +4,16 @@ import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
 import { NewsGridSkeleton, NewsSidebarSkeleton, JobsSidebarSkeleton } from "./Skeleton";
+import NewsListSEO from "./NewsListSEO";
 
 interface NewsPageProps {
   onNewsClick: (id: number | string) => void;
   onViewAllJobs?: () => void;
+  initialCategory?: string;
 }
 
-export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) {
-  const [activeFilter, setActiveFilter] = useState("Tudo");
+export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }: NewsPageProps) {
+  const [activeFilter, setActiveFilter] = useState(initialCategory || "Tudo");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -115,10 +117,17 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
   const topNews = useMemo(() => news.slice(0, 4), [news]);
 
   return (
-    <div className="flex w-full pb-16 md:pb-0">
-      <div className="flex-1 min-w-0">
-        <div className="py-4 md:py-5 lg:py-5">
-        {/* Filters */}
+    <>
+      {/* SEO Meta Tags for News List */}
+      <NewsListSEO category={activeFilter} />
+
+      <div className="flex w-full pb-16 md:pb-0">
+        <div className="flex-1 min-w-0">
+          <div className="py-4 md:py-5 lg:py-5">
+          {/* Page Title - H1 for SEO */}
+          <h1 className="sr-only">Notícias de Inteligência Artificial</h1>
+
+          {/* Filters */}
         <div className="mb-5 px-4 md:px-6 lg:px-8">
           <div className="flex items-center gap-2">
           {/* Left Navigation Button */}
@@ -382,15 +391,16 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
         </div>
       </aside>
 
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-    </div>
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+      </div>
+    </>
   );
 }
