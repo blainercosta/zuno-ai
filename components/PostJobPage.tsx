@@ -130,12 +130,12 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fadeIn"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] animate-fadeIn"
         onClick={onBack}
       />
 
       {/* Modal Container with slide-up animation */}
-      <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center pointer-events-none">
+      <div className="fixed inset-0 z-[95] flex items-end md:items-center md:justify-center pointer-events-none">
         <div
           className="pointer-events-auto w-full md:w-auto md:max-w-4xl md:mx-4 bg-zinc-950 md:rounded-2xl overflow-hidden animate-slideUp md:animate-scaleIn flex flex-col max-h-screen"
           onClick={(e) => e.stopPropagation()}
