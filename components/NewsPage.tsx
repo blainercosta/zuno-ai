@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNews } from "@/hooks/useNews";
+import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
 import { NewsGridSkeleton, NewsSidebarSkeleton, JobsSidebarSkeleton } from "./Skeleton";
-
-const FILTERS = [
-  "Tudo", "IA", "Startups", "Tecnologia", "Design", "Produto",
-  "Engenharia", "Dados", "Web3", "DevOps", "Mobile", "Backend"
-];
 
 interface NewsPageProps {
   onNewsClick: (id: number | string) => void;
@@ -23,6 +19,9 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
   const [loadingJobs, setLoadingJobs] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Fetch categories from database
+  const { categories } = useCategories();
 
   // Fetch news from Supabase with category filter
   const { news, isLoading, hasMore, loadMore } = useNews(activeFilter);
@@ -136,8 +135,28 @@ export default function NewsPage({ onNewsClick, onViewAllJobs }: NewsPageProps) 
           )}
 
           <div ref={scrollContainerRef} className="flex-1 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 pb-1">
-              {FILTERS.map((filter) => (
+            <div className="flex gap-2 pb-1 items-center">
+              {/* Tudo */}
+              <button
+                onClick={() => setActiveFilter("Tudo")}
+                className={`
+                  px-3 py-2 rounded-xl text-sm whitespace-nowrap border border-zinc-800
+                  ${activeFilter === "Tudo"
+                    ? 'bg-white text-slate-950 border-slate-950'
+                    : 'hover:bg-zinc-800'
+                  }
+                `}
+              >
+                Tudo
+              </button>
+
+              {/* Separator */}
+              {categories.length > 0 && (
+                <div className="w-px h-6 bg-zinc-700 mx-1 shrink-0" />
+              )}
+
+              {/* Dynamic categories from database */}
+              {categories.map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
