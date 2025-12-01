@@ -85,13 +85,13 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
       <div className="max-w-[968px] mx-auto px-4 md:px-8 lg:px-24 pt-12 pb-8 sm:pt-20 sm:pb-16 md:pt-24 md:pb-24">
         <div className="text-center">
           <h1 className="text-[28px] sm:text-[36px] md:text-[48px] leading-[1.2] mb-4 md:mb-6">
-            Vagas de IA para profissionais<br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>no Brasil
+            Pare de caçar vaga.<br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>Deixe a IA caçar por você.
           </h1>
 
           <p className="text-[16px] sm:text-[18px] leading-[28px] text-zinc-400 mb-6 max-w-[480px] mx-auto">
-            Empresas verificadas. Salários transparentes.<br />
-            Oportunidades reais em IA.
+            Oportunidades reais em IA,<br />
+            atualizadas automaticamente.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
