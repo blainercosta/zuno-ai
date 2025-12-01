@@ -43,69 +43,58 @@ function extractTweetId(url: string): string | null {
   return null;
 }
 
-// Load Twitter widgets script with timeout
+// Load Twitter widgets script
 function loadTwitterScript(): Promise<void> {
   return new Promise((resolve, reject) => {
-    // If already loaded
-    if (window.twttr?.widgets) {
+    // If already loaded and ready
+    if (window.twttr?.widgets?.createTweet) {
       resolve();
       return;
     }
 
+    // Check if script tag exists
     const existingScript = document.getElementById('twitter-wjs');
-    if (existingScript) {
-      // Script exists but not loaded yet, wait for it
-      if (window.twttr?.widgets) {
-        resolve();
-      } else {
-        // Wait for twttr to be ready
-        const checkInterval = setInterval(() => {
-          if (window.twttr?.widgets) {
-            clearInterval(checkInterval);
-            resolve();
-          }
-        }, 100);
 
-        // Timeout after 5 seconds
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          if (window.twttr?.widgets) {
-            resolve();
-          } else {
-            reject(new Error('Twitter script timeout'));
-          }
-        }, 5000);
-      }
-      return;
+    if (!existingScript) {
+      // Create and add the script
+      const script = document.createElement('script');
+      script.id = 'twitter-wjs';
+      script.src = 'https://platform.twitter.com/widgets.js';
+      script.async = true;
+      script.charset = 'utf-8';
+      document.body.appendChild(script);
     }
 
-    const script = document.createElement('script');
-    script.id = 'twitter-wjs';
-    script.src = 'https://platform.twitter.com/widgets.js';
-    script.async = true;
-
-    script.onload = () => {
-      // Wait for twttr to be fully ready
-      const checkInterval = setInterval(() => {
-        if (window.twttr?.widgets) {
-          clearInterval(checkInterval);
+    // Wait for twttr to be ready using twttr.ready if available
+    const waitForReady = () => {
+      if (window.twttr?.ready) {
+        window.twttr.ready(() => {
           resolve();
-        }
-      }, 100);
-
-      setTimeout(() => {
-        clearInterval(checkInterval);
-        if (window.twttr?.widgets) {
-          resolve();
-        } else {
-          reject(new Error('Twitter widgets not available'));
-        }
-      }, 3000);
+        });
+      } else {
+        // Poll for twttr availability
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds
+        const checkInterval = setInterval(() => {
+          attempts++;
+          if (window.twttr?.widgets?.createTweet) {
+            clearInterval(checkInterval);
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            reject(new Error('Twitter script load timeout'));
+          }
+        }, 100);
+      }
     };
 
-    script.onerror = () => reject(new Error('Failed to load Twitter script'));
-
-    document.head.appendChild(script);
+    // If script already exists, just wait for it
+    if (existingScript) {
+      waitForReady();
+    } else {
+      // For new script, wait a tick then start waiting
+      setTimeout(waitForReady, 50);
+    }
   });
 }
 
@@ -113,6 +102,7 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const embedAttempted = useRef(false);
 
   // Get the tweet ID from either prop
   const id = tweetId || (tweetUrl ? extractTweetId(tweetUrl) : null);
@@ -124,40 +114,44 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
       return;
     }
 
+    // Prevent double embedding in StrictMode
+    if (embedAttempted.current) {
+      return;
+    }
+    embedAttempted.current = true;
+
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
 
     const embedTweet = async () => {
       try {
         await loadTwitterScript();
 
-        if (!mounted || !containerRef.current || !window.twttr?.widgets) {
-          throw new Error('Component unmounted or Twitter not ready');
+        if (!mounted || !containerRef.current) {
+          return;
         }
 
-        // Clear container
+        if (!window.twttr?.widgets?.createTweet) {
+          throw new Error('Twitter widgets not available');
+        }
+
+        // Clear container before embedding
         containerRef.current.innerHTML = '';
 
-        // Set a timeout for the embed itself
-        const embedPromise = window.twttr.widgets.createTweet(id, containerRef.current, {
-          theme: 'dark',
-          dnt: true,
-          align: 'center',
-        });
-
-        // Race between embed and timeout
-        const result = await Promise.race([
-          embedPromise,
-          new Promise<undefined>((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Tweet embed timeout')), 10000);
-          })
-        ]);
-
-        clearTimeout(timeoutId);
+        // Create the tweet embed
+        const tweetElement = await window.twttr.widgets.createTweet(
+          id,
+          containerRef.current,
+          {
+            theme: 'dark',
+            dnt: true,
+            align: 'center',
+            conversation: 'none',
+          }
+        );
 
         if (mounted) {
-          // If result is undefined, the tweet might not exist or be private
-          if (!result) {
+          // createTweet returns undefined if tweet doesn't exist or is private
+          if (!tweetElement) {
             setError(true);
           }
           setIsLoading(false);
@@ -175,7 +169,6 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
 
     return () => {
       mounted = false;
-      clearTimeout(timeoutId);
     };
   }, [id]);
 
