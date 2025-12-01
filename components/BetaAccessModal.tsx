@@ -173,7 +173,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center p-0 md:p-4"
+      className="fixed inset-0 z-[100] flex items-end md:items-center md:justify-center p-0 md:p-4"
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(12px)',
@@ -489,7 +489,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
           .success-card .card-inner {
             position: relative !important;
             inset: auto !important;
-            padding-bottom: 24px !important;
+            padding-bottom: 100px !important;
           }
         }
 
