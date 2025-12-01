@@ -436,6 +436,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
           .modal-flipper {
             transform-style: flat;
+            height: auto;
           }
 
           .modal-flipper.flipped {
@@ -447,6 +448,7 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
             position: relative;
             backface-visibility: visible;
             -webkit-backface-visibility: visible;
+            height: auto;
           }
 
           .modal-back {
@@ -460,6 +462,12 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
 
           .modal-flipper.flipped .modal-back {
             display: block;
+          }
+
+          .zuno-gradient .card-inner,
+          .success-card .card-inner {
+            position: relative !important;
+            inset: auto !important;
           }
         }
 
