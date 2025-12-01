@@ -180,7 +180,6 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
             alt={news.title}
             loading="eager"
             decoding="async"
-            fetchpriority="high"
             className="w-full h-full object-cover"
           />
         </div>

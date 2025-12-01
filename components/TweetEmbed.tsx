@@ -15,8 +15,9 @@ declare global {
           tweetId: string,
           container: HTMLElement,
           options?: Record<string, unknown>
-        ) => Promise<HTMLElement>;
+        ) => Promise<HTMLElement | undefined>;
       };
+      ready: (callback: () => void) => void;
     };
   }
 }
@@ -42,17 +43,39 @@ function extractTweetId(url: string): string | null {
   return null;
 }
 
-// Load Twitter widgets script
+// Load Twitter widgets script with timeout
 function loadTwitterScript(): Promise<void> {
-  return new Promise((resolve) => {
-    if (window.twttr) {
+  return new Promise((resolve, reject) => {
+    // If already loaded
+    if (window.twttr?.widgets) {
       resolve();
       return;
     }
 
     const existingScript = document.getElementById('twitter-wjs');
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve());
+      // Script exists but not loaded yet, wait for it
+      if (window.twttr?.widgets) {
+        resolve();
+      } else {
+        // Wait for twttr to be ready
+        const checkInterval = setInterval(() => {
+          if (window.twttr?.widgets) {
+            clearInterval(checkInterval);
+            resolve();
+          }
+        }, 100);
+
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          if (window.twttr?.widgets) {
+            resolve();
+          } else {
+            reject(new Error('Twitter script timeout'));
+          }
+        }, 5000);
+      }
       return;
     }
 
@@ -60,7 +83,28 @@ function loadTwitterScript(): Promise<void> {
     script.id = 'twitter-wjs';
     script.src = 'https://platform.twitter.com/widgets.js';
     script.async = true;
-    script.onload = () => resolve();
+
+    script.onload = () => {
+      // Wait for twttr to be fully ready
+      const checkInterval = setInterval(() => {
+        if (window.twttr?.widgets) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (window.twttr?.widgets) {
+          resolve();
+        } else {
+          reject(new Error('Twitter widgets not available'));
+        }
+      }, 3000);
+    };
+
+    script.onerror = () => reject(new Error('Failed to load Twitter script'));
+
     document.head.appendChild(script);
   });
 }
@@ -81,24 +125,41 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
     }
 
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
     const embedTweet = async () => {
       try {
         await loadTwitterScript();
 
-        if (!mounted || !containerRef.current || !window.twttr) return;
+        if (!mounted || !containerRef.current || !window.twttr?.widgets) {
+          throw new Error('Component unmounted or Twitter not ready');
+        }
 
         // Clear container
         containerRef.current.innerHTML = '';
 
-        // Create the tweet
-        await window.twttr.widgets.createTweet(id, containerRef.current, {
+        // Set a timeout for the embed itself
+        const embedPromise = window.twttr.widgets.createTweet(id, containerRef.current, {
           theme: 'dark',
-          dnt: true, // Do not track
+          dnt: true,
           align: 'center',
         });
 
+        // Race between embed and timeout
+        const result = await Promise.race([
+          embedPromise,
+          new Promise<undefined>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Tweet embed timeout')), 10000);
+          })
+        ]);
+
+        clearTimeout(timeoutId);
+
         if (mounted) {
+          // If result is undefined, the tweet might not exist or be private
+          if (!result) {
+            setError(true);
+          }
           setIsLoading(false);
         }
       } catch (err) {
@@ -114,12 +175,13 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
 
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
     };
   }, [id]);
 
+  // Show fallback link if error or no ID
   if (error || !id) {
-    // Fallback: show link to tweet
-    const url = tweetUrl || `https://twitter.com/i/status/${id}`;
+    const url = tweetUrl || (id ? `https://x.com/i/status/${id}` : '');
     return (
       <div className="my-8 p-4 bg-zinc-900 rounded-xl border border-zinc-800">
         <div className="flex items-center gap-3 mb-3">
@@ -128,14 +190,16 @@ export default function TweetEmbed({ tweetId, tweetUrl }: TweetEmbedProps) {
           </svg>
           <span className="text-sm text-zinc-400">Post do X</span>
         </div>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sky-400 hover:text-sky-300 text-sm break-all"
-        >
-          {url}
-        </a>
+        {url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sky-400 hover:text-sky-300 text-sm break-all"
+          >
+            Ver post original →
+          </a>
+        )}
       </div>
     );
   }
