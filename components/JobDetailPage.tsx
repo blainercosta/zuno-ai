@@ -80,7 +80,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {/* Description */}
               {job.description_full && (
                 <div className="mb-8">
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.description_full}
                   </div>
                 </div>
@@ -90,7 +90,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.about_company && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6">Sobre a empresa</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.about_company}
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.responsibilities && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6 pt-2">Responsabilidades</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.responsibilities}
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.requirements && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6 pt-2">Requisitos</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.requirements}
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.differentials && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6 pt-2">Diferenciais</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.differentials}
                   </div>
                 </div>
@@ -130,7 +130,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.benefits && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6 pt-2">Benefícios</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.benefits}
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               {job.process && (
                 <div className="mb-8">
                   <h3 className="text-[20px] leading-[30px] text-slate-50 mb-6 pt-2">Processo seletivo</h3>
-                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap">
+                  <div className="text-zinc-400 leading-[24px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>
                     {job.process}
                   </div>
                 </div>
