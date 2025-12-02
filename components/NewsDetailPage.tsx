@@ -191,21 +191,20 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         </div>
       </div>
 
-      {/* Hero Image */}
-      {news.image_url && (
-        <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-zinc-900 overflow-hidden">
-          <img
-            src={news.image_url}
-            alt={news.title}
-            loading="eager"
-            decoding="async"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
       {/* Content */}
       <div className="max-w-[720px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        {/* Hero Image */}
+        {news.image_url && (
+          <div className="w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -mx-4 md:-mx-8 mb-8 aspect-[16/9] bg-zinc-900 overflow-hidden rounded-xl">
+            <img
+              src={news.image_url}
+              alt={news.title}
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         {/* Category Badge */}
         <div className="mb-6">
           <span className="inline-block px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-zinc-300 font-medium">
