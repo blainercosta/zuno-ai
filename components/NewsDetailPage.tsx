@@ -8,6 +8,25 @@ import NewsSEO from './NewsSEO';
 import { NewsDetailSkeleton } from './Skeleton';
 import StructuredContent from './StructuredContent';
 
+// Função para calcular tempo relativo
+function getRelativeTime(date: string | Date): string {
+  const now = new Date();
+  const published = new Date(date);
+  const diffMs = now.getTime() - published.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return 'agora mesmo';
+  if (diffMins < 60) return `há ${diffMins} ${diffMins === 1 ? 'minuto' : 'minutos'}`;
+  if (diffHours < 24) return `há ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
+  if (diffDays === 1) return 'há 1 dia';
+  if (diffDays < 30) return `há ${diffDays} dias`;
+
+  // Para mais de 30 dias, mostrar data
+  return published.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 // Configuração segura do DOMPurify
 const sanitizeConfig = {
   ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'strong', 'em', 'b', 'i', 'img', 'blockquote', 'code', 'pre', 'br', 'span', 'div'],
@@ -207,14 +226,15 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         )}
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-zinc-500 mb-8 md:mb-12 pb-6 md:pb-8 border-b border-zinc-800">
-          <div className="flex items-center gap-2">
-            <img src="/zuno-avatar.svg" alt="Zuno AI" className="size-6 rounded-md" />
-            <span>{news.author}</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 md:gap-4 text-xs md:text-sm text-zinc-500 mb-8 md:mb-12 pb-6 md:pb-8 border-b border-zinc-800">
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2">
+              <img src="/zuno-avatar.svg" alt="Zuno AI" className="size-6 rounded-md" />
+              <span>{news.author}</span>
+            </div>
+            <span className="hidden sm:inline">•</span>
+            <span>{getRelativeTime(news.published_at)}</span>
           </div>
-          <span className="hidden sm:inline">•</span>
-          <span>{new Date(news.published_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-          <span className="hidden sm:inline">•</span>
           <span>{news.read_time} min de leitura</span>
         </div>
 
