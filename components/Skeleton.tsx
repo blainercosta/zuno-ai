@@ -248,11 +248,11 @@ export function NewsDetailSkeleton() {
         </div>
       </div>
 
-      {/* Hero Image */}
-      <Skeleton className="w-full aspect-[16/9] md:aspect-[21/9]" />
-
       {/* Content */}
       <div className="max-w-[720px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        {/* Hero Image */}
+        <Skeleton className="w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -mx-4 md:-mx-8 mb-8 aspect-[16/9] rounded-xl" />
+
         {/* Category */}
         <Skeleton className="h-7 w-20 rounded-full mb-6" />
 
@@ -270,9 +270,12 @@ export function NewsDetailSkeleton() {
         </div>
 
         {/* Meta */}
-        <div className="flex items-center gap-4 mb-12 pb-8 border-b border-zinc-800">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-20" />
+        <div className="flex items-center justify-between mb-12 pb-8 border-b border-zinc-800">
+          <div className="flex items-center gap-4">
+            <Skeleton className="size-6 rounded-md" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-24" />
+          </div>
           <Skeleton className="h-4 w-28" />
         </div>
 
