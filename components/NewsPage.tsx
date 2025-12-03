@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNews } from "@/hooks/useNews";
+import { useTopNews } from "@/hooks/useTopNews";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
@@ -55,6 +56,9 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
 
   // Fetch news from Supabase with category filter
   const { news, isLoading, hasMore, loadMore } = useNews(activeFilter);
+
+  // Fetch top news for sidebar (most read this week)
+  const { topNews, isLoading: isLoadingTopNews } = useTopNews(4);
 
   // Fetch recent jobs
   useEffect(() => {
@@ -141,8 +145,6 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
     });
   }, [news, searchQuery]);
 
-  // Get top 4 news for sidebar (most recent)
-  const topNews = useMemo(() => news.slice(0, 4), [news]);
 
   return (
     <>
@@ -338,7 +340,7 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
           <h3 className="mb-6">Mais lidas da semana</h3>
 
           <div className="space-y-4">
-            {isLoading && news.length === 0 ? (
+            {isLoadingTopNews ? (
               <NewsSidebarSkeleton />
             ) : (
               topNews.map((item, i) => (
@@ -355,18 +357,11 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
                       <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
                         {item.title}
                       </h4>
-                      <div className="flex items-center gap-2 text-xs text-zinc-500">
-                        <span>
-                          {formatPublishedDate(item.published_at)}
-                          {' · '}
-                          {item.read_time} min de leitura
-                        </span>
-                        {isNewArticle(item.published_at) && (
-                          <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 uppercase tracking-wide">
-                            Novo
-                          </span>
-                        )}
-                      </div>
+                      <p className="text-xs text-zinc-500">
+                        {formatPublishedDate(item.published_at)}
+                        {' · '}
+                        {item.read_time} min de leitura
+                      </p>
                     </div>
                   </div>
                 </div>

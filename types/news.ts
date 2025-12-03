@@ -26,4 +26,5 @@ export interface News {
   status?: 'draft' | 'published' | 'archived'
   created_at?: string
   updated_at?: string
+  view_count?: number
 }
