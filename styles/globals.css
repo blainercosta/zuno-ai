@@ -239,6 +239,16 @@
   }
 }
 
+/* Hide scrollbar only for sidebar */
+.sidebar-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /**
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
  */

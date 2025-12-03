@@ -365,7 +365,7 @@ export default function ProfessionalsPage({ onProfessionalClick }: Professionals
       </div>
 
       {/* Right Sidebar */}
-      <aside className="hidden lg:block w-[359px] border-l border-zinc-800 h-screen sticky top-0 overflow-y-auto">
+      <aside className="hidden lg:block w-[359px] border-l border-zinc-800 h-screen sticky top-0 overflow-y-auto sidebar-scroll">
         {/* Search Bar */}
         <div className="p-8 border-b border-zinc-800">
           <div className="relative">

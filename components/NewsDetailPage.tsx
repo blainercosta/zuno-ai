@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { supabase } from '@/lib/supabase';
 import type { News } from '@/types/news';
@@ -8,8 +9,17 @@ import NewsSEO from './NewsSEO';
 import { NewsDetailSkeleton } from './Skeleton';
 import StructuredContent from './StructuredContent';
 
-// Função para calcular tempo relativo
-function getRelativeTime(date: string | Date): string {
+// Função para verificar se notícia é nova (< 1 hora)
+function isNewArticle(date: string | Date): boolean {
+  const now = new Date();
+  const published = new Date(date);
+  const diffMs = now.getTime() - published.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+  return diffHours < 1;
+}
+
+// Função para formatar data (relativo se < 7 dias, data completa se >= 7 dias)
+function formatPublishedDate(date: string | Date): string {
   const now = new Date();
   const published = new Date(date);
   const diffMs = now.getTime() - published.getTime();
@@ -17,13 +27,13 @@ function getRelativeTime(date: string | Date): string {
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffMins < 1) return 'agora mesmo';
+  if (diffMins < 1) return 'Agora';
   if (diffMins < 60) return `há ${diffMins} ${diffMins === 1 ? 'minuto' : 'minutos'}`;
   if (diffHours < 24) return `há ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
   if (diffDays === 1) return 'há 1 dia';
-  if (diffDays < 30) return `há ${diffDays} dias`;
+  if (diffDays < 7) return `há ${diffDays} dias`;
 
-  // Para mais de 30 dias, mostrar data
+  // Para >= 7 dias, mostrar data completa
   return published.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
@@ -41,6 +51,171 @@ interface NewsDetailPageProps {
   newsId: number | string;
   onBack: () => void;
 }
+
+// Componente ZunoChatBot focado em timing de posts
+function ZunoChatBot({ newsTitle }: { newsTitle?: string; newsImage?: string }) {
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+
+  // Mostrar conteúdo após abrir
+  useEffect(() => {
+    if (!isOpen) {
+      setShowContent(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowContent(true);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleCTA = () => {
+    navigate('/checkout');
+  };
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Chat Dialog */}
+      {isOpen && (
+        <div className="absolute bottom-14 right-0 w-80 mb-2 animate-slideUp">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-zinc-800 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img src="/zuno-ai.svg" alt="Zuno AI" className="h-5" />
+                <span className="text-sm font-medium">Zuno AI</span>
+              </div>
+              <button
+                onClick={handleClose}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              {/* Initial message */}
+              <div className="animate-fadeIn">
+                <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed inline-block">
+                  Você leu essa notícia aqui primeiro 👆
+                </div>
+              </div>
+
+              {/* News preview + timing message */}
+              {showContent && (
+                <>
+                  <div className="animate-fadeIn">
+                    <div className="bg-zinc-800 rounded-xl p-3">
+                      <p className="text-xs text-zinc-400 mb-1">Esta notícia:</p>
+                      <p className="text-sm font-medium leading-tight line-clamp-2">
+                        {newsTitle || 'Notícia de IA'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="animate-fadeIn">
+                    <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed inline-block">
+                      Quer receber as próximas <span className="text-emerald-400 font-medium">antes de todo mundo</span>?
+                    </div>
+                  </div>
+
+                  <div className="animate-fadeIn">
+                    <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed inline-block">
+                      Direto no seu WhatsApp. Poste na hora certa.
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="animate-fadeIn pt-2">
+                    <button
+                      onClick={handleCTA}
+                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white text-sm font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity"
+                    >
+                      Quero receber primeiro
+                    </button>
+                    <p className="text-center text-xs text-zinc-500 mt-2">
+                      Notícias de IA no WhatsApp
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Button with typing indicator inside */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`relative transition-transform duration-300 ${isOpen ? 'scale-90' : 'animate-float'}`}
+        title="Zuno AI"
+      >
+        {/* Typing indicator bubble - appears before opening, moves with button */}
+        {!isOpen && (
+          <div className="absolute -top-6 -left-16 animate-pulse-bubble">
+            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl rounded-br-sm px-3 py-2 shadow-lg">
+              <div className="flex gap-1">
+                <span className="size-2 bg-zinc-400 rounded-full animate-bounce-dot" style={{ animationDelay: '0ms' }} />
+                <span className="size-2 bg-zinc-400 rounded-full animate-bounce-dot" style={{ animationDelay: '150ms' }} />
+                <span className="size-2 bg-zinc-400 rounded-full animate-bounce-dot" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          </div>
+        )}
+        <img src="/zuno-ai.svg" alt="Zuno AI" className="h-10" />
+      </button>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes bounce-dot {
+          0%, 60%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-4px); }
+        }
+        .animate-bounce-dot {
+          animation: bounce-dot 1s ease-in-out infinite;
+        }
+        @keyframes pulse-bubble {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
+        .animate-pulse-bubble {
+          animation: pulse-bubble 2s ease-in-out infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+
 
 export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) {
   const [news, setNews] = useState<News | null>(null);
@@ -231,10 +406,19 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
               <img src="/zuno-avatar.svg" alt="Zuno AI" className="size-6 rounded-md" />
               <span>{news.author}</span>
             </div>
-            <span className="hidden sm:inline">•</span>
-            <span>{getRelativeTime(news.published_at)}</span>
           </div>
-          <span>{news.read_time} min de leitura</span>
+          <div className="flex items-center gap-2">
+            <span>
+              {formatPublishedDate(news.published_at)}
+              {' · '}
+              {news.read_time} min de leitura
+            </span>
+            {isNewArticle(news.published_at) && (
+              <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 uppercase tracking-wide">
+                Novo
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Article Content */}
@@ -366,7 +550,18 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
         )}
       </div>
 
+      {/* Floating Zuno AI Chat Bot */}
+      <ZunoChatBot newsTitle={news.title} newsImage={news.image_url} />
+
       <style>{`
+        /* Fix mobile text overflow */
+        .article-content {
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          max-width: 100%;
+        }
+
         .article-content h2 {
           font-size: 26px;
           font-weight: 600;
@@ -374,6 +569,8 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           margin-bottom: 20px;
           color: white;
           line-height: 1.3;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
 
         .article-content h3 {
@@ -383,6 +580,8 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           margin-bottom: 16px;
           color: white;
           line-height: 1.3;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
 
         .article-content p {
@@ -390,6 +589,8 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           line-height: 1.8;
           margin-bottom: 24px;
           color: #a1a1aa;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
 
         .article-content p:first-of-type {
@@ -415,6 +616,9 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           text-decoration: underline;
           text-decoration-color: rgba(125, 211, 252, 0.3);
           transition: text-decoration-color 0.2s;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-all;
         }
 
         .article-content a:hover {
@@ -450,6 +654,9 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           border-radius: 12px;
           overflow-x: auto;
           margin: 32px 0;
+          max-width: 100%;
+          white-space: pre-wrap;
+          word-wrap: break-word;
         }
 
         .article-content pre code {

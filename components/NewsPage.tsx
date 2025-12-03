@@ -6,6 +6,34 @@ import type { Job } from "@/types/job";
 import { NewsGridSkeleton, NewsSidebarSkeleton, JobsSidebarSkeleton } from "./Skeleton";
 import NewsListSEO from "./NewsListSEO";
 
+// Função para verificar se notícia é nova (< 1 hora)
+function isNewArticle(date: string | Date): boolean {
+  const now = new Date();
+  const published = new Date(date);
+  const diffMs = now.getTime() - published.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+  return diffHours < 1;
+}
+
+// Função para formatar data (relativo se < 7 dias, data completa se >= 7 dias)
+function formatPublishedDate(date: string | Date): string {
+  const now = new Date();
+  const published = new Date(date);
+  const diffMs = now.getTime() - published.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return 'Agora';
+  if (diffMins < 60) return `há ${diffMins} ${diffMins === 1 ? 'minuto' : 'minutos'}`;
+  if (diffHours < 24) return `há ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
+  if (diffDays === 1) return 'há 1 dia';
+  if (diffDays < 7) return `há ${diffDays} dias`;
+
+  // Para >= 7 dias, mostrar data completa
+  return published.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 interface NewsPageProps {
   onNewsClick: (id: number | string) => void;
   onViewAllJobs?: () => void;
@@ -233,8 +261,19 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
 
               {/* Content - vertical layout */}
               <div className="space-y-2">
-                {/* Read time */}
-                <p className="text-sm text-zinc-500">{item.read_time} min de leitura</p>
+                {/* Date and Read time */}
+                <div className="flex items-center gap-2 text-sm text-zinc-500">
+                  <span>
+                    {formatPublishedDate(item.published_at)}
+                    {' · '}
+                    {item.read_time} min de leitura
+                  </span>
+                  {isNewArticle(item.published_at) && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 uppercase tracking-wide">
+                      Novo
+                    </span>
+                  )}
+                </div>
 
                 {/* Title */}
                 <h3 className="text-sm text-white line-clamp-2">
@@ -275,7 +314,7 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
       </div>
 
       {/* Right Sidebar */}
-      <aside className="hidden lg:block w-[359px] border-l border-zinc-800 h-screen sticky top-0 overflow-y-auto">
+      <aside className="hidden lg:block w-[359px] border-l border-zinc-800 h-screen sticky top-0 overflow-y-auto sidebar-scroll">
         {/* Search Bar */}
         <div className="p-8 border-b border-zinc-800">
           <div className="relative">
@@ -316,7 +355,18 @@ export default function NewsPage({ onNewsClick, onViewAllJobs, initialCategory }
                       <h4 className="text-sm text-zinc-100 group-hover:text-white transition-colors mb-1 line-clamp-2">
                         {item.title}
                       </h4>
-                      <p className="text-xs text-zinc-500">{item.read_time} min de leitura</p>
+                      <div className="flex items-center gap-2 text-xs text-zinc-500">
+                        <span>
+                          {formatPublishedDate(item.published_at)}
+                          {' · '}
+                          {item.read_time} min de leitura
+                        </span>
+                        {isNewArticle(item.published_at) && (
+                          <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 uppercase tracking-wide">
+                            Novo
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
