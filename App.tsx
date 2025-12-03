@@ -19,6 +19,7 @@ const ProfessionalDetailPage = lazy(() => import("./components/ProfessionalDetai
 const ProfileSettingsPage = lazy(() => import("./components/ProfileSettingsPage"));
 const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const CheckoutSuccessPage = lazy(() => import("./components/CheckoutSuccessPage"));
+const BetaTesterPage = lazy(() => import("./components/BetaTesterPage"));
 
 // Loading Component
 function LoadingSpinner() {
@@ -466,6 +467,9 @@ export default function App() {
           {/* Checkout routes - Outside Layout (no sidebar) */}
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/checkout/sucesso" element={<CheckoutSuccessPage />} />
+
+          {/* Beta Tester route - Outside Layout (no sidebar, no payment) */}
+          <Route path="/beta" element={<BetaTesterPage />} />
 
           {/* All other routes - Inside Layout (with sidebar) */}
           <Route path="/*" element={

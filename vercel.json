@@ -1,5 +1,11 @@
 {
+  "functions": {
+    "api/og-news.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/og-news", "destination": "/api/og-news" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

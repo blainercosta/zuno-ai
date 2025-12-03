@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, email, instagram, whatsapp, niche, utm_source, utm_medium, utm_campaign } = body;
+    const { name, email, instagram, whatsapp, niche, source, utm_source, utm_medium, utm_campaign } = body;
 
     // Validar todos os campos
     const errors: Record<string, string> = {};
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       instagram: instagram.trim().replace('@', '').toLowerCase(),
       whatsapp: whatsapp.trim(),
       niche: niche.trim(),
-      source: 'checkout',
+      source: source || 'checkout',
       utm_source: utm_source || null,
       utm_medium: utm_medium || null,
       utm_campaign: utm_campaign || null,
