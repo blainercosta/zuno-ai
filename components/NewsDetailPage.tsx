@@ -318,7 +318,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
   if (!news) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <div className="text-center">
           <p className="text-zinc-400 mb-4">Notícia não encontrada</p>
           <button
@@ -333,7 +333,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-zinc-950 overflow-x-hidden">
       {/* SEO Meta Tags */}
       {news && <NewsSEO news={news} url={currentUrl} />}
 

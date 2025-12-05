@@ -27,7 +27,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
 
   if (!job) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950">
         <p className="text-zinc-500">Vaga não encontrada</p>
       </div>
     );
@@ -37,7 +37,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
       {/* Structured Data para SEO */}
       <JobStructuredData job={job} />
 
-      <div className="flex min-h-screen">
+      <div className="flex flex-col min-h-screen bg-zinc-950 overflow-x-hidden">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -70,10 +70,10 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
         </div>
 
         {/* Content */}
-        <div className="flex flex-col lg:flex-row flex-1">
+        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
           {/* Article Section */}
-          <div className="flex-1 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
-            <div className="max-w-[752px]">
+          <div className="flex-1 px-4 sm:px-6 lg:px-16 py-8 lg:py-16 min-w-0 overflow-y-auto">
+            <div className="max-w-[752px] w-full">
               {/* Title */}
               <h1 className="text-[30px] leading-[36px] mb-8">{job.job_title}</h1>
 
@@ -174,7 +174,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
           </div>
 
           {/* Right Sidebar */}
-          <aside className="w-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-zinc-800">
+          <aside className="w-full lg:w-[400px] lg:shrink-0 border-t lg:border-t-0 lg:border-l border-zinc-800 overflow-y-auto">
             {/* Company Info */}
             <div className="px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
               <div className="flex items-start gap-3 mb-6">

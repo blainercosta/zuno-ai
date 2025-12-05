@@ -133,7 +133,7 @@ export function JobsSidebarSkeleton({ count = 4 }: { count?: number }) {
 // Job detail skeleton
 export function JobDetailSkeleton() {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col min-h-screen bg-zinc-950 overflow-x-hidden">
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -234,7 +234,7 @@ export function JobDetailSkeleton() {
 // News detail skeleton
 export function NewsDetailSkeleton() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-zinc-950 overflow-x-hidden">
       {/* Header */}
       <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
         <div className="flex items-center w-full">
