@@ -133,98 +133,92 @@ export function JobsSidebarSkeleton({ count = 4 }: { count?: number }) {
 // Job detail skeleton
 export function JobDetailSkeleton() {
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 overflow-x-hidden">
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
-          <div className="flex items-center w-full">
-            <div className="flex-[0_0_auto] min-w-0 p-3">
-              <Skeleton className="size-9 rounded-xl" />
+    <div className="min-h-screen bg-zinc-950">
+      {/* Header */}
+      <div className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-10">
+        <div className="flex items-center w-full">
+          <div className="flex-[0_0_auto] min-w-0 p-3">
+            <Skeleton className="size-9 rounded-xl" />
+          </div>
+          <div className="flex-1 flex items-center justify-center p-3">
+            <Skeleton className="h-5 w-12" />
+          </div>
+          <div className="flex-[0_0_auto] min-w-0" style={{ width: '60px' }} />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-[720px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        {/* Company Info Card */}
+        <div className="flex items-start gap-3 mb-8 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
+          <Skeleton className="size-12 rounded-xl shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <Skeleton className="hidden sm:block h-10 w-28 rounded-xl" />
+        </div>
+
+        {/* Title */}
+        <div className="space-y-3 mb-8">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-3/4" />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-3 mb-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-5 w-full" />
+          ))}
+          <Skeleton className="h-5 w-2/3" />
+        </div>
+
+        {/* Section */}
+        <div className="space-y-4 mb-8">
+          <Skeleton className="h-7 w-40" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-5 w-full" />
+          ))}
+        </div>
+
+        {/* Another Section */}
+        <div className="space-y-4 mb-8">
+          <Skeleton className="h-7 w-32" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-5 w-full" />
+          ))}
+        </div>
+
+        {/* Apply Button */}
+        <Skeleton className="h-12 w-36 rounded-xl mb-8" />
+
+        {/* Share Section */}
+        <div className="border-t border-zinc-800 pt-8 mt-8">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-40" />
+            <div className="flex gap-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="size-5 rounded" />
+              ))}
             </div>
-            <div className="flex-1 flex items-center justify-center p-3">
-              <Skeleton className="h-5 w-12" />
-            </div>
-            <div className="flex-[0_0_auto] min-w-0" style={{ width: '60px' }} />
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex flex-col lg:flex-row flex-1">
-          {/* Article */}
-          <div className="flex-1 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
-            <div className="max-w-[752px] space-y-8">
-              <Skeleton className="h-9 w-3/4" />
-
-              {/* Description */}
-              <div className="space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <Skeleton key={i} className="h-5 w-full" />
-                ))}
-                <Skeleton className="h-5 w-2/3" />
-              </div>
-
-              {/* Section */}
-              <div className="space-y-4">
-                <Skeleton className="h-7 w-40" />
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-5 w-full" />
-                ))}
-              </div>
-
-              {/* Another Section */}
-              <div className="space-y-4">
-                <Skeleton className="h-7 w-32" />
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-5 w-full" />
-                ))}
-              </div>
-
-              <Skeleton className="h-12 w-36 rounded-xl" />
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <aside className="w-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-zinc-800">
-            {/* Company Info */}
-            <div className="px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
-              <div className="flex items-start gap-3 mb-6">
+        {/* Similar Jobs */}
+        <div className="border-t border-zinc-800 pt-8 mt-8">
+          <Skeleton className="h-6 w-32 mb-6" />
+          <div className="space-y-2 mb-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 p-4 bg-zinc-900 rounded-xl">
                 <Skeleton className="size-12 rounded-xl shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
                 </div>
               </div>
-              <Skeleton className="h-12 w-full rounded-xl" />
-            </div>
-
-            {/* Share */}
-            <div className="border-t border-zinc-800 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
-              <Skeleton className="h-5 w-32 mb-4" />
-              <div className="flex gap-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="size-5 rounded" />
-                ))}
-              </div>
-            </div>
-
-            {/* Similar Jobs */}
-            <div className="border-t border-zinc-800 px-4 sm:px-6 lg:px-16 py-8 lg:py-16">
-              <Skeleton className="h-5 w-28 mb-4" />
-              <div className="space-y-4 mb-6">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3">
-                    <Skeleton className="size-12 rounded-xl shrink-0" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-5 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Skeleton className="h-10 w-full rounded-xl" />
-            </div>
-          </aside>
+            ))}
+          </div>
+          <Skeleton className="h-12 w-full rounded-xl" />
         </div>
       </div>
     </div>
