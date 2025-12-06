@@ -50,10 +50,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Extracted ID:', newsId, 'Table:', table);
     console.log('Supabase URL configured:', !!supabaseUrl);
 
-    // Fetch news data
+    // Fetch news data - news table has different columns than posts
     const { data: news, error } = await supabase
       .from(table)
-      .select('id, title, excerpt, subtitle, image_url, cover_image, author, published_at, category')
+      .select('id, title, subtitle, image_url, cover_image, author, published_at, category')
       .eq('id', newsId)
       .single();
 
@@ -71,8 +71,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const baseUrl = 'https://www.usezuno.app';
     const title = news.title;
-    const description = (news.excerpt || news.subtitle || '').substring(0, 155);
+    const description = (news.subtitle || '').substring(0, 155);
+    // Prioritize cover_image for OG (better resolution), fallback to image_url
     const imageUrl = news.cover_image || news.image_url || `${baseUrl}/og-cover.png`;
+
+    console.log('Image URL for OG:', imageUrl);
     const canonicalUrl = `${baseUrl}/noticias-ia/${slug}`;
 
     // Generate HTML with proper OG meta tags
