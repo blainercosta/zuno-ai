@@ -476,7 +476,7 @@ export default function App() {
             <Layout>
               <Routes>
                 {/* Default route */}
-                <Route path="/" element={<Navigate to="/jobs" replace />} />
+                <Route path="/" element={<Navigate to="/noticias-ia" replace />} />
 
                 {/* Jobs routes */}
                 <Route path="/jobs" element={<JobsPageWrapper />} />
@@ -503,8 +503,8 @@ export default function App() {
                 <Route path="/news" element={<Navigate to="/noticias-ia" replace />} />
                 <Route path="/news/:slug" element={<NewsLegacyRedirect />} />
 
-                {/* Catch all - redirect to jobs */}
-                <Route path="*" element={<Navigate to="/jobs" replace />} />
+                {/* Catch all - redirect to news */}
+                <Route path="*" element={<Navigate to="/noticias-ia" replace />} />
               </Routes>
             </Layout>
           } />
