@@ -30,9 +30,8 @@ export default function middleware(request: Request) {
   // If it's a crawler and it's a news detail page (has slug after /noticias-ia/)
   if (isCrawler && pathname.startsWith('/noticias-ia/') && pathname !== '/noticias-ia/') {
     const slug = pathname.replace('/noticias-ia/', '');
-    // Rewrite internally to the API endpoint (not redirect)
-    const apiUrl = new URL(`/api/og-news?slug=${encodeURIComponent(slug)}`, request.url);
-    return fetch(apiUrl);
+    // Rewrite to the API endpoint
+    return Response.redirect(new URL(`/api/og-news?slug=${encodeURIComponent(slug)}`, request.url), 307);
   }
 
   return next();
