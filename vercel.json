@@ -1,9 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+  "routes": [
     {
-      "source": "/noticias-ia/:slug*",
-      "destination": "/api/og-news?slug=:slug*",
+      "src": "/noticias-ia/(.+)",
+      "dest": "/api/og-news?slug=$1",
       "has": [
         {
           "type": "header",
@@ -12,7 +11,14 @@
         }
       ]
     },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ],
   "functions": {
     "api/og-news.ts": {
