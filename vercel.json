@@ -1,9 +1,7 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/noticias-ia/:slug*", "destination": "/api/og-news?slug=:slug*", "has": [
-      { "type": "header", "key": "user-agent", "value": ".*(?:facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot).*" }
-    ]},
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/noticias-ia/:slug*", "destination": "/api/og-news?slug=:slug*" },
+    { "source": "/((?!api/|noticias-ia/).*)", "destination": "/index.html" }
   ]
 }

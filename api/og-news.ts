@@ -10,27 +10,53 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // UUID regex pattern
 const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
+// Crawler User-Agent patterns
+const CRAWLER_USER_AGENTS = [
+  'facebookexternalhit',
+  'Facebot',
+  'WhatsApp',
+  'Twitterbot',
+  'LinkedInBot',
+  'Pinterest',
+  'Slackbot',
+  'TelegramBot',
+  'Discordbot',
+  'Googlebot',
+  'bingbot',
+];
+
+function isCrawler(userAgent: string): boolean {
+  return CRAWLER_USER_AGENTS.some(agent =>
+    userAgent.toLowerCase().includes(agent.toLowerCase())
+  );
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
+  const userAgent = req.headers['user-agent'] || '';
 
   if (!slug || typeof slug !== 'string') {
-    return res.redirect(301, '/noticias-ia');
+    return res.redirect(302, '/noticias-ia');
+  }
+
+  const baseUrl = 'https://www.usezuno.app';
+  const canonicalUrl = `${baseUrl}/noticias-ia/${slug}`;
+
+  // If not a crawler, redirect to SPA immediately
+  if (!isCrawler(userAgent)) {
+    return res.redirect(302, canonicalUrl);
   }
 
   // Extract ID from slug
-  // Format: "titulo-da-noticia-UUID" or "titulo-da-noticia-123"
   let newsId: string | number;
   let table: 'news' | 'posts' = 'posts';
 
-  // Try to find UUID in the slug
   const uuidMatch = slug.match(UUID_REGEX);
 
   if (uuidMatch) {
-    // Found UUID - it's from news table
     newsId = uuidMatch[0];
     table = 'news';
   } else {
-    // Try to extract numeric ID from end of slug
     const parts = slug.split('-');
     const lastPart = parts[parts.length - 1];
 
@@ -38,61 +64,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       newsId = parseInt(lastPart, 10);
       table = 'posts';
     } else {
-      // Couldn't identify ID type, try as-is
       newsId = slug;
       table = 'news';
     }
   }
 
   try {
-    // Debug logging
-    console.log('OG-News API called with slug:', slug);
-    console.log('Extracted ID:', newsId, 'Table:', table);
-    console.log('Supabase URL configured:', !!supabaseUrl);
+    console.log('Crawler detected:', userAgent);
+    console.log('Fetching news:', newsId, 'from table:', table);
 
-    // Fetch news data - news table has different columns than posts
     const { data: news, error } = await supabase
       .from(table)
       .select('id, title, subtitle, image_url, cover_image, author, published_at, category')
       .eq('id', newsId)
       .single();
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return res.redirect(301, '/noticias-ia');
-    }
-
-    if (!news) {
-      console.error('News not found for ID:', newsId);
-      return res.redirect(301, '/noticias-ia');
+    if (error || !news) {
+      console.error('Error fetching news:', error);
+      // Return basic HTML with fallback meta tags
+      return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
     }
 
     console.log('News found:', news.title);
 
-    const baseUrl = 'https://www.usezuno.app';
-    const title = news.title;
-    const description = (news.subtitle || '').substring(0, 155);
-    // Prioritize cover_image for OG (better resolution), fallback to image_url
+    const title = escapeHtml(news.title);
+    const description = escapeHtml((news.subtitle || '').substring(0, 155));
     const imageUrl = news.cover_image || news.image_url || `${baseUrl}/og-cover.png`;
+    const author = escapeHtml(news.author || 'Zuno AI');
+    const category = escapeHtml(news.category || 'Inteligência Artificial');
 
-    console.log('Image URL for OG:', imageUrl);
-    const canonicalUrl = `${baseUrl}/noticias-ia/${slug}`;
-
-    // Generate HTML with proper OG meta tags
     const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO Meta Tags -->
   <title>${title} | Notícias de IA - Zuno AI</title>
   <meta name="description" content="${description}">
-  <meta name="author" content="${news.author || 'Zuno AI'}">
-  <meta name="robots" content="index, follow">
+  <meta name="author" content="${author}">
   <link rel="canonical" href="${canonicalUrl}">
 
-  <!-- Open Graph / Facebook / WhatsApp -->
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="${canonicalUrl}">
   <meta property="og:title" content="${title}">
@@ -101,30 +112,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <meta property="og:image:secure_url" content="${imageUrl}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:alt" content="${title}">
   <meta property="og:site_name" content="Zuno AI">
   <meta property="og:locale" content="pt_BR">
 
-  <!-- Article Meta -->
+  <!-- Article -->
   <meta property="article:published_time" content="${news.published_at}">
-  <meta property="article:author" content="${news.author || 'Zuno AI'}">
-  <meta property="article:section" content="${news.category || 'Inteligência Artificial'}">
+  <meta property="article:author" content="${author}">
+  <meta property="article:section" content="${category}">
 
-  <!-- Twitter Card -->
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@zunoai">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${imageUrl}">
-  <meta name="twitter:image:alt" content="${title}">
-
-  <!-- Redirect to SPA -->
-  <meta http-equiv="refresh" content="0;url=${canonicalUrl}">
-  <script>window.location.href = "${canonicalUrl}";</script>
 </head>
 <body>
-  <p>Redirecionando para <a href="${canonicalUrl}">${title}</a>...</p>
+  <h1>${title}</h1>
+  <p>${description}</p>
+  <p><a href="${canonicalUrl}">Leia mais em Zuno AI</a></p>
 </body>
 </html>`;
 
@@ -132,7 +138,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
     return res.status(200).send(html);
   } catch (err) {
-    console.error('Error fetching news:', err);
-    return res.redirect(301, '/noticias-ia');
+    console.error('Error:', err);
+    return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
   }
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function generateFallbackHtml(slug: string, canonicalUrl: string, baseUrl: string): string {
+  const title = slug.split('-').slice(0, -5).join(' ').replace(/^\w/, c => c.toUpperCase());
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>${title} | Zuno AI</title>
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:image" content="${baseUrl}/og-cover.png">
+  <meta property="og:site_name" content="Zuno AI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${baseUrl}/og-cover.png">
+</head>
+<body>
+  <p><a href="${canonicalUrl}">Leia em Zuno AI</a></p>
+</body>
+</html>`;
 }
