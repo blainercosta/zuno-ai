@@ -1,17 +1,9 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "functions": {
-    "api/og-news.ts": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "routes": [
     {
-      "src": "/noticias-ia/(?<slug>.+)",
-      "dest": "/api/og-news?slug=$slug",
+      "source": "/noticias-ia/:slug*",
+      "destination": "/api/og-news?slug=:slug*",
       "has": [
         {
           "type": "header",
@@ -19,6 +11,12 @@
           "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|bingbot).*"
         }
       ]
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/og-news.ts": {
+      "runtime": "nodejs20.x"
     }
-  ]
+  }
 }
