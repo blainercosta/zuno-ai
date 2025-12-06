@@ -6,6 +6,9 @@ const supabase = createClient(
   process.env.VITE_SUPABASE_ANON_KEY || ''
 );
 
+// UUID regex pattern
+const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
 
@@ -13,28 +16,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.redirect(301, '/noticias-ia');
   }
 
-  // Extract ID from slug (last part after last hyphen, or the whole thing if UUID)
-  const isUUID = slug.includes('-') && slug.split('-').length > 4;
+  // Extract ID from slug
+  // Format: "titulo-da-noticia-UUID" or "titulo-da-noticia-123"
   let newsId: string | number;
   let table: 'news' | 'posts' = 'posts';
 
-  if (isUUID) {
-    // It's a UUID from news table
-    newsId = slug;
+  // Try to find UUID in the slug
+  const uuidMatch = slug.match(UUID_REGEX);
+
+  if (uuidMatch) {
+    // Found UUID - it's from news table
+    newsId = uuidMatch[0];
     table = 'news';
   } else {
-    // Extract ID from end of slug
+    // Try to extract numeric ID from end of slug
     const parts = slug.split('-');
     const lastPart = parts[parts.length - 1];
 
     if (/^\d+$/.test(lastPart)) {
       newsId = parseInt(lastPart, 10);
       table = 'posts';
-    } else if (lastPart.includes('-')) {
-      newsId = lastPart;
-      table = 'news';
     } else {
+      // Couldn't identify ID type, try as-is
       newsId = slug;
+      table = 'news';
     }
   }
 
