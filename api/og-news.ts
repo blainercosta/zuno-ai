@@ -1,10 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || '',
-  process.env.VITE_SUPABASE_ANON_KEY || ''
-);
+// Vercel serverless: use non-VITE env vars or fallback to VITE_ prefixed
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // UUID regex pattern
 const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -44,6 +45,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Debug logging
+    console.log('OG-News API called with slug:', slug);
+    console.log('Extracted ID:', newsId, 'Table:', table);
+    console.log('Supabase URL configured:', !!supabaseUrl);
+
     // Fetch news data
     const { data: news, error } = await supabase
       .from(table)
@@ -51,9 +57,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('id', newsId)
       .single();
 
-    if (error || !news) {
+    if (error) {
+      console.error('Supabase error:', error);
       return res.redirect(301, '/noticias-ia');
     }
+
+    if (!news) {
+      console.error('News not found for ID:', newsId);
+      return res.redirect(301, '/noticias-ia');
+    }
+
+    console.log('News found:', news.title);
 
     const baseUrl = 'https://www.usezuno.app';
     const title = news.title;
