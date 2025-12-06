@@ -72,6 +72,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     console.log('Crawler detected:', userAgent);
     console.log('Fetching news:', newsId, 'from table:', table);
+    console.log('Supabase URL:', supabaseUrl ? 'configured' : 'MISSING');
+    console.log('Supabase Key:', supabaseKey ? 'configured' : 'MISSING');
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Supabase credentials missing!');
+      return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
+    }
 
     const { data: news, error } = await supabase
       .from(table)
@@ -79,9 +86,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('id', newsId)
       .single();
 
-    if (error || !news) {
-      console.error('Error fetching news:', error);
-      // Return basic HTML with fallback meta tags
+    if (error) {
+      console.error('Supabase query error:', error.message, error.code);
+      return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
+    }
+
+    if (!news) {
+      console.error('News not found for ID:', newsId);
       return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
     }
 
