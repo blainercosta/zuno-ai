@@ -80,9 +80,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).send(generateFallbackHtml(slug, canonicalUrl, baseUrl));
     }
 
+    // news table has cover_image, posts table has image_url
+    const columns = table === 'news'
+      ? 'id, title, subtitle, cover_image, author, published_at, category'
+      : 'id, title, excerpt, image_url, author, published_at, category';
+
     const { data: news, error } = await supabase
       .from(table)
-      .select('id, title, subtitle, image_url, cover_image, author, published_at, category')
+      .select(columns)
       .eq('id', newsId)
       .single();
 
@@ -99,7 +104,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('News found:', news.title);
 
     const title = escapeHtml(news.title);
-    const description = escapeHtml((news.subtitle || '').substring(0, 155));
+    // news uses subtitle, posts uses excerpt
+    const description = escapeHtml((news.subtitle || news.excerpt || '').substring(0, 155));
+    // news uses cover_image, posts uses image_url
     const imageUrl = news.cover_image || news.image_url || `${baseUrl}/og-cover.png`;
     const author = escapeHtml(news.author || 'Zuno AI');
     const category = escapeHtml(news.category || 'Inteligência Artificial');
