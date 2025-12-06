@@ -42,9 +42,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const baseUrl = 'https://www.usezuno.app';
   const canonicalUrl = `${baseUrl}/noticias-ia/${slug}`;
 
-  // If not a crawler, redirect to SPA immediately
+  // If not a crawler (direct API call), redirect to SPA
+  // Note: When called via vercel.json routes, it's always a crawler
   if (!isCrawler(userAgent)) {
-    return res.redirect(302, canonicalUrl);
+    // Check if this is a direct API call or routed request
+    const isDirectApiCall = req.url?.includes('/api/og-news');
+    if (isDirectApiCall) {
+      return res.redirect(302, canonicalUrl);
+    }
   }
 
   // Extract ID from slug
