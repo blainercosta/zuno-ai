@@ -6,6 +6,7 @@ export interface ContentBlock {
   caption?: string
   style?: string
   // Tweet/embed specific fields
+  id?: string
   tweetId?: string
   tweetUrl?: string
   embedType?: 'twitter' | 'youtube' | 'instagram'

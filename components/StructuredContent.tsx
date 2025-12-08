@@ -104,7 +104,7 @@ export default function StructuredContent({ content }: StructuredContentProps) {
             return (
               <TweetEmbed
                 key={index}
-                tweetId={block.tweetId}
+                tweetId={block.tweetId || block.id}
                 tweetUrl={block.tweetUrl || block.url}
               />
             )
