@@ -54,13 +54,11 @@ function formatWhatsApp(value: string): string {
 // Formatação de WhatsApp para envio ao banco (ex: 5511934943020)
 function formatWhatsAppForDB(value: string): string {
   const digits = value.replace(/\D/g, '');
-  // Se já tem 13 dígitos (com código do país), retorna como está
-  if (digits.length === 13) return digits;
-  // Se tem 11 dígitos (DDD + 9 dígitos), adiciona 55
-  if (digits.length === 11) return `55${digits}`;
-  // Se tem 10 dígitos (DDD + 8 dígitos), adiciona 55
-  if (digits.length === 10) return `55${digits}`;
-  // Retorna os dígitos como estão
+  // Se já tem 12+ dígitos (provavelmente já tem código do país), retorna como está
+  if (digits.length >= 12) return digits;
+  // Se tem 10-11 dígitos (formato brasileiro DDD + número), adiciona 55
+  if (digits.length >= 10 && digits.length <= 11) return `55${digits}`;
+  // Números menores ou formatos desconhecidos: retorna como está
   return digits;
 }
 
