@@ -177,16 +177,8 @@ export default function BetaTesterPage() {
     const saved = await saveSubscriber();
     if (!saved) return;
 
-    const message = encodeURIComponent(
-      `Oi! Sou beta tester do Zuno AI.\n\n` +
-      `Nome: ${formData.nome}\n` +
-      `Email: ${formData.email}\n` +
-      `Instagram: @${formData.instagram.replace('@', '')}\n` +
-      `WhatsApp: ${formData.whatsapp}\n` +
-      `Nicho: ${getNicho()}`
-    );
-
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    // Abre o link do grupo de beta testers
+    window.open('https://chat.whatsapp.com/HMnVyFPGsa4KSfT8HCNyy0', '_blank');
   };
 
   // Tela final de sucesso (step 6)
