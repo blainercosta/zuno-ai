@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SUBSCRIBER_NICHES } from '@/types/subscriber';
+import PhoneInput from './PhoneInput';
 
 // Supabase config
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -40,26 +41,10 @@ const validators = {
   },
 };
 
-// Formatação de WhatsApp para exibição
-function formatWhatsApp(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  if (digits.length <= 11) {
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  }
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
-}
-
 // Formatação de WhatsApp para envio ao banco (ex: 5511934943020)
-function formatWhatsAppForDB(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  // Se já tem 12+ dígitos (provavelmente já tem código do país), retorna como está
-  if (digits.length >= 12) return digits;
-  // Se tem 10-11 dígitos (formato brasileiro DDD + número), adiciona 55
-  if (digits.length >= 10 && digits.length <= 11) return `55${digits}`;
-  // Números menores ou formatos desconhecidos: retorna como está
-  return digits;
+function formatWhatsAppForDB(countryCode: string, localNumber: string): string {
+  const digits = localNumber.replace(/\D/g, '');
+  return `${countryCode}${digits}`;
 }
 
 export default function BetaTesterPage() {
@@ -71,6 +56,7 @@ export default function BetaTesterPage() {
     email: '',
     instagram: '',
     whatsapp: '',
+    countryCode: '55', // Código do país padrão (Brasil)
     nicho: '',
     nichoCustom: '',
   });
@@ -151,7 +137,7 @@ export default function BetaTesterPage() {
           name: formData.nome.trim(),
           email: formData.email.trim().toLowerCase(),
           instagram: formData.instagram.trim().replace('@', '').toLowerCase(),
-          whatsapp: formatWhatsAppForDB(formData.whatsapp),
+          whatsapp: formatWhatsAppForDB(formData.countryCode, formData.whatsapp),
           niche: showCustomNiche ? formData.nichoCustom.trim() : formData.nicho,
           source: 'beta_tester', // Different source for beta testers
           utm_source: urlParams.get('utm_source') || 'beta',
@@ -427,21 +413,17 @@ export default function BetaTesterPage() {
               <p className="text-zinc-500 text-base mb-8">
                 Para te avisar quando o beta estiver pronto
               </p>
-              <input
-                type="tel"
-                placeholder="(11) 99999-9999"
-                value={formData.whatsapp}
-                onChange={(e) => {
-                  setFormData({ ...formData, whatsapp: formatWhatsApp(e.target.value) });
-                  setErrors({ ...errors, whatsapp: null });
-                }}
-                onKeyDown={handleKeyDown}
-                onBlur={() => validateField('whatsapp')}
-                className={`w-full bg-black/40 border rounded-xl px-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none transition-all ${
-                  errors.whatsapp ? 'border-red-400/60 focus:border-red-400' : 'border-zinc-800 focus:border-zinc-600'
-                }`}
-                autoFocus
-              />
+              <PhoneInput
+                  value={formData.whatsapp}
+                  onChange={(value, countryCode) => {
+                    setFormData({ ...formData, whatsapp: value, countryCode });
+                    setErrors({ ...errors, whatsapp: null });
+                  }}
+                  onKeyDown={handleKeyDown}
+                  onBlur={() => validateField('whatsapp')}
+                  error={!!errors.whatsapp}
+                  autoFocus
+                />
               {errors.whatsapp && (
                 <p className="text-red-400 text-sm mt-3">{errors.whatsapp}</p>
               )}
