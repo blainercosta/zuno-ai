@@ -29,8 +29,8 @@ const validators = {
   },
   whatsapp: (value: string) => {
     const digits = value.replace(/\D/g, '');
-    if (digits.length < 10) return 'WhatsApp deve ter pelo menos 10 dígitos';
-    if (digits.length > 13) return 'WhatsApp muito longo';
+    if (digits.length < 8) return 'Número deve ter pelo menos 8 dígitos';
+    if (digits.length > 15) return 'Número muito longo';
     return null;
   },
   niche: (value: string) => {
