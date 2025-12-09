@@ -222,10 +222,9 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
               <div className="flex items-start md:items-center gap-3 md:gap-4">
                 {/* Logo */}
                 <div className="shrink-0">
-                  {job.logo_url ? (
-                    <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden">
+                  <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden">
                       <img
-                        src={job.logo_url}
+                        src={job.logo_url || '/zuno-mini.svg'}
                         alt={job.company_name}
                         className="w-full h-full object-cover"
                         width="48"
@@ -234,11 +233,6 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                         decoding="async"
                       />
                     </div>
-                  ) : (
-                    <div className="size-12 rounded-xl flex items-center justify-center bg-zinc-800 text-white">
-                      <span className="text-base">{job.company_name.charAt(0).toUpperCase()}</span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Job Info */}

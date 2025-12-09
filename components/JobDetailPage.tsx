@@ -71,15 +71,9 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
       <div className="max-w-[720px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
         {/* Company Info Card */}
         <div className="flex items-start gap-3 mb-8 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
-          {job.logo_url ? (
-            <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
-              <img src={job.logo_url} alt={job.company_name} className="w-full h-full object-cover" />
+          <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
+              <img src={job.logo_url || '/zuno-mini.svg'} alt={job.company_name} className="w-full h-full object-cover" />
             </div>
-          ) : (
-            <div className="size-12 rounded-xl flex items-center justify-center bg-zinc-800 text-white shrink-0">
-              <span className="text-base">{job.company_name.charAt(0).toUpperCase()}</span>
-            </div>
-          )}
           <div className="flex-1 min-w-0">
             <h3 className="text-base leading-[24px] mb-0.5">{job.company_name}</h3>
             <p className="text-sm text-zinc-400 leading-[21px]">{job.location}</p>
@@ -253,15 +247,9 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                   className="w-full p-4 bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors text-left"
                 >
                   <div className="flex items-center gap-3">
-                    {similarJob.logo_url ? (
-                      <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
-                        <img src={similarJob.logo_url} alt={similarJob.company_name} className="w-full h-full object-cover" />
+                    <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
+                        <img src={similarJob.logo_url || '/zuno-mini.svg'} alt={similarJob.company_name} className="w-full h-full object-cover" />
                       </div>
-                    ) : (
-                      <div className="size-12 rounded-xl flex items-center justify-center bg-zinc-800 text-white shrink-0">
-                        <span className="text-base">{similarJob.company_name.charAt(0).toUpperCase()}</span>
-                      </div>
-                    )}
                     <div className="flex-1 min-w-0">
                       <h4 className="text-base text-white leading-[24px] truncate">{similarJob.job_title}</h4>
                       <div className="flex items-center gap-2 text-sm text-zinc-400 leading-[21px]">
