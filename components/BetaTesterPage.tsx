@@ -40,7 +40,7 @@ const validators = {
   },
 };
 
-// Formatação de WhatsApp
+// Formatação de WhatsApp para exibição
 function formatWhatsApp(value: string): string {
   const digits = value.replace(/\D/g, '');
   if (digits.length <= 2) return digits;
@@ -49,6 +49,19 @@ function formatWhatsApp(value: string): string {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   }
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
+
+// Formatação de WhatsApp para envio ao banco (ex: 5511934943020)
+function formatWhatsAppForDB(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  // Se já tem 13 dígitos (com código do país), retorna como está
+  if (digits.length === 13) return digits;
+  // Se tem 11 dígitos (DDD + 9 dígitos), adiciona 55
+  if (digits.length === 11) return `55${digits}`;
+  // Se tem 10 dígitos (DDD + 8 dígitos), adiciona 55
+  if (digits.length === 10) return `55${digits}`;
+  // Retorna os dígitos como estão
+  return digits;
 }
 
 export default function BetaTesterPage() {
@@ -140,7 +153,7 @@ export default function BetaTesterPage() {
           name: formData.nome.trim(),
           email: formData.email.trim().toLowerCase(),
           instagram: formData.instagram.trim().replace('@', '').toLowerCase(),
-          whatsapp: formData.whatsapp.trim(),
+          whatsapp: formatWhatsAppForDB(formData.whatsapp),
           niche: showCustomNiche ? formData.nichoCustom.trim() : formData.nicho,
           source: 'beta_tester', // Different source for beta testers
           utm_source: urlParams.get('utm_source') || 'beta',
