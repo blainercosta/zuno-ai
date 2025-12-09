@@ -171,8 +171,6 @@ export default function BetaTesterPage() {
     }
   };
 
-  const getNicho = () => showCustomNiche ? formData.nichoCustom.trim() : formData.nicho;
-
   const handleFinish = async () => {
     const saved = await saveSubscriber();
     if (!saved) return;
