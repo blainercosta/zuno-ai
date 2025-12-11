@@ -112,7 +112,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // news uses subtitle, posts uses excerpt
     const description = escapeHtml((news.subtitle || news.excerpt || '').substring(0, 155));
     // news uses cover_image, posts uses image_url
-    const imageUrl = news.cover_image || news.image_url || `${baseUrl}/og-cover.png`;
+    const originalImageUrl = news.cover_image || news.image_url || '';
+    // Use proxy for external images to avoid WhatsApp blocking
+    const imageUrl = originalImageUrl
+      ? `${baseUrl}/api/image-proxy?url=${encodeURIComponent(originalImageUrl)}`
+      : `${baseUrl}/og-cover.png`;
     const author = escapeHtml(news.author || 'Zuno AI');
     const category = escapeHtml(news.category || 'Inteligência Artificial');
 
