@@ -35,6 +35,11 @@ export function formatRelativeDate(dateString: string | null): string {
   const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
 
+  // Data no futuro - tratar como "agora"
+  if (diffInMinutes < 0) {
+    return 'agora'
+  }
+
   // Menos de 1 hora - mostrar minutos
   if (diffInMinutes < 60) {
     if (diffInMinutes === 0) {
