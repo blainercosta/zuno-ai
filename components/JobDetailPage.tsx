@@ -72,7 +72,14 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
         {/* Company Info Card */}
         <div className="flex items-start gap-3 mb-8 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
           <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
-              <img src={job.logo_url || '/zuno-mini.svg'} alt={job.company_name} className="w-full h-full object-cover" />
+              <img
+                src={job.logo_url || '/zuno-mini.svg'}
+                alt={job.company_name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/zuno-mini.svg';
+                }}
+              />
             </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-base leading-[24px] mb-0.5">{job.company_name}</h3>
@@ -248,7 +255,14 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 >
                   <div className="flex items-center gap-3">
                     <div className="size-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
-                        <img src={similarJob.logo_url || '/zuno-mini.svg'} alt={similarJob.company_name} className="w-full h-full object-cover" />
+                        <img
+                          src={similarJob.logo_url || '/zuno-mini.svg'}
+                          alt={similarJob.company_name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/zuno-mini.svg';
+                          }}
+                        />
                       </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-base text-white leading-[24px] truncate">{similarJob.job_title}</h4>

@@ -231,6 +231,9 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                         height="48"
                         loading="lazy"
                         decoding="async"
+                        onError={(e) => {
+                          e.currentTarget.src = '/zuno-mini.svg';
+                        }}
                       />
                     </div>
                 </div>
