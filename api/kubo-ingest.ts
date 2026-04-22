@@ -123,11 +123,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'invalid_json' });
   }
 
-  if (payload.event !== 'content.published' || !payload.data?.url || !payload.data?.slug || !payload.data?.title) {
-    return res.status(400).json({ error: 'invalid_payload' });
+  // Eventos que não sejam content.published (ping de teste, health check, etc) —
+  // assinatura já foi validada, então reconhece e retorna 200 sem side effects.
+  if (payload.event !== 'content.published') {
+    return res.status(200).json({ ok: true, mode: 'test_received', event: payload.event ?? null });
   }
 
-  const d = payload.data;
+  const d = payload.data ?? ({} as KuboPayload['data']);
+  if (!d.url) return res.status(400).json({ error: 'missing_url' });
+  if (!d.slug) return res.status(400).json({ error: 'missing_slug' });
+  if (!d.title) return res.status(400).json({ error: 'missing_title' });
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   const row = {
