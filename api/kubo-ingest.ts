@@ -24,6 +24,21 @@ const supabaseUrl =
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const kuboSecret = process.env.KUBO_WEBHOOK_SECRET || '';
 
+// Categorias aceitas pelo enum news_category. Kubo gera categorias livres
+// ("Empresa", "Negócios" etc) que não batem com esse enum — coerce pra null
+// quando não tiver match, em vez de falhar o upsert com 500.
+const VALID_NEWS_CATEGORIES = new Set([
+  'OpenAI', 'Google', 'Anthropic', 'xAI', 'Meta', 'Microsoft',
+  'Mistral', 'Amazon', 'Apple', 'Nvidia',
+  'Texto', 'Imagem', 'Video', 'Audio', 'Codigo',
+  'Agentes', 'Robotica', 'Multimodal',
+]);
+
+function coerceCategory(raw?: string | null): string | null {
+  if (!raw) return null;
+  return VALID_NEWS_CATEGORIES.has(raw) ? raw : null;
+}
+
 interface KuboBlock {
   type: string;
   text?: string;
@@ -143,7 +158,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     subtitle: d.subtitle ?? null,
     content: d.content,
     cover_image: d.cover_image ?? null,
-    category: d.category ?? null,
+    category: coerceCategory(d.category),
     author: d.author ?? 'Zuno AI',
     key_takeaway: d.key_takeaway ?? null,
     read_time: d.read_time ?? null,
