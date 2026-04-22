@@ -16,7 +16,11 @@ export const config = {
   },
 };
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const supabaseUrl =
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.VITE_SUPABASE_URL ||
+  '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const kuboSecret = process.env.KUBO_WEBHOOK_SECRET || '';
 
@@ -87,14 +91,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  // Config checks
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('[kubo-ingest] Supabase env vars ausentes');
-    return res.status(500).json({ error: 'supabase_not_configured' });
+  // Config checks — erros separados pra debug direto sem log
+  if (!supabaseUrl) {
+    console.error('[kubo-ingest] Supabase URL ausente (checou SUPABASE_URL, NEXT_PUBLIC_SUPABASE_URL, VITE_SUPABASE_URL)');
+    return res.status(500).json({ error: 'supabase_url_missing' });
+  }
+  if (!supabaseServiceKey) {
+    console.error('[kubo-ingest] SUPABASE_SERVICE_ROLE_KEY ausente');
+    return res.status(500).json({ error: 'service_role_key_missing' });
   }
   if (!kuboSecret) {
     console.error('[kubo-ingest] KUBO_WEBHOOK_SECRET ausente');
-    return res.status(500).json({ error: 'webhook_secret_not_configured' });
+    return res.status(500).json({ error: 'webhook_secret_missing' });
   }
 
   const signature = req.headers['x-ingest-signature'];
