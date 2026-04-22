@@ -32,6 +32,10 @@
     "api/og-news.ts": {
       "memory": 1024,
       "maxDuration": 10
+    },
+    "api/kubo-ingest.ts": {
+      "memory": 512,
+      "maxDuration": 15
     }
   }
 }
