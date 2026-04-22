@@ -35,7 +35,7 @@
     },
     "api/kubo-ingest.ts": {
       "memory": 512,
-      "maxDuration": 15
+      "maxDuration": 10
     }
   }
 }

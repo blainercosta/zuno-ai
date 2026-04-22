@@ -24,14 +24,14 @@ const supabaseUrl =
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const kuboSecret = process.env.KUBO_WEBHOOK_SECRET || '';
 
-// Categorias aceitas pelo enum news_category. Kubo gera categorias livres
-// ("Empresa", "Negócios" etc) que não batem com esse enum — coerce pra null
-// quando não tiver match, em vez de falhar o upsert com 500.
+// Espelha exatamente o enum news_category do Postgres (ver enum_range pra confirmar).
+// Kubo gera categorias livres (LLM), então coerce pra null quando não tiver match
+// em vez de falhar o upsert. Mantenha em sync se o enum mudar.
 const VALID_NEWS_CATEGORIES = new Set([
-  'OpenAI', 'Google', 'Anthropic', 'xAI', 'Meta', 'Microsoft',
-  'Mistral', 'Amazon', 'Apple', 'Nvidia',
-  'Texto', 'Imagem', 'Video', 'Audio', 'Codigo',
-  'Agentes', 'Robotica', 'Multimodal',
+  'OpenAI', 'Google', 'Anthropic', 'xAI', 'Meta', 'Microsoft', 'Mistral', 'Amazon',
+  'Runway', 'Stability', 'Midjourney', 'Adobe', 'Salesforce',
+  'Texto', 'Imagem', 'Video', 'Audio', 'Codigo', 'Agentes', 'Multimodal',
+  'Mercado', 'Ferramentas', 'Tutoriais', 'Hardware',
 ]);
 
 function coerceCategory(raw?: string | null): string | null {
@@ -53,6 +53,8 @@ interface KuboBlock {
 interface KuboPayload {
   event: string;
   content_id: string;
+  project_id?: string;
+  project_name?: string;
   data: {
     url: string;
     slug: string;
