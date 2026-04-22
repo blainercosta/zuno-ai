@@ -161,6 +161,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     content: d.content,
     cover_image: d.cover_image ?? null,
     category: coerceCategory(d.category),
+    raw_category: d.category ?? null,
     author: d.author ?? 'Zuno AI',
     key_takeaway: d.key_takeaway ?? null,
     read_time: d.read_time ?? null,

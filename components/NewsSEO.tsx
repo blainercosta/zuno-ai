@@ -72,10 +72,11 @@ export default function NewsSEO({ news, url }: NewsSEOProps) {
       : news.title;
 
     // Keywords for SEO
+    const displayCategory = news.category ?? news.raw_category ?? null;
     const keywords = [
       'IA',
       'inteligência artificial',
-      news.category,
+      displayCategory,
       'notícias IA Brasil',
       'tecnologia',
       'inovação',
@@ -111,7 +112,7 @@ export default function NewsSEO({ news, url }: NewsSEOProps) {
     updateMetaTag('article:modified_time', news.updated_at || news.published_at, true);
     updateMetaTag('article:author', news.author || 'Zuno AI', true);
     updateMetaTag('article:section', 'Inteligência Artificial', true);
-    updateMetaTag('article:tag', news.category, true);
+    if (displayCategory) updateMetaTag('article:tag', displayCategory, true);
     updateMetaTag('article:tag', 'IA', true);
     updateMetaTag('article:tag', 'Tecnologia', true);
 
@@ -180,10 +181,7 @@ export default function NewsSEO({ news, url }: NewsSEOProps) {
           '@type': 'Thing',
           name: 'Inteligência Artificial',
         },
-        {
-          '@type': 'Thing',
-          name: news.category,
-        },
+        ...(displayCategory ? [{ '@type': 'Thing', name: displayCategory }] : []),
       ],
       articleSection: 'Inteligência Artificial',
       keywords: keywords,

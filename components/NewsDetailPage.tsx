@@ -381,11 +381,13 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
           </div>
         )}
         {/* Category Badge */}
-        <div className="mb-6">
-          <span className="inline-block px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-zinc-300 font-medium">
-            {news.category}
-          </span>
-        </div>
+        {(news.category || news.raw_category) && (
+          <div className="mb-6">
+            <span className="inline-block px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-zinc-300 font-medium">
+              {news.category ?? news.raw_category}
+            </span>
+          </div>
+        )}
 
         {/* Title */}
         <h1 className="text-[28px] md:text-[40px] leading-[1.15] mb-6 font-semibold">
@@ -529,9 +531,11 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
                       </div>
                     )}
                     <div className="p-4">
-                      <span className="inline-block px-2 py-0.5 text-xs rounded bg-zinc-800 text-zinc-400 mb-2">
-                        {item.category}
-                      </span>
+                      {(item.category || item.raw_category) && (
+                        <span className="inline-block px-2 py-0.5 text-xs rounded bg-zinc-800 text-zinc-400 mb-2">
+                          {item.category ?? item.raw_category}
+                        </span>
+                      )}
                       <h3 className="text-sm font-medium line-clamp-2 group-hover:text-white transition-colors">
                         {item.title}
                       </h3>

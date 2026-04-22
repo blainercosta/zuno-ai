@@ -13,7 +13,7 @@ export function useCategories() {
       const [newsResult, postsResult] = await Promise.all([
         supabase
           .from('news')
-          .select('category')
+          .select('category, raw_category')
           .or('status.eq.published,status.is.null'),
         supabase
           .from('posts')
@@ -25,7 +25,8 @@ export function useCategories() {
       const allCategories = new Set<string>()
 
       newsResult.data?.forEach(item => {
-        if (item.category) allCategories.add(item.category)
+        const value = item.category ?? item.raw_category
+        if (value) allCategories.add(value)
       })
 
       postsResult.data?.forEach(item => {

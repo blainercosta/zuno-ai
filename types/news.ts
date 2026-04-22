@@ -22,6 +22,7 @@ export interface News {
   published_at: string
   read_time: string
   category: string
+  raw_category?: string  // fallback quando category (enum) é null
   image_url?: string
   slug?: string
   status?: 'draft' | 'published' | 'archived'

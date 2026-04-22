@@ -34,7 +34,7 @@ export async function findSimilarNewsByCategory(currentNews: News, limit = 4): P
     const [newsResult, postsResult] = await Promise.all([
       supabase
         .from('news')
-        .select('id, title, category, subtitle, cover_image, published_at, author, read_time, slug')
+        .select('id, title, category, raw_category, subtitle, cover_image, published_at, author, read_time, slug')
         .or('status.eq.published,status.is.null')
         .neq('id', isUUID ? currentNews.id : 'impossible-id')
         .order('published_at', { ascending: false })
