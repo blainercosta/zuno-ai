@@ -18,7 +18,7 @@
       "dest": "/assets/$1"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json|webp|avif))",
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json|webp|avif|xml|txt|webmanifest))",
       "dest": "/$1"
     },
     {
