@@ -11,6 +11,7 @@ interface NewsItem {
   id: string | number
   title: string
   category: string
+  raw_category?: string
   content?: string
   excerpt?: string
   subtitle?: string
@@ -20,6 +21,41 @@ interface NewsItem {
   author?: string
   read_time?: string
   slug?: string
+  embedding?: number[] | string | null
+  embedding_updated_at?: string | null
+}
+
+// news-table row shape, straight from match_news / the `news` table (before remapping)
+interface NewsRow {
+  id: string
+  title: string
+  category: string
+  raw_category?: string | null
+  content?: string | null
+  subtitle?: string | null
+  cover_image?: string | null
+  published_at: string
+  author?: string | null
+  read_time?: string | null
+  slug?: string | null
+  embedding?: number[] | string | null
+  embedding_updated_at?: string | null
+}
+
+function mapNewsRow(n: NewsRow): NewsItem {
+  return {
+    id: n.id,
+    title: n.title,
+    category: n.category,
+    raw_category: n.raw_category ?? undefined,
+    content: n.content ?? undefined,
+    published_at: n.published_at,
+    author: n.author ?? undefined,
+    read_time: n.read_time ?? undefined,
+    slug: n.slug ?? undefined,
+    image_url: n.cover_image ?? undefined,
+    excerpt: n.subtitle ?? undefined,
+  }
 }
 
 function generateNewsText(news: NewsItem): string {
@@ -46,29 +82,14 @@ async function createEmbedding(openai: OpenAI, text: string): Promise<number[] |
   }
 }
 
-function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) return 0
-
-  let dotProduct = 0
-  let normA = 0
-  let normB = 0
-
-  for (let i = 0; i < a.length; i++) {
-    dotProduct += a[i] * b[i]
-    normA += a[i] * a[i]
-    normB += b[i] * b[i]
-  }
-
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { newsId, limit = 4 } = await req.json()
+    const { newsId, limit: rawLimit = 4 } = await req.json()
+    const limit = Math.min(Math.max(Number(rawLimit) || 4, 1), 10)
 
     if (!newsId) {
       return new Response(
@@ -91,7 +112,7 @@ serve(async (req) => {
     if (isUUID) {
       const { data, error } = await supabase
         .from('news')
-        .select('id, title, category, content, subtitle, cover_image, published_at, author, read_time, slug')
+        .select('id, title, category, raw_category, content, subtitle, cover_image, published_at, author, read_time, slug, embedding')
         .eq('id', newsId)
         .or('status.eq.published,status.is.null')
         .single()
@@ -99,11 +120,8 @@ serve(async (req) => {
       if (error) {
         console.error('Error fetching news:', error)
       } else if (data) {
-        currentNews = {
-          ...data,
-          image_url: data.cover_image,
-          excerpt: data.subtitle,
-        }
+        currentNews = mapNewsRow(data as NewsRow)
+        currentNews.embedding = data.embedding
       }
     } else {
       const { data, error } = await supabase
@@ -127,100 +145,98 @@ serve(async (req) => {
       )
     }
 
-    // Fetch all published news from both tables
-    const [newsResult, postsResult] = await Promise.all([
-      supabase
-        .from('news')
-        .select('id, title, category, content, subtitle, cover_image, published_at, author, read_time, slug')
-        .or('status.eq.published,status.is.null')
-        .neq('id', isUUID ? newsId : 'impossible-id')
-        .order('published_at', { ascending: false })
-        .limit(30),
-      supabase
-        .from('posts')
-        .select('id, title, category, content, excerpt, image_url, published_at, author, read_time, slug')
-        .eq('status', 'published')
-        .neq('id', !isUUID ? newsId : -999999)
-        .order('published_at', { ascending: false })
-        .limit(30),
-    ])
+    // Candidates from `posts` — the legacy blog table has no embedding column and is
+    // out of scope for the pgvector migration, so it's only ever ranked by category
+    // match, never by semantic similarity. No per-row embedding calls happen for it.
+    const { data: postsData } = await supabase
+      .from('posts')
+      .select('id, title, category, content, excerpt, image_url, published_at, author, read_time, slug')
+      .eq('status', 'published')
+      .neq('id', !isUUID ? newsId : -999999)
+      .order('published_at', { ascending: false })
+      .limit(30)
 
-    const allNews: NewsItem[] = [
-      ...(newsResult.data || []).map(n => ({
-        ...n,
-        image_url: n.cover_image,
-        excerpt: n.subtitle,
-      })),
-      ...(postsResult.data || []).map(p => ({
-        ...p,
-      })),
-    ]
+    const postsCandidates: NewsItem[] = postsData || []
 
-    if (allNews.length === 0) {
-      return new Response(
-        JSON.stringify({ data: [] }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    function categoryFallback(): NewsItem[] {
+      const sameCategory = postsCandidates.filter(n => n.category === currentNews!.category)
+      const rest = postsCandidates.filter(n => n.category !== currentNews!.category)
+      return [...sameCategory, ...rest]
     }
 
-    // If OpenAI is not configured, return news from same category or random
+    // If OpenAI is not configured, return category-based or random news (no embedding calls)
     if (!openaiApiKey) {
       console.warn('OPENAI_API_KEY not configured, returning category-based or random news')
-      const sameCategory = allNews.filter(n => n.category === currentNews!.category)
-      const result = sameCategory.length >= limit
-        ? sameCategory.slice(0, limit)
-        : [...sameCategory, ...allNews.filter(n => n.category !== currentNews!.category)]
-            .slice(0, limit)
-
       return new Response(
-        JSON.stringify({ data: result }),
+        JSON.stringify({ data: categoryFallback().slice(0, limit) }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     const openai = new OpenAI({ apiKey: openaiApiKey })
 
-    // Generate embedding for current news
-    const currentNewsText = generateNewsText(currentNews)
-    const currentEmbedding = await createEmbedding(openai, currentNewsText)
+    // Reuse the persisted embedding when the current item is a `news` row; compute it
+    // once (and persist) if missing. `posts` has no embedding column, so for a post we
+    // compute an embedding on the fly to rank `news` candidates against it, but never
+    // persist it.
+    let currentEmbedding: number[] | null = null
+
+    if (isUUID && currentNews.embedding) {
+      currentEmbedding = typeof currentNews.embedding === 'string'
+        ? JSON.parse(currentNews.embedding)
+        : currentNews.embedding
+    } else {
+      const currentNewsText = generateNewsText(currentNews)
+      currentEmbedding = await createEmbedding(openai, currentNewsText)
+
+      if (currentEmbedding && isUUID) {
+        const { error: updateError } = await supabase
+          .from('news')
+          .update({
+            embedding: currentEmbedding,
+            embedding_updated_at: new Date().toISOString(),
+          })
+          .eq('id', newsId)
+
+        if (updateError) {
+          console.error('Error persisting news embedding:', updateError)
+        }
+      }
+    }
 
     if (!currentEmbedding) {
-      // Fallback to category-based
-      const sameCategory = allNews.filter(n => n.category === currentNews!.category)
-      const result = sameCategory.length >= limit
-        ? sameCategory.slice(0, limit)
-        : [...sameCategory, ...allNews.filter(n => n.category !== currentNews!.category)]
-            .slice(0, limit)
-
       return new Response(
-        JSON.stringify({ data: result }),
+        JSON.stringify({ data: categoryFallback().slice(0, limit) }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Calculate similarity with each news item
-    const newsWithSimilarity = await Promise.all(
-      allNews.map(async (news) => {
-        const newsText = generateNewsText(news)
-        const newsEmbedding = await createEmbedding(openai, newsText)
+    // Single ANN search in Postgres against `news` — no more per-candidate
+    // embeddings.create calls for the (up to 60) candidates.
+    const { data: newsMatches, error: matchError } = await supabase.rpc('match_news', {
+      query_embedding: currentEmbedding,
+      exclude_id: isUUID ? newsId : null,
+      match_count: limit,
+    })
 
-        if (!newsEmbedding) {
-          return { news, similarity: 0 }
-        }
+    if (matchError) {
+      console.error('Error calling match_news:', matchError)
+      return new Response(
+        JSON.stringify({ data: categoryFallback().slice(0, limit) }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-        const similarity = cosineSimilarity(currentEmbedding, newsEmbedding)
-        return { news, similarity }
-      })
-    )
+    const rankedNews = ((newsMatches || []) as NewsRow[]).map(mapNewsRow)
 
-    // Sort by similarity and return top N
-    const sortedNews = newsWithSimilarity
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, limit)
-      .map(item => item.news)
+    // Fill any remaining slots with category-matched posts (still zero embedding calls).
+    const remaining = limit - rankedNews.length
+    const result = remaining > 0
+      ? [...rankedNews, ...categoryFallback().slice(0, remaining)]
+      : rankedNews.slice(0, limit)
 
     return new Response(
-      JSON.stringify({ data: sortedNews }),
+      JSON.stringify({ data: result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
