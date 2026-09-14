@@ -27,10 +27,18 @@ interface WebhookPayload {
       id?: string;
       amount?: number;
       paidAt?: string;
+      externalId?: string;
       customer?: {
         email?: string;
         metadata?: { email?: string; name?: string };
       };
+    };
+    checkout?: {
+      id?: string;
+      status?: string;
+      externalId?: string;
+      receiptUrl?: string;
+      metadata?: { email?: string; subscriber_id?: string; name?: string };
     };
     customer?: { email?: string; metadata?: { name?: string } };
     payment?: { id?: string; amount?: number; paidAt?: string };
@@ -84,6 +92,21 @@ function extractEmail(data: WebhookPayload['data']): string | null {
 function extractName(data: WebhookPayload['data']): string | null {
   const candidate = data?.billing?.customer?.metadata?.name ?? data?.customer?.metadata?.name ?? null;
   return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate.trim() : null;
+}
+
+// `subscribers.id` é BIGSERIAL (inteiro), não UUID — é o valor que
+// create-checkout envia como `externalId`/`metadata.subscriber_id` para a
+// AbacatePay. Validamos como inteiro positivo em vez de um formato UUID.
+function extractSubscriberId(data: WebhookPayload['data']): string | null {
+  const candidate =
+    data?.checkout?.externalId ??
+    data?.checkout?.metadata?.subscriber_id ??
+    data?.billing?.externalId ??
+    null;
+
+  if (!candidate || typeof candidate !== 'string') return null;
+  const trimmed = candidate.trim();
+  return /^\d+$/.test(trimmed) ? trimmed : null;
 }
 
 function extractPaymentId(data: WebhookPayload['data']): string | null {
@@ -154,23 +177,36 @@ Deno.serve(async (req) => {
     });
   }
 
+  // `checkout.completed` (v2) não garante `data.checkout.status === 'PAID'` —
+  // payloads reais chegaram com `status: "ACTIVE"` em eventos já pagos. O
+  // nome do evento (via PAYMENT_CONFIRMED_EVENTS) já é o sinal de confirmação;
+  // não fazemos nenhuma checagem adicional sobre `status` aqui de propósito.
+  const subscriberId = extractSubscriberId(payload.data);
   const email = extractEmail(payload.data);
   const paymentId = extractPaymentId(payload.data);
   const paidAt = extractPaidAt(payload.data);
   const name = extractName(payload.data);
 
-  if (!email) {
+  const logUnmatchable = () => {
     // Log top-level shape (keys only, no values) so the real payload path can be mapped
-    console.error('abacatepay-webhook: could not extract customer email from payload', {
+    console.error('abacatepay-webhook: could not match a subscriber for this payload', {
       event,
       paymentId,
+      receiptUrl: payload.data?.checkout?.receiptUrl,
       dataKeys: payload.data ? Object.keys(payload.data) : [],
       nestedKeys: Object.fromEntries(
         Object.entries(payload.data ?? {}).map(([k, v]) => [k, v && typeof v === 'object' ? Object.keys(v as object) : typeof v])
       ),
     });
-    return new Response(JSON.stringify({ error: 'Missing customer email in payload' }), {
-      status: 400,
+  };
+
+  if (!subscriberId && !email) {
+    // Sem externalId/metadata.subscriber_id e sem email: não há como associar a
+    // um subscriber. Signature válida, então 200 para o provider parar de
+    // retentar um evento que nunca vai casar — mas fica logado para reconciliação manual.
+    logUnmatchable();
+    return new Response(JSON.stringify({ received: true, matched: false }), {
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
@@ -184,7 +220,65 @@ Deno.serve(async (req) => {
   // possui coluna `payment_provider_id` hoje. Guardamos o id do pagamento
   // apenas em log/observabilidade até que a coluna seja adicionada via
   // migração (fora do escopo deste agente).
-  console.log('abacatepay-webhook: processing payment', { email, paymentId, event });
+  console.log('abacatepay-webhook: processing payment', { subscriberId, email, paymentId, event });
+
+  // --- (a) Match por subscriber id (externalId/metadata.subscriber_id) ---
+  // É o caminho esperado para todo checkout criado pela função create-checkout.
+  if (subscriberId) {
+    const { data: byId, error: selectByIdError } = await supabaseAdmin
+      .from('subscribers')
+      .select('id, payment_confirmed_at')
+      .eq('id', subscriberId)
+      .maybeSingle();
+
+    if (selectByIdError) {
+      console.error('abacatepay-webhook: failed to look up subscriber by id', selectByIdError);
+      return new Response(JSON.stringify({ error: 'Database error' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (byId) {
+      // Idempotência: coalesce mantém a primeira confirmação registrada.
+      if (byId.payment_confirmed_at) {
+        return new Response(JSON.stringify({ received: true, matched: true }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const { error: updateByIdError } = await supabaseAdmin
+        .from('subscribers')
+        .update({ payment_confirmed_at: paidAt })
+        .eq('id', byId.id);
+
+      if (updateByIdError) {
+        console.error('abacatepay-webhook: failed to update subscriber by id', updateByIdError);
+        return new Response(JSON.stringify({ error: 'Database error' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      return new Response(JSON.stringify({ received: true, matched: true }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // subscriberId veio no payload mas não existe na tabela: cai para o
+    // caminho por email (se houver) antes de desistir.
+  }
+
+  // --- (b) Match por email (fluxo pré-existente) ---
+  if (!email) {
+    logUnmatchable();
+    return new Response(JSON.stringify({ received: true, matched: false }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   const { data: existing, error: selectError } = await supabaseAdmin
     .from('subscribers')
@@ -203,7 +297,7 @@ Deno.serve(async (req) => {
   if (existing) {
     // Idempotência: coalesce mantém a primeira confirmação registrada.
     if (existing.payment_confirmed_at) {
-      return new Response(JSON.stringify({ received: true }), {
+      return new Response(JSON.stringify({ received: true, matched: true }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -222,7 +316,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ received: true }), {
+    return new Response(JSON.stringify({ received: true, matched: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -257,7 +351,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ received: true }), {
+  return new Response(JSON.stringify({ received: true, matched: true }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
