@@ -18,11 +18,8 @@ Allow: /news/*
 Disallow: /admin
 Disallow: /api/private
 Disallow: /settings
-Disallow: /_next/
 
 # Sitemap locations
-Sitemap: https://usezuno.app/sitemap.xml
-Sitemap: https://usezuno.app/sitemap-news.xml
-
-# Crawl delay (adjust based on server capacity)
-Crawl-delay: 1
+Sitemap: https://www.usezuno.app/sitemap.xml
+Sitemap: https://www.usezuno.app/sitemap-news.xml
+Sitemap: https://www.usezuno.app/sitemap-jobs.xml
