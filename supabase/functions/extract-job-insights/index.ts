@@ -126,6 +126,9 @@ function sanitizeExtracted(raw: unknown, validJobIds: Set<string>): ExtractedJob
       }))
       // Canonical skill names only: letters/digits and a few symbols, 2-40 chars. Blocks prompt-injected text/URLs.
       .filter((s) => /^[a-z0-9à-ú][a-z0-9à-ú .+#/-]{0,38}[a-z0-9à-ú+#]$/.test(s.skill) && !s.skill.includes('http'))
+      // Dedupe by skill name: a duplicate inside one upsert statement makes Postgres
+      // fail with "ON CONFLICT DO UPDATE command cannot affect row a second time"
+      .filter((s, i, arr) => arr.findIndex((o) => o.skill === s.skill) === i)
       .slice(0, 12)
 
     result.push({
