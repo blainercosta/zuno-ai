@@ -36,6 +36,9 @@ interface JobData {
   benefits?: string
   salary?: string
   process?: string
+  submitted_by_email?: string
+  // Honeypot anti-spam: must stay empty, only real users leave it untouched
+  website?: string
 }
 
 interface WaitlistData {

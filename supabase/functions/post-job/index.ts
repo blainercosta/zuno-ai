@@ -26,6 +26,20 @@ interface JobData {
   benefits?: string
   salary?: string
   process?: string
+  submitted_by_email?: string
+  // Honeypot: campo invisível no formulário. Bots preenchem, humanos não.
+  website?: string
+}
+
+// Encurtadores bloqueados: mascaram o destino real e são amplamente
+// usados em spam. Exigimos o link direto da vaga.
+const SHORTENER_DENYLIST = ['bit.ly', 't.co', 'tinyurl.com']
+
+const MIN_DESCRIPTION_LENGTH = 80
+
+function isShortenerUrl(url: URL): boolean {
+  const host = url.hostname.toLowerCase().replace(/^www\./, '')
+  return SHORTENER_DENYLIST.some((denied) => host === denied || host.endsWith(`.${denied}`))
 }
 
 // Validação de URL
@@ -45,6 +59,10 @@ function sanitizeText(text: string | undefined): string | null {
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<[^>]*>/g, '')
     .trim()
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
 serve(async (req) => {
@@ -72,7 +90,44 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Parse body
-    const body: JobData = await req.json()
+    const rawBody = await req.text()
+    if (rawBody.length > 60_000) {
+      return new Response(
+        JSON.stringify({ error: 'Conteúdo muito grande. Reduza o texto da vaga.' }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    const body: JobData = JSON.parse(rawBody)
+
+    // Per-field caps: keep DB and downstream LLM prompts bounded
+    const FIELD_CAPS: Record<string, number> = {
+      job_title: 200, company_name: 200, location: 200, salary: 200, process: 5_000,
+      description_full: 20_000, about_company: 5_000, responsibilities: 10_000,
+      requirements: 10_000, differentials: 5_000, submitted_by_email: 254, job_url: 2_000,
+    }
+    for (const [field, cap] of Object.entries(FIELD_CAPS)) {
+      const v = (body as Record<string, unknown>)[field]
+      if (typeof v === 'string' && v.length > cap) {
+        return new Response(
+          JSON.stringify({ error: `Campo ${field} excede ${cap} caracteres.` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Honeypot anti-spam: campo "website" é invisível no form real.
+    // Se vier preenchido, é bot. Respondemos como sucesso (sem gravar nada)
+    // para não sinalizar ao bot que foi bloqueado.
+    if (body.website && body.website.trim().length > 0) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          status: 'pending',
+          message: 'Vaga recebida. Publicamos após revisão, geralmente em até 24h.',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     // Validações obrigatórias
     if (!body.company_name || body.company_name.trim().length < 2) {
@@ -92,6 +147,22 @@ serve(async (req) => {
     if (!body.job_url || !isValidUrl(body.job_url)) {
       return new Response(
         JSON.stringify({ error: 'URL de candidatura inválida' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const jobUrl = new URL(body.job_url.trim())
+
+    if (jobUrl.protocol !== 'https:') {
+      return new Response(
+        JSON.stringify({ error: 'Link para candidatura deve usar https://' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (isShortenerUrl(jobUrl)) {
+      return new Response(
+        JSON.stringify({ error: 'Não aceitamos links encurtados (bit.ly, t.co, tinyurl). Use o link direto da vaga.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -117,6 +188,32 @@ serve(async (req) => {
       )
     }
 
+    // Anti-spam: conteúdo total precisa ter substância mínima
+    const combinedDescriptionLength = [
+      body.description_full,
+      body.about_company,
+      body.responsibilities,
+      body.requirements,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .trim().length
+
+    if (combinedDescriptionLength < MIN_DESCRIPTION_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `A descrição da vaga precisa ter pelo menos ${MIN_DESCRIPTION_LENGTH} caracteres no total` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // E-mail de contato é opcional, mas se informado deve ser válido
+    if (body.submitted_by_email && !isValidEmail(body.submitted_by_email.trim())) {
+      return new Response(
+        JSON.stringify({ error: 'E-mail de contato inválido' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Validar URLs opcionais
     if (body.company_url && !isValidUrl(body.company_url)) {
       return new Response(
@@ -132,19 +229,20 @@ serve(async (req) => {
       )
     }
 
-    // Rate limiting simples por IP (em produção use Redis)
-    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
+    // Rate limit per IP: hash the IP (never store raw), count submissions in the last hour
+    const clientIp = (req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown').split(',')[0].trim()
+    const ipDigest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(clientIp))
+    const submitterIpHash = Array.from(new Uint8Array(ipDigest)).map((b) => b.toString(16).padStart(2, '0')).join('')
 
-    // Verificar se já houve submissão recente deste IP (últimos 5 minutos)
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-    const { data: recentJobs, error: rateLimitError } = await supabase
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count: recentCount } = await supabase
       .from('vagas_ia')
-      .select('id')
-      .gte('posted_at', fiveMinutesAgo)
-      .limit(5)
+      .select('id', { count: 'exact', head: true })
+      .eq('submitter_ip_hash', submitterIpHash)
+      .gte('submitted_at', oneHourAgo)
 
-    // Se houver mais de 3 vagas nos últimos 5 minutos, bloquear
-    if (recentJobs && recentJobs.length >= 3) {
+    // Max 3 submissions per IP per hour
+    if ((recentCount ?? 0) >= 3) {
       return new Response(
         JSON.stringify({ error: 'Muitas submissões recentes. Aguarde alguns minutos.' }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -159,7 +257,7 @@ serve(async (req) => {
       .from('vagas_ia')
       .insert([{
         job_id: jobId,
-        job_url: body.job_url.trim(),
+        job_url: jobUrl.toString(),
         job_title: sanitizeText(body.job_title),
         company_name: sanitizeText(body.company_name),
         company_url: body.company_url?.trim() || null,
@@ -181,18 +279,21 @@ serve(async (req) => {
         salary: sanitizeText(body.salary),
         process: sanitizeText(body.process),
         status: 'pending', // Requer aprovação manual
+        submitted_by_email: body.submitted_by_email?.trim() || null,
+        submitter_ip_hash: submitterIpHash,
       }])
       .select()
 
     if (error) {
       console.error('Supabase error:', JSON.stringify(error, null, 2))
-      throw new Error(`Erro ao salvar vaga: ${error.message || error.code || 'unknown'}`)
+      throw new Error('Erro ao salvar vaga. Tente novamente em alguns minutos.')
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Vaga enviada para aprovação',
+        status: 'pending',
+        message: 'Vaga recebida. Publicamos após revisão, geralmente em até 24h.',
         job_id: jobId
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
