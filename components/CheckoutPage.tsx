@@ -45,8 +45,11 @@ export default function CheckoutPage() {
                 onClick={handleConfirmPayment}
                 className="w-full bg-white text-zinc-950 font-medium py-3.5 rounded-xl hover:bg-zinc-100 transition-colors"
               >
-                Já paguei
+                Já paguei, continuar
               </button>
+              <p className="text-sm text-zinc-500">
+                Confirmamos seu pagamento automaticamente em alguns minutos.
+              </p>
 
               <button
                 onClick={handlePayment}

@@ -56,15 +56,19 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
   const faqs = [
     {
       question: 'O que é o Zuno AI?',
-      answer: 'Zuno AI é o maior hub de Inteligência Artificial do Brasil. Conectamos profissionais de IA com vagas, cursos, comunidade e recursos para desenvolvimento de carreira.'
+      answer: 'Zuno AI é uma plataforma que reúne vagas de Inteligência Artificial e notícias de IA em português, atualizadas diariamente.'
     },
     {
-      question: 'Como encontrar vagas de IA no Brasil?',
-      answer: 'No Zuno AI você encontra vagas de Inteligência Artificial generalista de empresas verificadas, com salários transparentes e oportunidades reais em todas as áreas de IA.'
+      question: 'Como encontrar vagas de IA no Zuno AI?',
+      answer: 'Navegue pela lista de vagas de Inteligência Artificial, filtre por área de interesse e candidate-se diretamente no site da empresa responsável pela vaga.'
     },
     {
-      question: 'O Zuno AI é gratuito?',
-      answer: 'Sim! O hub Zuno AI é 100% gratuito para profissionais. Acesse vagas, participe da comunidade e explore recursos sem custos.'
+      question: 'As vagas são atualizadas com que frequência?',
+      answer: 'As vagas são atualizadas diariamente, reunindo novas oportunidades de IA publicadas por empresas.'
+    },
+    {
+      question: 'O Zuno AI também traz notícias sobre IA?',
+      answer: 'Sim. Além das vagas, o Zuno AI publica notícias de Inteligência Artificial em português para acompanhar as principais novidades do setor.'
     }
   ]
 

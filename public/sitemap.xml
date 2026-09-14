@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>https://usezuno.app/sitemap-pages.xml</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://www.usezuno.app/sitemap-pages.xml</loc>
+    <lastmod>2026-09-14</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://usezuno.app/sitemap-news.xml</loc>
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://www.usezuno.app/sitemap-news.xml</loc>
+    <lastmod>2026-09-14</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.usezuno.app/sitemap-jobs.xml</loc>
+    <lastmod>2026-09-14</lastmod>
   </sitemap>
 </sitemapindex>
