@@ -177,19 +177,34 @@ Deno.serve(async (req) => {
   );
 
   // Upsert por email (case-insensitive): mantém payment_confirmed_at se já existir.
-  const { data: existing, error: selectError } = await supabaseAdmin
-    .from('subscribers')
-    .select('id, payment_confirmed_at')
-    .eq('email', normalizedEmail)
-    .maybeSingle();
+  // Subscribers are unique by email AND by WhatsApp digits (see idx_subscribers_unique_*).
+  // Look up by both so a beta tester paying with a new email reuses the same row.
+  const whatsappTail = normalizedWhatsapp.slice(-11);
+  const [byEmailRes, byWhatsappRes] = await Promise.all([
+    supabaseAdmin
+      .from('subscribers')
+      .select('id, email, payment_confirmed_at')
+      .eq('email', normalizedEmail)
+      .maybeSingle(),
+    supabaseAdmin
+      .from('subscribers')
+      .select('id, email, payment_confirmed_at')
+      .ilike('whatsapp', `%${whatsappTail}`)
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  if (selectError) {
-    console.error('create-checkout: failed to look up subscriber', selectError);
+  if (byEmailRes.error || byWhatsappRes.error) {
+    console.error('create-checkout: failed to look up subscriber', byEmailRes.error ?? byWhatsappRes.error);
     return new Response(JSON.stringify({ error: 'Database error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+
+  const byEmail = byEmailRes.data;
+  const byWhatsapp = byWhatsappRes.data;
+  const existing = byEmail ?? byWhatsapp;
 
   let subscriberId: string;
 
@@ -201,8 +216,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    const updates: Record<string, unknown> = { name: normalizedName, whatsapp: normalizedWhatsapp };
+    const updates: Record<string, unknown> = { name: normalizedName };
     if (normalizedNiche) updates.niche = normalizedNiche;
+    // Only move email/whatsapp onto this row when no OTHER row already owns that value
+    if (!byEmail && byWhatsapp) updates.email = normalizedEmail;
+    if (byEmail && (!byWhatsapp || byWhatsapp.id === byEmail.id)) updates.whatsapp = normalizedWhatsapp;
 
     const { error: updateError } = await supabaseAdmin
       .from('subscribers')
