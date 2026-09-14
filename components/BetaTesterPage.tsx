@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SUBSCRIBER_NICHES } from '@/types/subscriber';
 import PhoneInput from './PhoneInput';
+import { getWhatsAppUrl } from '@/lib/constants';
 
 // Supabase config
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -176,8 +177,7 @@ export default function BetaTesterPage() {
   };
 
   const handleWhatsAppBot = () => {
-    const message = encodeURIComponent('Oi! Quero receber as notícias de IA.');
-    window.open(`https://wa.me/5511918492120?text=${message}`, '_blank');
+    window.open(getWhatsAppUrl('Oi! Quero receber as notícias de IA.'), '_blank');
   };
 
   // Tela final de sucesso (step 6)

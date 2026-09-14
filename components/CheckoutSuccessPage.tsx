@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SUBSCRIBER_NICHES } from '@/types/subscriber';
+import { getWhatsAppUrl } from '@/lib/constants';
 
 // Supabase config
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -188,16 +189,15 @@ export default function CheckoutSuccessPage() {
     const saved = await saveSubscriber();
     if (!saved) return;
 
-    const message = encodeURIComponent(
+    const message =
       `Oi! Acabei de assinar o Zuno AI.\n\n` +
       `Nome: ${formData.nome}\n` +
       `Email: ${formData.email}\n` +
       `Instagram: @${formData.instagram.replace('@', '')}\n` +
       `WhatsApp: ${formData.whatsapp}\n` +
-      `Nicho: ${getNicho()}`
-    );
+      `Nicho: ${getNicho()}`;
 
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    window.open(getWhatsAppUrl(message), '_blank');
   };
 
   // Tela de sucesso inicial
