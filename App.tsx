@@ -10,6 +10,7 @@ import { JobDetailSkeleton } from "./components/Skeleton";
 import BetaAccessModal from "./components/BetaAccessModal";
 
 // Lazy load componentes secundários para reduzir bundle inicial
+const HomePage = lazy(() => import("./components/HomePage"));
 const JobDetailPage = lazy(() => import("./components/JobDetailPage"));
 const PostJobPage = lazy(() => import("./components/PostJobPage"));
 const NewsPage = lazy(() => import("./components/NewsPage"));
@@ -20,6 +21,7 @@ const ProfileSettingsPage = lazy(() => import("./components/ProfileSettingsPage"
 const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const CheckoutSuccessPage = lazy(() => import("./components/CheckoutSuccessPage"));
 const BetaTesterPage = lazy(() => import("./components/BetaTesterPage"));
+const SalariosPage = lazy(() => import("./components/SalariosPage"));
 
 // Loading Component
 function LoadingSpinner() {
@@ -181,6 +183,63 @@ function ProfessionalDetailWrapper({ professionalId, onBack }: { professionalId:
   return <ProfessionalDetailPage professional={professional} onBack={onBack} />;
 }
 
+// Home Page Wrapper with navigation
+function HomePageWrapper() {
+  const navigate = useNavigate();
+
+  const handleNewsClick = async (newsId: number | string) => {
+    const isUUID = typeof newsId === 'string' && newsId.includes('-');
+
+    try {
+      let title: string | undefined;
+
+      if (isUUID) {
+        const { data: newsData } = await supabase
+          .from('news')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+        title = newsData?.title;
+      } else {
+        const { data: postData } = await supabase
+          .from('posts')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+        title = postData?.title;
+      }
+
+      if (title) {
+        const slug = `${title
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[̀-ͯ]/g, '')
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim()}-${newsId}`;
+        navigate(`/noticias-ia/${slug}`);
+      } else {
+        navigate(`/noticias-ia/${newsId}`);
+      }
+    } catch (error) {
+      console.error('Error fetching news title:', error);
+      navigate(`/noticias-ia/${newsId}`);
+    }
+  };
+
+  return (
+    <HomePage
+      onNewsClick={handleNewsClick}
+      onJobClick={(job: Job) => navigate(`/job/${job.job_id}`)}
+      onViewNews={() => navigate('/noticias-ia')}
+      onViewJobs={() => navigate('/jobs')}
+      onPostJobClick={() => navigate('/post-job')}
+      onBetaClick={() => navigate('/beta')}
+    />
+  );
+}
+
 // Jobs Page Wrapper with navigation
 function JobsPageWrapper() {
   const navigate = useNavigate();
@@ -308,20 +367,18 @@ function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Nav Icons */}
           <div className="flex flex-col gap-[14px] items-center px-2">
-            {/* Home - Hidden in production */}
-            {import.meta.env.DEV && (
-              <button
-                onClick={() => navigate('/')}
-                className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
-                  isActive('/') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
-                }`}
-                aria-label="Home"
-              >
-                <svg className="size-6" fill="none" stroke={isActive('/') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M19.842 8.29901L13.842 3.63201C12.759 2.78901 11.242 2.78901 10.158 3.63201L4.158 8.29901C3.427 8.86701 3 9.74101 3 10.667V18C3 19.657 4.343 21 6 21H18C19.657 21 21 19.657 21 18V10.667C21 9.74101 20.573 8.86701 19.842 8.29901Z" strokeWidth="2"/>
-                </svg>
-              </button>
-            )}
+            {/* Home */}
+            <button
+              onClick={() => navigate('/')}
+              className={`size-14 flex items-center justify-center rounded-xl transition-colors ${
+                isActive('/') ? 'bg-zinc-800' : 'hover:bg-zinc-800'
+              }`}
+              aria-label="Home"
+            >
+              <svg className="size-6" fill="none" stroke={isActive('/') ? 'white' : '#CBD5E1'} viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d="M19.842 8.29901L13.842 3.63201C12.759 2.78901 11.242 2.78901 10.158 3.63201L4.158 8.29901C3.427 8.86701 3 9.74101 3 10.667V18C3 19.657 4.343 21 6 21H18C19.657 21 21 19.657 21 18V10.667C21 9.74101 20.573 8.86701 19.842 8.29901Z" strokeWidth="2"/>
+              </svg>
+            </button>
 
             {/* News */}
             <button
@@ -476,15 +533,15 @@ export default function App() {
             <Layout>
               <Routes>
                 {/* Default route */}
-                <Route path="/" element={<Navigate to="/noticias-ia" replace />} />
+                <Route path="/" element={<HomePageWrapper />} />
 
                 {/* Jobs routes */}
                 <Route path="/jobs" element={<JobsPageWrapper />} />
                 <Route path="/job/:slug" element={<JobDetailRoute />} />
-                {/* Post job route - hidden in production */}
-                {import.meta.env.DEV && (
-                  <Route path="/post-job" element={<PostJobPageWrapper />} />
-                )}
+                <Route path="/post-job" element={<PostJobPageWrapper />} />
+
+                {/* Salaries route */}
+                <Route path="/salarios-ia" element={<SalariosPage />} />
 
                 {/* Professionals routes - Hidden in production */}
                 {import.meta.env.DEV && (
