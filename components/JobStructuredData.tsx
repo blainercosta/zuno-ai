@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { Job } from '@/types/job'
+import { parseSalary } from '@/utils/salary'
 
 interface JobStructuredDataProps {
   job: Job
@@ -11,6 +12,10 @@ interface JobStructuredDataProps {
  */
 export default function JobStructuredData({ job }: JobStructuredDataProps) {
   useEffect(() => {
+    if (job.status !== 'active') return
+
+    const parsedSalary = job.salary ? parseSalary(job.salary) : null
+
     const structuredData = {
       '@context': 'https://schema.org/',
       '@type': 'JobPosting',
@@ -41,13 +46,15 @@ export default function JobStructuredData({ job }: JobStructuredDataProps) {
       ...(job.is_remote && {
         jobLocationType: 'TELECOMMUTE'
       }),
-      ...(job.salary && {
+      ...(parsedSalary && {
         baseSalary: {
           '@type': 'MonetaryAmount',
           currency: 'BRL',
           value: {
             '@type': 'QuantitativeValue',
-            value: job.salary,
+            ...(parsedSalary.value !== undefined
+              ? { value: parsedSalary.value }
+              : { minValue: parsedSalary.min, maxValue: parsedSalary.max }),
             unitText: 'MONTH'
           }
         }
