@@ -11,12 +11,18 @@ interface WaitlistData {
   name: string
   email: string
   phone: string
+  ref?: string
 }
 
 // Validação de email
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
+}
+
+// Código de referral: 4-16 caracteres [a-z0-9], igual ao formato gerado pelo trigger set_referral_code
+function isValidRefFormat(ref: string): boolean {
+  return /^[a-z0-9]{4,16}$/.test(ref)
 }
 
 // Validação de telefone brasileiro
@@ -101,10 +107,26 @@ serve(async (req) => {
       .single()
 
     if (existingEmail) {
+      // Never leak the existing referral_code on duplicates (account enumeration + link takeover)
       return new Response(
         JSON.stringify({ error: 'Este email já está cadastrado' }),
         { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    // Validar referral code (opcional): se não existir na base, ignora em silêncio
+    // em vez de falhar o cadastro por causa de um link de indicação inválido/expirado.
+    let referredBy: string | null = null
+    if (body.ref && isValidRefFormat(body.ref)) {
+      const { data: referrer } = await supabase
+        .from('beta_waitlist')
+        .select('referral_code')
+        .eq('referral_code', body.ref)
+        .single()
+
+      if (referrer) {
+        referredBy = referrer.referral_code
+      }
     }
 
     // Rate limiting: máximo 3 cadastros por hora do mesmo IP
@@ -113,16 +135,18 @@ serve(async (req) => {
     // Limpar telefone
     const cleanPhone = body.phone.replace(/\D/g, '')
 
-    // Inserir na waitlist
+    // Inserir na waitlist (referral_code é atribuído pelo trigger set_referral_code)
     const { data, error } = await supabase
       .from('beta_waitlist')
       .insert([{
         name: sanitizeName(body.name),
         email: body.email.trim().toLowerCase(),
         phone: cleanPhone,
+        referred_by: referredBy,
         created_at: new Date().toISOString(),
       }])
-      .select()
+      .select('id, referral_code')
+      .single()
 
     if (error) {
       console.error('Supabase error:', error)
@@ -141,7 +165,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Cadastro realizado com sucesso!'
+        message: 'Cadastro realizado com sucesso!',
+        referral_code: data.referral_code,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

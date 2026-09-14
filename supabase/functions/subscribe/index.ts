@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { name, email, instagram, whatsapp, niche, source, utm_source, utm_medium, utm_campaign } = body;
+    const { name, email, instagram, whatsapp, niche, source, utm_source, utm_medium, utm_campaign, ref } = body;
 
     // Validar todos os campos
     const errors: Record<string, string> = {};
@@ -82,6 +82,21 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Validar referral code (opcional): se não existir na base, ignora em silêncio
+    // em vez de falhar o cadastro por causa de um link de indicação inválido/expirado.
+    let referredBy: string | null = null;
+    if (ref && /^[a-z0-9]{4,16}$/.test(ref)) {
+      const { data: referrer } = await supabaseAdmin
+        .from('subscribers')
+        .select('referral_code')
+        .eq('referral_code', ref)
+        .single();
+
+      if (referrer) {
+        referredBy = referrer.referral_code;
+      }
+    }
+
     // Normalizar dados
     const subscriberData = {
       name: name.trim(),
@@ -93,13 +108,14 @@ Deno.serve(async (req) => {
       utm_source: utm_source || null,
       utm_medium: utm_medium || null,
       utm_campaign: utm_campaign || null,
+      referred_by: referredBy,
     };
 
-    // Inserir no banco
+    // Inserir no banco (referral_code é atribuído pelo trigger set_referral_code)
     const { data, error } = await supabaseAdmin
       .from('subscribers')
       .insert(subscriberData)
-      .select('id, name, email')
+      .select('id, name, email, referral_code')
       .single();
 
     if (error) {
@@ -111,6 +127,9 @@ Deno.serve(async (req) => {
         } else if (error.message.includes('whatsapp')) {
           message = 'Este WhatsApp já está cadastrado';
         }
+
+        // Never return the existing row's referral_code here: it would let anyone
+        // confirm an email is registered and take over that user's referral link.
         return new Response(
           JSON.stringify({ success: false, error: message, code: 'DUPLICATE' }),
           { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -125,7 +144,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, data: { id: data.id, name: data.name } }),
+      JSON.stringify({ success: true, data: { id: data.id, name: data.name, referral_code: data.referral_code } }),
       { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

@@ -126,10 +126,13 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
         return;
       }
 
+      const ref = sessionStorage.getItem('zuno_ref') || undefined;
+
       const result = await submitWaitlist({
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         phone: cleanPhone,
+        ref,
       });
 
       if (result.error) {
