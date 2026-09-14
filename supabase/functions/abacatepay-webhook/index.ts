@@ -9,9 +9,15 @@ const corsHeaders = {
 // 'billing.paid' é o nome documentado; os demais são tolerados defensivamente
 // caso a nomenclatura mude entre ambientes/versões da API.
 const PAYMENT_CONFIRMED_EVENTS = new Set([
+  // Webhook v1
   'billing.paid',
   'payment.confirmed',
   'billing.completed',
+  // Webhook v2 (docs.abacatepay.com/pages/webhooks)
+  'checkout.completed',
+  'transparent.completed',
+  'subscription.completed',
+  'subscription.renewed',
 ]);
 
 interface WebhookPayload {
@@ -47,12 +53,27 @@ async function timingSafeEqual(a: string, b: string): Promise<boolean> {
   return result === 0;
 }
 
+// Fallback: depth-first search for the first string value under a key named "email".
+// Payload shape differs between v1 (billing.customer.metadata.email) and v2 events.
+function findEmailDeep(value: unknown, depth = 0): string | null {
+  if (!value || typeof value !== 'object' || depth > 6) return null;
+  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+    if (key.toLowerCase() === 'email' && typeof v === 'string' && v.includes('@')) return v;
+  }
+  for (const v of Object.values(value as Record<string, unknown>)) {
+    const found = findEmailDeep(v, depth + 1);
+    if (found) return found;
+  }
+  return null;
+}
+
 function extractEmail(data: WebhookPayload['data']): string | null {
   const candidate =
     data?.billing?.customer?.metadata?.email ??
     data?.customer?.email ??
     data?.billing?.customer?.email ??
     data?.customer?.metadata?.email ??
+    findEmailDeep(data) ??
     null;
 
   if (!candidate || typeof candidate !== 'string') return null;
@@ -139,9 +160,14 @@ Deno.serve(async (req) => {
   const name = extractName(payload.data);
 
   if (!email) {
+    // Log top-level shape (keys only, no values) so the real payload path can be mapped
     console.error('abacatepay-webhook: could not extract customer email from payload', {
       event,
       paymentId,
+      dataKeys: payload.data ? Object.keys(payload.data) : [],
+      nestedKeys: Object.fromEntries(
+        Object.entries(payload.data ?? {}).map(([k, v]) => [k, v && typeof v === 'object' ? Object.keys(v as object) : typeof v])
+      ),
     });
     return new Response(JSON.stringify({ error: 'Missing customer email in payload' }), {
       status: 400,
