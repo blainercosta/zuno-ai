@@ -26,6 +26,9 @@ interface FormData {
   benefits: string
   salary: string
   process: string
+  submitted_by_email: string
+  // Honeypot anti-spam: hidden from real users, only bots fill it in
+  website: string
 }
 
 interface FieldErrors {
@@ -51,7 +54,9 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
     differentials: '',
     benefits: '',
     salary: '',
-    process: ''
+    process: '',
+    submitted_by_email: '',
+    website: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -124,6 +129,14 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
         new URL(formData.logo_url)
       } catch {
         errors.logo_url = 'Digite uma URL válida para o logo'
+      }
+    }
+
+    // Optional contact e-mail
+    if (formData.submitted_by_email.trim()) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailPattern.test(formData.submitted_by_email.trim())) {
+        errors.submitted_by_email = 'Digite um e-mail válido'
       }
     }
 
@@ -213,6 +226,8 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
         benefits: formData.benefits || undefined,
         salary: formData.salary || undefined,
         process: formData.process || undefined,
+        submitted_by_email: formData.submitted_by_email || undefined,
+        website: formData.website || undefined,
       })
 
       if (result.error) {
@@ -220,7 +235,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
       }
 
       setShowSuccess(true)
-      setMessage({ type: 'success', text: 'Vaga enviada para aprovação!' })
+      setMessage({ type: 'success', text: 'Vaga recebida. Publicamos após revisão, geralmente em até 24h.' })
 
       setTimeout(() => {
         onBack()
@@ -305,6 +320,18 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
+                {/* Honeypot anti-spam: invisível para pessoas, bots costumam preencher tudo */}
+                <input
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+                />
+
                 {/* Informações da Empresa */}
                 <div className="space-y-5 md:space-y-6">
                   <h3 className="text-[20px] leading-[30px] text-slate-50">Informações da empresa</h3>
@@ -657,6 +684,31 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
                   </div>
                 </div>
 
+                {/* Contato para revisão */}
+                <div className="space-y-5 md:space-y-6 pt-8 border-t border-zinc-800">
+                  <h3 className="text-[20px] leading-[30px] text-slate-50">Contato (opcional)</h3>
+
+                  <div>
+                    <label className="block text-[14px] leading-[21px] mb-2 text-zinc-300">
+                      Seu e-mail para contato
+                    </label>
+                    <input
+                      type="email"
+                      name="submitted_by_email"
+                      value={formData.submitted_by_email}
+                      onChange={handleChange}
+                      className={inputClassName('submitted_by_email')}
+                      placeholder="voce@empresa.com"
+                    />
+                    {fieldErrors.submitted_by_email && (
+                      <p className="mt-2 text-sm text-red-400">{fieldErrors.submitted_by_email}</p>
+                    )}
+                    <p className="text-[12px] leading-[18px] text-zinc-500 mt-2">
+                      Usamos apenas se precisarmos falar sobre a revisão da vaga. Não é publicado.
+                    </p>
+                  </div>
+                </div>
+
                 {/* Submit Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-8">
                   <button
@@ -689,8 +741,11 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
               <h3 className="text-2xl md:text-3xl font-semibold text-white mb-3 text-center">
                 Vaga enviada com sucesso!
               </h3>
+              <p className="text-base text-zinc-400 text-center mb-2 max-w-md">
+                Publicamos após revisão, geralmente em até 24h.
+              </p>
               <p className="text-base text-zinc-400 text-center mb-6 max-w-md">
-                Sua vaga foi enviada para aprovação e em breve estará disponível na plataforma.
+                Assim que for aprovada, ela aparece na lista de vagas para todo mundo.
               </p>
 
               <p className="text-sm text-zinc-500 text-center">
