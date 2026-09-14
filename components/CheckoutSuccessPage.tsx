@@ -74,6 +74,29 @@ export default function CheckoutSuccessPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Prefill nome/email/whatsapp salvos pelo CheckoutPage antes de abrir o pagamento,
+  // assim o usuário não precisa retypar o que já informou.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('zuno_checkout');
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw) as { name?: string; email?: string; whatsapp?: string };
+      const digits = (parsed.whatsapp || '').replace(/\D/g, '');
+      // whatsapp salvo vem com DDI (ex: 5511999998888); aqui usamos só o número local.
+      const localDigits = digits.startsWith('55') && digits.length > 11 ? digits.slice(2) : digits;
+
+      setFormData((prev) => ({
+        ...prev,
+        nome: parsed.name || prev.nome,
+        email: parsed.email || prev.email,
+        whatsapp: localDigits ? formatWhatsApp(localDigits) : prev.whatsapp,
+      }));
+    } catch (err) {
+      console.error('Failed to prefill checkout data:', err);
+    }
+  }, []);
+
   const validateField = (field: keyof typeof formData) => {
     const validatorKey = field === 'nome' ? 'name' : field === 'nicho' || field === 'nichoCustom' ? 'niche' : field;
     const validator = validators[validatorKey as keyof typeof validators];

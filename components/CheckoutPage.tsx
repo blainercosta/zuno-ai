@@ -1,19 +1,107 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PhoneInput from './PhoneInput';
+import { createCheckout } from '@/lib/api';
 
-// Reusable AbacatePay payment link. Single-use `bill_` URLs expire after one payment;
-// set VITE_ABACATEPAY_PAYMENT_URL in Vercel to a reusable link so swaps need no deploy.
-const PAYMENT_URL =
-  import.meta.env.VITE_ABACATEPAY_PAYMENT_URL ??
-  'https://www.abacatepay.com/pay/bill_0TMmxNs4wD3Kh0w2aswempbX';
+// Validação (mesmas regras usadas em BetaTesterPage/CheckoutSuccessPage e na Edge Function)
+const validators = {
+  name: (value: string) => {
+    const trimmed = value.trim();
+    if (trimmed.length < 2) return 'Nome deve ter pelo menos 2 caracteres';
+    if (trimmed.length > 100) return 'Nome muito longo';
+    return null;
+  },
+  email: (value: string) => {
+    const trimmed = value.trim().toLowerCase();
+    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+    if (!emailRegex.test(trimmed)) return 'Email inválido';
+    return null;
+  },
+  whatsapp: (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length < 10) return 'WhatsApp deve ter pelo menos 10 dígitos';
+    if (digits.length > 13) return 'WhatsApp muito longo';
+    return null;
+  },
+};
+
+function formatWhatsAppForApi(countryCode: string, localNumber: string): string {
+  const digits = localNumber.replace(/\D/g, '');
+  return `${countryCode}${digits}`;
+}
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [paymentStarted, setPaymentStarted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    whatsapp: '',
+    countryCode: '55',
+  });
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
 
-  const handlePayment = () => {
-    window.open(PAYMENT_URL, '_blank');
-    setPaymentStarted(true);
+  const validateField = (field: 'name' | 'email' | 'whatsapp') => {
+    const error = validators[field](formData[field]);
+    setErrors((prev) => ({ ...prev, [field]: error }));
+    return !error;
+  };
+
+  const isFormValid = () =>
+    !validators.name(formData.name) &&
+    !validators.email(formData.email) &&
+    !validators.whatsapp(formData.whatsapp);
+
+  const handlePayment = async () => {
+    const nameValid = validateField('name');
+    const emailValid = validateField('email');
+    const whatsappValid = validateField('whatsapp');
+    if (!nameValid || !emailValid || !whatsappValid) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const name = formData.name.trim();
+      const email = formData.email.trim().toLowerCase();
+      const whatsapp = formatWhatsAppForApi(formData.countryCode, formData.whatsapp);
+
+      const result = await createCheckout({
+        name,
+        email,
+        whatsapp,
+        utm_source: urlParams.get('utm_source'),
+        utm_medium: urlParams.get('utm_medium'),
+        utm_campaign: urlParams.get('utm_campaign'),
+      });
+
+      if (result.alreadyPaid) {
+        navigate('/checkout/sucesso');
+        return;
+      }
+
+      if (!result.url) {
+        if (result.errors) {
+          const firstError = Object.values(result.errors)[0];
+          setSubmitError(firstError || 'Não conseguimos gerar seu PIX. Tente de novo.');
+        } else {
+          setSubmitError('Não conseguimos gerar seu PIX. Tente de novo.');
+        }
+        return;
+      }
+
+      sessionStorage.setItem('zuno_checkout', JSON.stringify({ name, email, whatsapp }));
+      window.open(result.url, '_blank');
+      setPaymentStarted(true);
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setSubmitError('Não conseguimos gerar seu PIX. Tente de novo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleConfirmPayment = () => {
@@ -57,10 +145,15 @@ export default function CheckoutPage() {
 
               <button
                 onClick={handlePayment}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium py-3.5 rounded-xl hover:bg-zinc-800 hover:border-zinc-700 transition-colors"
+                disabled={isSubmitting}
+                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium py-3.5 rounded-xl hover:bg-zinc-800 hover:border-zinc-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Abrir pagamento novamente
+                {isSubmitting ? 'Gerando pagamento...' : 'Abrir pagamento novamente'}
               </button>
+
+              {submitError && (
+                <p className="text-red-400 text-sm">{submitError}</p>
+              )}
             </div>
 
             <p className="text-sm text-zinc-600 mt-8">
@@ -142,6 +235,56 @@ export default function CheckoutPage() {
             </p>
           </div>
 
+          {/* Form */}
+          <div className="space-y-3 mb-2">
+            <div>
+              <input
+                type="text"
+                placeholder="Seu nome"
+                value={formData.name}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  setErrors((prev) => ({ ...prev, name: null }));
+                }}
+                onBlur={() => validateField('name')}
+                className={`w-full bg-black/40 border rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none transition-all ${
+                  errors.name ? 'border-red-400/60 focus:border-red-400' : 'border-zinc-800 focus:border-zinc-600'
+                }`}
+              />
+              {errors.name && <p className="text-red-400 text-sm mt-2">{errors.name}</p>}
+            </div>
+
+            <div>
+              <input
+                type="email"
+                placeholder="seu@email.com"
+                value={formData.email}
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  setErrors((prev) => ({ ...prev, email: null }));
+                }}
+                onBlur={() => validateField('email')}
+                className={`w-full bg-black/40 border rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none transition-all ${
+                  errors.email ? 'border-red-400/60 focus:border-red-400' : 'border-zinc-800 focus:border-zinc-600'
+                }`}
+              />
+              {errors.email && <p className="text-red-400 text-sm mt-2">{errors.email}</p>}
+            </div>
+
+            <div>
+              <PhoneInput
+                value={formData.whatsapp}
+                onChange={(value, countryCode) => {
+                  setFormData({ ...formData, whatsapp: value, countryCode });
+                  setErrors((prev) => ({ ...prev, whatsapp: null }));
+                }}
+                onBlur={() => validateField('whatsapp')}
+                error={!!errors.whatsapp}
+              />
+              {errors.whatsapp && <p className="text-red-400 text-sm mt-2">{errors.whatsapp}</p>}
+            </div>
+          </div>
+
           {/* Spacer */}
           <div className="flex-1 min-h-8" />
 
@@ -159,11 +302,20 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {submitError && (
+              <p className="text-center text-red-400 text-sm mb-4">{submitError}</p>
+            )}
+
             <button
               onClick={handlePayment}
-              className="w-full bg-white text-zinc-950 font-medium py-4 rounded-xl hover:bg-zinc-100 transition-colors text-base"
+              disabled={isSubmitting || !isFormValid()}
+              className={`w-full font-medium py-4 rounded-xl transition-colors text-base ${
+                isSubmitting || !isFormValid()
+                  ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                  : 'bg-white text-zinc-950 hover:bg-zinc-100'
+              }`}
             >
-              Quero receber primeiro
+              {isSubmitting ? 'Gerando pagamento...' : 'Quero receber primeiro'}
             </button>
 
             <p className="text-center text-xs text-zinc-600 mt-4">

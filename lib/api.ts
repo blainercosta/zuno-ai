@@ -49,6 +49,24 @@ interface SimilarJobsData {
   limit?: number
 }
 
+interface CreateCheckoutData {
+  name: string
+  email: string
+  whatsapp: string
+  niche?: string
+  utm_source?: string | null
+  utm_medium?: string | null
+  utm_campaign?: string | null
+}
+
+interface CreateCheckoutResult {
+  url?: string
+  billingId?: string
+  alreadyPaid?: boolean
+  errors?: Record<string, string>
+  error?: string
+}
+
 /**
  * Envia uma nova vaga para aprovação via Edge Function
  */
@@ -126,6 +144,34 @@ export async function fetchSimilarJobs(data: SimilarJobsData): Promise<ApiRespon
     return result
   } catch (error) {
     console.error('Error fetching similar jobs:', error)
+    return { error: 'Erro de conexão. Tente novamente.' }
+  }
+}
+
+/**
+ * Cria um checkout AbacatePay individual (PIX) para o subscriber via Edge Function
+ */
+export async function createCheckout(data: CreateCheckoutData): Promise<CreateCheckoutResult> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(data),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      return result.errors ? { errors: result.errors } : { error: result.error || 'Erro ao gerar pagamento' }
+    }
+
+    return result
+  } catch (error) {
+    console.error('Error creating checkout:', error)
     return { error: 'Erro de conexão. Tente novamente.' }
   }
 }
