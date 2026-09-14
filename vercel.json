@@ -14,20 +14,20 @@
       }
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json|webp|avif|xml|txt|webmanifest))",
-      "dest": "/$1"
-    },
-    {
       "src": "/sitemap-news.xml",
       "dest": "/api/sitemap?type=news"
     },
     {
       "src": "/sitemap-jobs.xml",
       "dest": "/api/sitemap?type=jobs"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json|webp|avif|xml|txt|webmanifest))",
+      "dest": "/$1"
     },
     {
       "src": "/noticias-ia/(.+)",
