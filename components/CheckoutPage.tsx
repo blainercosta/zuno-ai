@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 // set VITE_ABACATEPAY_PAYMENT_URL in Vercel to a reusable link so swaps need no deploy.
 const PAYMENT_URL =
   import.meta.env.VITE_ABACATEPAY_PAYMENT_URL ??
-  'https://www.abacatepay.com/pay/bill_aJYE06HEdYEUx2fHd3L0mTNa';
+  'https://www.abacatepay.com/pay/bill_0TMmxNs4wD3Kh0w2aswempbX';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
