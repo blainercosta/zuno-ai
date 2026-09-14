@@ -62,6 +62,10 @@ echo "Deploying backfill-embeddings..."
 npx supabase functions deploy backfill-embeddings --project-ref "$SUPABASE_PROJECT_REF"
 
 echo ""
+echo "Deploying extract-job-insights..."
+npx supabase functions deploy extract-job-insights --project-ref "$SUPABASE_PROJECT_REF"
+
+echo ""
 echo "Deploying abacatepay-webhook..."
 npx supabase functions deploy abacatepay-webhook --project-ref "$SUPABASE_PROJECT_REF"
 
