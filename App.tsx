@@ -22,6 +22,8 @@ const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const CheckoutSuccessPage = lazy(() => import("./components/CheckoutSuccessPage"));
 const BetaTesterPage = lazy(() => import("./components/BetaTesterPage"));
 const SalariosPage = lazy(() => import("./components/SalariosPage"));
+const NichesIndexPage = lazy(() => import("./components/NichesIndexPage"));
+const NichePage = lazy(() => import("./components/NichePage"));
 
 // Loading Component
 function LoadingSpinner() {
@@ -542,6 +544,10 @@ export default function App() {
 
                 {/* Salaries route */}
                 <Route path="/salarios-ia" element={<SalariosPage />} />
+
+                {/* Niches routes - "IA para [nicho]" vertical hubs */}
+                <Route path="/ia-para" element={<NichesIndexPage />} />
+                <Route path="/ia-para/:slug" element={<NichePage />} />
 
                 {/* Professionals routes - Hidden in production */}
                 {import.meta.env.DEV && (

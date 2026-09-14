@@ -15,6 +15,7 @@ interface ApiResponse<T = unknown> {
   error?: string
   data?: T
   message?: string
+  referral_code?: string | null
 }
 
 interface JobData {
@@ -45,6 +46,7 @@ interface WaitlistData {
   name: string
   email: string
   phone: string
+  ref?: string
 }
 
 interface SimilarJobsData {

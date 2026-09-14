@@ -40,6 +40,58 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- IA para a sua área - Niches index -->
+  <url>
+    <loc>https://www.usezuno.app/ia-para</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- IA para a sua área - Niche pages -->
+  <url>
+    <loc>https://www.usezuno.app/ia-para/tech-startups</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/marketing</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/financas</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/saude</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/educacao</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/ecommerce</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.usezuno.app/ia-para/criadores-de-conteudo</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Beta Tester -->
   <url>
     <loc>https://www.usezuno.app/beta</loc>

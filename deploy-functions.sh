@@ -74,6 +74,10 @@ echo "Deploying create-checkout..."
 npx supabase functions deploy create-checkout --project-ref "$SUPABASE_PROJECT_REF"
 
 echo ""
+echo "Deploying seed-niches..."
+npx supabase functions deploy seed-niches --project-ref "$SUPABASE_PROJECT_REF"
+
+echo ""
 echo "=== Deploy concluído! ==="
 echo ""
 echo "Secret opcional (similar-jobs com IA):"
