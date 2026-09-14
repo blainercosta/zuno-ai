@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const PAYMENT_URL = 'https://www.abacatepay.com/pay/bill_aJYE06HEdYEUx2fHd3L0mTNa';
+// Reusable AbacatePay payment link. Single-use `bill_` URLs expire after one payment;
+// set VITE_ABACATEPAY_PAYMENT_URL in Vercel to a reusable link so swaps need no deploy.
+const PAYMENT_URL =
+  import.meta.env.VITE_ABACATEPAY_PAYMENT_URL ??
+  'https://www.abacatepay.com/pay/bill_aJYE06HEdYEUx2fHd3L0mTNa';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
