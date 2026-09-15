@@ -20,7 +20,7 @@ export default function JobStructuredData({ job }: JobStructuredDataProps) {
       '@context': 'https://schema.org/',
       '@type': 'JobPosting',
       title: job.job_title,
-      description: job.description_full || `Vaga de ${job.job_title} na ${job.company_name}`,
+      description: job.description_full || [job.about_company, job.responsibilities, job.requirements, job.differentials, job.benefits].filter(Boolean).join('\n\n') || `Vaga de ${job.job_title} na ${job.company_name}`,
       identifier: {
         '@type': 'PropertyValue',
         name: job.company_name,
