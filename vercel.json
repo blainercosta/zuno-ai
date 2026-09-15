@@ -76,6 +76,10 @@
     "api/kubo-ingest.ts": {
       "memory": 512,
       "maxDuration": 10
+    },
+    "api/phantombuster/[action].ts": {
+      "memory": 256,
+      "maxDuration": 10
     }
   }
 }
