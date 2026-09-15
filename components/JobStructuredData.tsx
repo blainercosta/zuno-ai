@@ -27,7 +27,8 @@ export default function JobStructuredData({ job }: JobStructuredDataProps) {
         value: job.job_id
       },
       datePosted: job.posted_at,
-      validThrough: new Date(new Date(job.posted_at || new Date()).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 dias
+      // Active job: validity is at least 14 days from now, never a past date (Google for Jobs drops expired postings)
+      validThrough: new Date(Math.max(new Date(job.posted_at || Date.now()).getTime() + 30 * 24 * 60 * 60 * 1000, Date.now() + 14 * 24 * 60 * 60 * 1000)).toISOString(),
       employmentType: job.employment_type?.toUpperCase() || 'FULL_TIME',
       hiringOrganization: {
         '@type': 'Organization',
