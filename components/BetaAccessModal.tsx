@@ -1,5 +1,10 @@
 import { useRef, useEffect, useState } from 'react';
 import { submitWaitlist } from '@/lib/api';
+import { track, EVENTS, identifyEmail } from '@/lib/analytics';
+
+// This modal doesn't collect a niche (unlike the BetaTesterPage/CheckoutSuccessPage
+// onboarding flows), so we report a fixed value to keep the event catalog consistent.
+const NO_NICHE = 'not_collected';
 
 interface BetaAccessModalProps {
   isOpen: boolean;
@@ -145,6 +150,8 @@ export default function BetaAccessModal({ isOpen, onClose }: BetaAccessModalProp
       }
 
       console.log('Beta waitlist signup successful:', result);
+      track(EVENTS.beta_signup_completed, { niche: NO_NICHE, has_ref: Boolean(ref) });
+      void identifyEmail(formData.email);
       setShowSuccess(true);
       setFormData({ name: '', email: '', phone: '' });
     } catch (error) {

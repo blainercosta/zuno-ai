@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { MessageCircle, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
@@ -12,6 +13,7 @@ import {
   getLinkedInShareUrl,
   getJobShareUrl
 } from "@/utils/tracking";
+import { track, EVENTS } from "@/lib/analytics";
 import { SimilarJobsListSkeleton } from "./Skeleton";
 
 interface JobDetailPageProps {
@@ -25,6 +27,16 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
 
   // Gera a URL compartilhável para esta vaga
   const jobUrl = job ? getJobShareUrl(job.job_id) : ''
+
+  useEffect(() => {
+    if (!job) return;
+    track(EVENTS.job_viewed, {
+      job_id: job.job_id,
+      company: job.company_name,
+      is_remote: Boolean(job.is_remote),
+      seniority: job.seniority_level,
+    });
+  }, [job]);
 
   if (!job) {
     return (
@@ -88,7 +100,10 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
             <p className="text-sm text-zinc-400 leading-[21px]">{job.location}</p>
           </div>
           <button
-            onClick={() => window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank')}
+            onClick={() => {
+              track(EVENTS.job_apply_clicked, { job_id: job.job_id, company: job.company_name, source_page: 'job_detail' });
+              window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
+            }}
             className="hidden sm:block bg-white text-slate-950 px-4 py-2 rounded-xl text-sm font-medium hover:bg-zinc-100 transition-colors shrink-0"
           >
             Candidatar-se
@@ -179,7 +194,10 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
 
         {/* Apply Button */}
         <button
-          onClick={() => window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank')}
+          onClick={() => {
+            track(EVENTS.job_apply_clicked, { job_id: job.job_id, company: job.company_name, source_page: 'job_detail' });
+            window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
+          }}
           className="w-full sm:w-auto bg-white text-slate-950 px-8 py-3 rounded-xl font-medium hover:bg-zinc-100 transition-colors mb-8"
         >
           Candidatar-se
@@ -198,7 +216,10 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
             <div className="flex items-center gap-4">
               <span className="text-sm text-zinc-400">Compartilhar:</span>
               <button
-                onClick={() => window.open(getTwitterShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}
+                onClick={() => {
+                  track(EVENTS.job_shared, { job_id: job.job_id, channel: 'twitter' });
+                  window.open(getTwitterShareUrl(job.job_title, job.company_name, jobUrl), '_blank');
+                }}
                 className="text-zinc-500 hover:text-white transition-colors"
                 title="Compartilhar no X"
               >
@@ -207,21 +228,30 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 </svg>
               </button>
               <button
-                onClick={() => window.open(getWhatsAppShareUrl(job.job_title, job.company_name, jobUrl), '_blank')}
+                onClick={() => {
+                  track(EVENTS.job_shared, { job_id: job.job_id, channel: 'whatsapp' });
+                  window.open(getWhatsAppShareUrl(job.job_title, job.company_name, jobUrl), '_blank');
+                }}
                 className="text-zinc-500 hover:text-white transition-colors"
                 title="Compartilhar no WhatsApp"
               >
                 <MessageCircle className="size-5" />
               </button>
               <button
-                onClick={() => window.open(getFacebookShareUrl(jobUrl), '_blank')}
+                onClick={() => {
+                  track(EVENTS.job_shared, { job_id: job.job_id, channel: 'facebook' });
+                  window.open(getFacebookShareUrl(jobUrl), '_blank');
+                }}
                 className="text-zinc-500 hover:text-white transition-colors"
                 title="Compartilhar no Facebook"
               >
                 <Facebook className="size-5" />
               </button>
               <button
-                onClick={() => window.open(getLinkedInShareUrl(jobUrl, job.job_title), '_blank')}
+                onClick={() => {
+                  track(EVENTS.job_shared, { job_id: job.job_id, channel: 'linkedin' });
+                  window.open(getLinkedInShareUrl(jobUrl, job.job_title), '_blank');
+                }}
                 className="text-zinc-500 hover:text-white transition-colors"
                 title="Compartilhar no LinkedIn"
               >
@@ -229,6 +259,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
               </button>
               <button
                 onClick={() => {
+                  track(EVENTS.job_shared, { job_id: job.job_id, channel: 'copy' });
                   navigator.clipboard.writeText(`${jobUrl}?utm_source=direct&utm_medium=share&utm_campaign=zuno`)
                   alert('Link copiado! Compartilhe a vaga do Zuno AI 🤖')
                 }}

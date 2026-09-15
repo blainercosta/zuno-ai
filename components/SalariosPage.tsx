@@ -4,6 +4,7 @@ import { useSalaryStats, useTopSkills } from "@/hooks/useJobInsights";
 import { shareOnWhatsApp, shareOnLinkedIn, shareOnTwitter, copyToClipboard } from "@/utils/shareUtils";
 import Footer from "./Footer";
 import { Skeleton } from "./Skeleton";
+import { track, EVENTS } from "@/lib/analytics";
 
 const SENIORITY_LABELS: Record<string, string> = {
   junior: "Júnior",
@@ -74,8 +75,12 @@ export default function SalariosPage() {
     [skills]
   );
 
-  const pageUrl = typeof window !== "undefined" ? window.location.href : "https://zuno.ai/salarios-ia";
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "https://www.usezuno.app/salarios-ia";
   const pageTitle = "Salários e skills em vagas de IA no Brasil";
+
+  useEffect(() => {
+    track(EVENTS.salarios_viewed, {});
+  }, []);
 
   useEffect(() => {
     document.title = `${pageTitle} | Zuno AI`;
@@ -130,9 +135,9 @@ export default function SalariosPage() {
       creator: {
         "@type": "Organization",
         name: "Zuno AI",
-        url: "https://zuno.ai",
+        url: "https://www.usezuno.app",
       },
-      license: "https://zuno.ai/salarios-ia",
+      license: "https://www.usezuno.app/salarios-ia",
     };
 
     script.textContent = JSON.stringify(structuredData);

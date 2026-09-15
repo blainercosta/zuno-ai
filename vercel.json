@@ -56,6 +56,72 @@
       ]
     },
     {
+      "src": "/profissoes",
+      "dest": "/api/og-page?type=professions",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
+      "src": "/profissoes/([a-z0-9-]{1,80})",
+      "dest": "/api/og-page?type=profession&slug=$1",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
+      "src": "/ia-para",
+      "dest": "/api/og-page?type=niches",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
+      "src": "/ia-para/([a-z0-9-]{1,80})",
+      "dest": "/api/og-page?type=niche&slug=$1",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
+      "src": "/salarios-ia",
+      "dest": "/api/og-page?type=salarios",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
+      "src": "/quiz",
+      "dest": "/api/og-page?type=quiz",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Slackbot|TelegramBot|Discordbot|Googlebot|Google-InspectionTool|bingbot).*"
+        }
+      ]
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     },
@@ -70,6 +136,10 @@
       "maxDuration": 10
     },
     "api/og-job.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/og-page.ts": {
       "memory": 1024,
       "maxDuration": 10
     },

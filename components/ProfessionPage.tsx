@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useProfession, useProfessionFeed, CLUSTER_LABELS, BAND_LABELS, BAND_COLORS } from "@/hooks/useProfessions";
 import { shareOnLinkedIn, shareOnTwitter, copyToClipboard } from "@/utils/shareUtils";
+import { track, EVENTS } from "@/lib/analytics";
 import { NewsPreviewCard, JobPreviewCard } from "./PreviewCards";
 import BreadcrumbSchema from "./BreadcrumbSchema";
 import Footer from "./Footer";
@@ -101,6 +102,12 @@ export default function ProfessionPage() {
     }
   }, [isLoadingProfession, slug, profession, navigate]);
 
+  useEffect(() => {
+    if (profession) {
+      track(EVENTS.profession_viewed, { slug: profession.slug, band: profession.exposure_band });
+    }
+  }, [profession]);
+
   if (!slug) {
     return null;
   }
@@ -119,6 +126,7 @@ export default function ProfessionPage() {
   const pageUrl = typeof window !== "undefined" ? window.location.href : `https://usezuno.app/profissoes/${profession.slug}`;
   const shareTitle = `Como a IA afeta a profissão de ${profession.name}?`;
   const shareOnWhatsAppMessage = () => {
+    track(EVENTS.profession_shared, { slug: profession.slug, channel: 'whatsapp' });
     const text = encodeURIComponent(`${shareTitle} Veja a análise: ${pageUrl}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
@@ -308,21 +316,30 @@ export default function ProfessionPage() {
               WhatsApp
             </button>
             <button
-              onClick={() => shareOnLinkedIn(pageUrl)}
+              onClick={() => {
+                track(EVENTS.profession_shared, { slug: profession.slug, channel: 'linkedin' });
+                shareOnLinkedIn(pageUrl);
+              }}
               className="p-2 rounded-lg border border-zinc-800 hover:bg-zinc-900 transition-colors text-zinc-400 text-[13px]"
               aria-label="Compartilhar no LinkedIn"
             >
               LinkedIn
             </button>
             <button
-              onClick={() => shareOnTwitter(shareTitle, pageUrl)}
+              onClick={() => {
+                track(EVENTS.profession_shared, { slug: profession.slug, channel: 'twitter' });
+                shareOnTwitter(shareTitle, pageUrl);
+              }}
               className="p-2 rounded-lg border border-zinc-800 hover:bg-zinc-900 transition-colors text-zinc-400 text-[13px]"
               aria-label="Compartilhar no X"
             >
               X
             </button>
             <button
-              onClick={() => copyToClipboard(pageUrl)}
+              onClick={() => {
+                track(EVENTS.profession_shared, { slug: profession.slug, channel: 'copy' });
+                copyToClipboard(pageUrl);
+              }}
               className="p-2 rounded-lg border border-zinc-800 hover:bg-zinc-900 transition-colors text-zinc-400 text-[13px]"
               aria-label="Copiar link"
             >

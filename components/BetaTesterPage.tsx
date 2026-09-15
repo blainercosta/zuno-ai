@@ -5,6 +5,7 @@ import PhoneInput from './PhoneInput';
 import { getWhatsAppUrl } from '@/lib/constants';
 import { supabase } from '@/lib/supabase';
 import { copyToClipboard, shareOnWhatsApp } from '@/utils/shareUtils';
+import { track, EVENTS, identifyEmail } from '@/lib/analytics';
 
 const REF_STORAGE_KEY = 'zuno_ref';
 
@@ -145,6 +146,7 @@ export default function BetaTesterPage() {
       // Salvar antes de ir para o step 6
       const saved = await saveSubscriber();
       if (saved) {
+        track(EVENTS.beta_step_completed, { step });
         setStep(step + 1);
       }
       return;
@@ -158,6 +160,7 @@ export default function BetaTesterPage() {
     };
     const field = fieldMap[step];
     if (field && validateField(field)) {
+      track(EVENTS.beta_step_completed, { step });
       setStep(step + 1);
     }
   };
@@ -218,6 +221,10 @@ export default function BetaTesterPage() {
       if (result.data?.referral_code) {
         setReferralCode(result.data.referral_code);
       }
+
+      const niche = showCustomNiche ? formData.nichoCustom.trim() : formData.nicho;
+      track(EVENTS.beta_signup_completed, { niche, has_ref: Boolean(ref) });
+      void identifyEmail(formData.email, { niche });
 
       return true;
     } catch (err) {
@@ -577,12 +584,14 @@ function ReferralInvite({ referralCode, referralCount }: ReferralInviteProps) {
   const handleCopy = async () => {
     const ok = await copyToClipboard(referralLink);
     if (ok) {
+      track(EVENTS.referral_link_copied);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleShareWhatsApp = () => {
+    track(EVENTS.referral_shared, { channel: 'whatsapp' });
     // shareOnWhatsApp builds "title - url"; title carries the pitch, url the link
     shareOnWhatsApp('Estou recebendo notícias de IA em português pelo Zuno. Entra comigo', referralLink);
   };

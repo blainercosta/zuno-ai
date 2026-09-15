@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { trackPageview } from "@/lib/analytics";
 import JobsPage from "./components/JobsPage";
 import { supabase } from "@/lib/supabase";
 import type { Job } from "@/types/job";
@@ -27,6 +28,27 @@ const NichePage = lazy(() => import("./components/NichePage"));
 const ProfessionsIndexPage = lazy(() => import("./components/ProfessionsIndexPage"));
 const ProfessionPage = lazy(() => import("./components/ProfessionPage"));
 const QuizPage = lazy(() => import("./components/QuizPage"));
+
+// Allowlist of query params safe to forward to analytics — everything else
+// (ref, email, etc.) is stripped before the pageview is tracked.
+const TRACKED_QUERY_PARAMS = ['perfil', 'niche', 'categoria'];
+
+function RouteTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const filteredParams = new URLSearchParams();
+    for (const key of TRACKED_QUERY_PARAMS) {
+      const value = params.get(key);
+      if (value) filteredParams.set(key, value);
+    }
+    const query = filteredParams.toString();
+    trackPageview(query ? `${location.pathname}?${query}` : location.pathname);
+  }, [location.pathname, location.search]);
+
+  return null;
+}
 
 // Loading Component
 function LoadingSpinner() {
@@ -521,6 +543,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <RouteTracker />
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           {/* Settings route - Outside Layout (no sidebar) */}

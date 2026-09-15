@@ -1,6 +1,7 @@
 import { useState, FormEvent, useRef } from 'react'
 import { submitJob } from '@/lib/api'
 import { supabase } from '@/lib/supabase'
+import { track, EVENTS } from '@/lib/analytics'
 import Footer from './Footer'
 
 interface PostJobPageProps {
@@ -234,6 +235,7 @@ export default function PostJobPage({ onBack }: PostJobPageProps) {
         throw new Error(result.error)
       }
 
+      track(EVENTS.post_job_submitted)
       setShowSuccess(true)
       setMessage({ type: 'success', text: 'Vaga recebida. Publicamos após revisão, geralmente em até 24h.' })
 
