@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PhoneInput from './PhoneInput';
 import { createCheckout } from '@/lib/api';
+import { track, EVENTS } from '@/lib/analytics';
 
 // Validação (mesmas regras usadas em BetaTesterPage/CheckoutSuccessPage e na Edge Function)
 const validators = {
@@ -79,6 +80,7 @@ export default function CheckoutPage() {
       });
 
       if (result.alreadyPaid) {
+        track(EVENTS.checkout_already_paid);
         navigate('/checkout/sucesso');
         return;
       }
@@ -93,8 +95,12 @@ export default function CheckoutPage() {
         return;
       }
 
+      track(EVENTS.checkout_started);
       sessionStorage.setItem('zuno_checkout', JSON.stringify({ name, email, whatsapp }));
       window.open(result.url, '_blank');
+      if (result.billingId) {
+        track(EVENTS.checkout_pix_opened, { billing_id: result.billingId });
+      }
       setPaymentStarted(true);
     } catch (err) {
       console.error('Checkout error:', err);

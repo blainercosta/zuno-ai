@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuizProfessions, CLUSTER_LABELS, type ProfessionCluster, type QuizProfession } from "@/hooks/useProfessions";
 import Footer from "./Footer";
+import { track, EVENTS } from "@/lib/analytics";
 
 const PAGE_TITLE = "Seu emprego está em risco pela IA? Faça o teste | Zuno AI";
 const PAGE_DESCRIPTION =
@@ -88,6 +89,10 @@ export default function QuizPage() {
   const [cluster, setCluster] = useState<ProfessionCluster | null>(null);
   const [profession, setProfession] = useState<QuizProfession | null>(null);
 
+  useEffect(() => {
+    track(EVENTS.quiz_started);
+  }, []);
+
   const clusters = useMemo(() => {
     const seen = new Set<ProfessionCluster>();
     const list: ProfessionCluster[] = [];
@@ -107,16 +112,20 @@ export default function QuizPage() {
 
   const handleSelectCluster = (selected: ProfessionCluster) => {
     setCluster(selected);
+    track(EVENTS.quiz_step_completed, { step: 1 });
     setStep(2);
   };
 
   const handleSelectProfession = (selected: QuizProfession) => {
     setProfession(selected);
+    track(EVENTS.quiz_step_completed, { step: 2 });
     setStep(3);
   };
 
   const handleFinish = (dailyProfile: DailyProfile) => {
     if (!profession) return;
+    track(EVENTS.quiz_step_completed, { step: 3 });
+    track(EVENTS.quiz_completed, { profession_slug: profession.slug, perfil: dailyProfile });
     navigate(`/profissoes/${profession.slug}?perfil=${dailyProfile}`);
   };
 

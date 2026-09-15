@@ -4,6 +4,7 @@ import { formatRelativeDate, getDateColor } from "@/utils/date";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
 import { getJobApplicationUrl } from "@/utils/tracking";
+import { track, EVENTS } from "@/lib/analytics";
 import OrganizationSchema from "./OrganizationSchema";
 import BreadcrumbSchema from "./BreadcrumbSchema";
 import FAQSchema from "./FAQSchema";
@@ -259,6 +260,7 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                     className="bg-white text-slate-950 px-4 py-2.5 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[14px] leading-[14px]"
                     onClick={(e) => {
                       e.stopPropagation();
+                      track(EVENTS.job_apply_clicked, { job_id: job.job_id, company: job.company_name, source_page: 'jobs_list' });
                       window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
                     }}
                   >
@@ -272,6 +274,7 @@ export default function JobsPage({ onJobClick, onPostJobClick, onNewsClick }: Jo
                     className="bg-white text-slate-950 px-4 py-2.5 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[14px] leading-[14px]"
                     onClick={(e) => {
                       e.stopPropagation();
+                      track(EVENTS.job_apply_clicked, { job_id: job.job_id, company: job.company_name, source_page: 'jobs_list' });
                       window.open(getJobApplicationUrl(job.job_url, job.job_id), '_blank');
                     }}
                   >

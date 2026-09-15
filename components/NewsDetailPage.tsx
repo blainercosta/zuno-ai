@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import type { News } from '@/types/news';
 import { shareOnTwitter, shareOnLinkedIn, shareOnWhatsApp, copyToClipboard, generateSlug } from '@/utils/shareUtils';
 import { useSimilarNews } from '@/hooks/useSimilarNews';
+import { track, EVENTS } from '@/lib/analytics';
 import NewsSEO from './NewsSEO';
 import { NewsDetailSkeleton } from './Skeleton';
 import StructuredContent from './StructuredContent';
@@ -252,6 +253,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
             excerpt: newsData.subtitle || newsData.excerpt,
             read_time: newsData.read_time || '5 min'
           });
+          track(EVENTS.news_viewed, { news_id: newsData.id, category: newsData.category ?? newsData.raw_category ?? null });
         } else if (newsError) {
           console.error('Error fetching news detail:', newsError);
         }
@@ -266,6 +268,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
         if (postData) {
           setNews(postData);
+          track(EVENTS.news_viewed, { news_id: postData.id, category: postData.category ?? postData.raw_category ?? null });
         } else if (postError) {
           console.error('Error fetching post detail:', postError);
         }
@@ -280,6 +283,7 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
   const handleCopyLink = async () => {
     const success = await copyToClipboard(currentUrl);
     if (success) {
+      if (news) track(EVENTS.news_shared, { news_id: news.id, channel: 'copy' });
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     }
@@ -287,17 +291,20 @@ export default function NewsDetailPage({ newsId, onBack }: NewsDetailPageProps) 
 
   const handleShareWhatsApp = () => {
     if (news) {
+      track(EVENTS.news_shared, { news_id: news.id, channel: 'whatsapp' });
       shareOnWhatsApp(news.title, currentUrl);
     }
   };
 
   const handleShareTwitter = () => {
     if (news) {
+      track(EVENTS.news_shared, { news_id: news.id, channel: 'twitter' });
       shareOnTwitter(news.title, currentUrl);
     }
   };
 
   const handleShareLinkedIn = () => {
+    if (news) track(EVENTS.news_shared, { news_id: news.id, channel: 'linkedin' });
     shareOnLinkedIn(currentUrl);
   };
 

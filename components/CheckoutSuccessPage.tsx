@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SUBSCRIBER_NICHES } from '@/types/subscriber';
 import { getWhatsAppUrl } from '@/lib/constants';
+import { track, EVENTS, identifyEmail } from '@/lib/analytics';
 
 // Supabase config
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -133,6 +134,7 @@ export default function CheckoutSuccessPage() {
           return;
         }
       }
+      track(EVENTS.beta_step_completed, { step });
       setStep(step + 1);
       return;
     }
@@ -145,6 +147,7 @@ export default function CheckoutSuccessPage() {
     };
     const field = fieldMap[step];
     if (field && validateField(field)) {
+      track(EVENTS.beta_step_completed, { step });
       setStep(step + 1);
     }
   };
@@ -211,6 +214,10 @@ export default function CheckoutSuccessPage() {
   const handleFinish = async () => {
     const saved = await saveSubscriber();
     if (!saved) return;
+
+    const niche = getNicho();
+    track(EVENTS.beta_signup_completed, { niche, has_ref: false });
+    void identifyEmail(formData.email, { niche });
 
     const message =
       `Oi! Acabei de assinar o Zuno AI.\n\n` +
