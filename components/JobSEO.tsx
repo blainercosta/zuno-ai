@@ -40,7 +40,7 @@ export default function JobSEO({ job, url }: JobSEOProps) {
   useEffect(() => {
     const location = job.is_remote ? 'Remoto' : job.location || 'Brasil';
     const title = `${job.job_title} - ${job.company_name} (${location}) | Vagas de IA - Zuno AI`;
-    const source = stripHtml(job.description_full) || `Vaga de ${job.job_title} na ${job.company_name}.`;
+    const source = stripHtml(job.description_full || job.responsibilities || job.requirements || job.about_company) || `Vaga de ${job.job_title} na ${job.company_name}.`;
     const description = source.length > 155 ? `${source.slice(0, 152).trimEnd()}...` : source;
 
     document.title = title;

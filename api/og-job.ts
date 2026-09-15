@@ -107,7 +107,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: job, error } = await supabase
       .from('vagas_ia')
       .select(
-        'job_id, job_title, company_name, company_url, logo_url, location, seniority_level, employment_type, is_remote, description_full, salary, job_url, posted_at, status'
+        'job_id, job_title, company_name, company_url, logo_url, location, seniority_level, employment_type, is_remote, description_full, about_company, responsibilities, requirements, differentials, benefits, salary, job_url, posted_at, status'
       )
       .eq('job_id', jobId)
       .eq('status', 'active')
@@ -122,10 +122,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const companyName = escapeHtml(job.company_name ?? '');
     const applyUrl = isSafeHttpUrl(job.job_url) ? job.job_url : canonicalUrl;
     const location = escapeHtml(job.location || '');
-    const descriptionSource = job.description_full
+    // Many jobs have no description_full; the text lives in section columns.
+    // Build one full description for JobPosting (Google for Jobs requires it) and a short meta.
+    const sections: Array<[string, string | null | undefined]> = [
+      ['Sobre a empresa', job.about_company],
+      ['Responsabilidades', job.responsibilities],
+      ['Requisitos', job.requirements],
+      ['Diferenciais', job.differentials],
+      ['Benefícios', job.benefits],
+    ];
+    const fullDescription = job.description_full
       ? stripHtml(job.description_full)
-      : `Vaga de ${job.job_title ?? ''} na ${job.company_name ?? ''}`;
-    const description = escapeHtml(descriptionSource.substring(0, 160));
+      : sections
+          .filter(([, v]) => v && stripHtml(v).length > 0)
+          .map(([label, v]) => `${label}: ${stripHtml(v as string)}`)
+          .join('\n\n');
+    const descriptionSource = fullDescription || `Vaga de ${job.job_title ?? ''} na ${job.company_name ?? ''}`;
+    // Meta description: prefer responsibilities/requirements over company boilerplate
+    const metaSource = stripHtml(job.description_full || job.responsibilities || job.requirements || job.about_company || '') || descriptionSource;
+    const description = escapeHtml(metaSource.substring(0, 160));
+
+    // Visible sections for non-JS crawlers (escaped)
+    const bodySections = job.description_full
+      ? `<p>${escapeHtml(stripHtml(job.description_full))}</p>`
+      : sections
+          .filter(([, v]) => v && stripHtml(v).length > 0)
+          .map(([label, v]) => `<h2>${escapeHtml(label)}</h2><p>${escapeHtml(stripHtml(v as string))}</p>`)
+          .join('\n  ') || `<p>${description}</p>`;
 
     const originalImageUrl = job.logo_url || '';
     const imageUrl = originalImageUrl
@@ -215,7 +238,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 <body>
   <h1>${title}</h1>
   <p>${companyName}${location ? ` · ${location}` : ''}</p>
-  <p>${description}</p>
+  ${bodySections}
   <p><a href="${escapeHtml(applyUrl)}" rel="nofollow noopener">Candidatar-se</a></p>
   <p><a href="${canonicalUrl}">Ver vaga completa em Zuno AI</a></p>
 </body>
