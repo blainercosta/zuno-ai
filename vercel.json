@@ -22,6 +22,10 @@
       "dest": "/api/sitemap?type=jobs"
     },
     {
+      "src": "/sitemap-professions.xml",
+      "dest": "/api/sitemap?type=professions"
+    },
+    {
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
     },

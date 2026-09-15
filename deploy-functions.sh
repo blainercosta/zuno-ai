@@ -78,6 +78,14 @@ echo "Deploying seed-niches..."
 npx supabase functions deploy seed-niches --project-ref "$SUPABASE_PROJECT_REF"
 
 echo ""
+echo "Deploying build-profession-index..."
+npx supabase functions deploy build-profession-index --project-ref "$SUPABASE_PROJECT_REF"
+
+echo ""
+echo "Deploying sitemap-professions..."
+npx supabase functions deploy sitemap-professions --project-ref "$SUPABASE_PROJECT_REF"
+
+echo ""
 echo "=== Deploy concluído! ==="
 echo ""
 echo "Secret opcional (similar-jobs com IA):"

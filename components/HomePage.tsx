@@ -154,6 +154,30 @@ export default function HomePage({
           </section>
         )}
 
+        {/* Seu emprego está em risco pela IA? */}
+        <section className="px-4 md:px-6 lg:px-8 mb-12 md:mb-16">
+          <div className="max-w-[896px] mx-auto border border-zinc-800 rounded-2xl p-6 md:p-10 text-center">
+            <h2 className="text-lg md:text-xl mb-2">Seu emprego está em risco pela IA?</h2>
+            <p className="text-sm text-zinc-400 mb-6 max-w-[420px] mx-auto">
+              Descubra em 1 minuto o quanto a IA já afeta a sua profissão, com base em vagas e notícias reais.
+            </p>
+            <button
+              onClick={() => navigate("/quiz")}
+              className="bg-white text-slate-950 px-6 py-3 rounded-xl border border-slate-950 hover:bg-zinc-100 transition-colors text-[15px] leading-[15px] mb-4"
+            >
+              Fazer o teste de 1 minuto
+            </button>
+            <div>
+              <button
+                onClick={() => navigate("/profissoes")}
+                className="text-zinc-500 hover:text-zinc-300 transition-colors text-[14px] underline underline-offset-4"
+              >
+                Ver todas as profissões
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* Receba no WhatsApp */}
         <section className="px-4 md:px-6 lg:px-8 mb-12 md:mb-16">
           <div className="max-w-[896px] mx-auto border border-zinc-800 rounded-2xl p-6 md:p-10 text-center">

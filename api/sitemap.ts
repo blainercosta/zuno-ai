@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Proxies /sitemap-news.xml and /sitemap-jobs.xml to the corresponding
-// Supabase Edge Function, since the project's Supabase URL is only
-// available via env vars (not a literal in the repo) and can't be
-// hardcoded into a vercel.json rewrite.
+// Proxies /sitemap-news.xml, /sitemap-jobs.xml and /sitemap-professions.xml
+// to the corresponding Supabase Edge Function, since the project's Supabase
+// URL is only available via env vars (not a literal in the repo) and can't
+// be hardcoded into a vercel.json rewrite.
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 
 const FALLBACK_XML =
@@ -12,7 +12,7 @@ const FALLBACK_XML =
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { type } = req.query;
 
-  if (type !== 'news' && type !== 'jobs') {
+  if (type !== 'news' && type !== 'jobs' && type !== 'professions') {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     return res.status(404).send(FALLBACK_XML);
   }

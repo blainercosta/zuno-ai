@@ -92,6 +92,22 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Como a IA afeta cada profissão -->
+  <url>
+    <loc>https://www.usezuno.app/profissoes</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Quiz: seu emprego está em risco pela IA? -->
+  <url>
+    <loc>https://www.usezuno.app/quiz</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Beta Tester -->
   <url>
     <loc>https://www.usezuno.app/beta</loc>
