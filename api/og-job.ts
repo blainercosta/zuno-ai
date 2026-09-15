@@ -133,7 +133,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       : `${baseUrl}/og-cover.png`;
 
     const postedAt = job.posted_at || new Date().toISOString();
-    const validThrough = new Date(new Date(postedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    // Active job: at least 14 days from now, never in the past
+    const validThrough = new Date(Math.max(new Date(postedAt).getTime() + 30 * 24 * 60 * 60 * 1000, Date.now() + 14 * 24 * 60 * 60 * 1000)).toISOString();
     const employmentType = mapEmploymentType(job.employment_type);
 
     const jobLocationJsonLd = job.is_remote

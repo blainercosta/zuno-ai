@@ -1,8 +1,9 @@
-import { Mail, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
+import { MessageCircle, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useSimilarJobs } from "@/hooks/useSimilarJobs";
 import type { Job } from "@/types/job";
 import Footer from "./Footer";
 import JobStructuredData from "./JobStructuredData";
+import JobSEO from "./JobSEO";
 import {
   getJobApplicationUrl,
   getWhatsAppShareUrl,
@@ -36,6 +37,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
   return (
     <div className="min-h-screen bg-zinc-950">
       {/* Structured Data para SEO */}
+      <JobSEO job={job} url={jobUrl} />
       <JobStructuredData job={job} />
 
       {/* Header */}
@@ -209,7 +211,7 @@ export default function JobDetailPage({ onBack, onJobClick, job }: JobDetailPage
                 className="text-zinc-500 hover:text-white transition-colors"
                 title="Compartilhar no WhatsApp"
               >
-                <Mail className="size-5" />
+                <MessageCircle className="size-5" />
               </button>
               <button
                 onClick={() => window.open(getFacebookShareUrl(jobUrl), '_blank')}
