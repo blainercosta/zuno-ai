@@ -24,6 +24,9 @@ const BetaTesterPage = lazy(() => import("./components/BetaTesterPage"));
 const SalariosPage = lazy(() => import("./components/SalariosPage"));
 const NichesIndexPage = lazy(() => import("./components/NichesIndexPage"));
 const NichePage = lazy(() => import("./components/NichePage"));
+const ProfessionsIndexPage = lazy(() => import("./components/ProfessionsIndexPage"));
+const ProfessionPage = lazy(() => import("./components/ProfessionPage"));
+const QuizPage = lazy(() => import("./components/QuizPage"));
 
 // Loading Component
 function LoadingSpinner() {
@@ -548,6 +551,11 @@ export default function App() {
                 {/* Niches routes - "IA para [nicho]" vertical hubs */}
                 <Route path="/ia-para" element={<NichesIndexPage />} />
                 <Route path="/ia-para/:slug" element={<NichePage />} />
+
+                {/* Professions routes - "IA por profissão" exposure pages */}
+                <Route path="/profissoes" element={<ProfessionsIndexPage />} />
+                <Route path="/profissoes/:slug" element={<ProfessionPage />} />
+                <Route path="/quiz" element={<QuizPage />} />
 
                 {/* Professionals routes - Hidden in production */}
                 {import.meta.env.DEV && (
